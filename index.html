@@ -252,8 +252,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="eyebrow">Step 1</div>
     <h2 class="t">Who are you?</h2>
     <p class="sub">আপনার নাম বেছে নিন</p>
-    <label>Name — Department</label>
-    <select id="doerSel" onchange="onDoer()"><option value="">Select your name</option></select>
+    <label>Name</label>
+    <select id="empSel" onchange="onEmp()"><option value="">Select your name</option></select>
     <div id="linkWarn"></div>
   </div>
 
@@ -261,17 +261,26 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="eyebrow">Step 2</div>
     <h2 class="t">What are you doing?</h2>
     <div class="seg">
-      <button class="on" id="tChk" onclick="setMode('Checklist')">Checklist<small>Pending planned tasks</small></button>
+      <button class="on" id="tChk" onclick="setMode('Checklist')">Checklist<small>Daily / Weekly / Monthly</small></button>
       <button id="tBrk" onclick="setMode('Breakdown')">Breakdown<small>Repair &amp; problem log</small></button>
     </div>
   </div>
 
   <div class="panel panel-pad hide" id="cardMachine">
-    <div class="eyebrow">Step 3 · optional</div>
+    <div class="eyebrow">Step 3</div>
     <h2 class="t">Which machine?</h2>
-    <p class="sub">Report ke header ke liye. Chhod bhi sakta hai.</p>
+    <p class="sub">তালিকায় না থাকলে Other বেছে নিন</p>
     <label>Machine</label>
-    <select id="macSel" onchange="onMachine()"><option value="">Not linked to a machine</option></select>
+    <select id="macSel" onchange="onMachine()"><option value="">Select machine</option></select>
+    <div id="otherBox" class="hide">
+      <div class="grid">
+        <div><label>Tag / model number</label><input id="macOther" placeholder="K-2216200" oninput="onOther()"></div>
+        <div><label>Machine type</label>
+          <select id="macOtherType" onchange="render()">
+            <option value="MOTOR">Motor</option><option value="PUMP">Pump</option><option value="FILTER">Filter</option>
+          </select></div>
+      </div>
+    </div>
   </div>
 
   <div id="macSummary"></div>
@@ -362,7 +371,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div><label>To</label><input id="fTo" type="date" onchange="loadEntries()"></div>
     </div>
     <div class="grid">
-      <div><label>Doer</label><select id="fDoer" onchange="applyFilter()"><option value="">All doers</option></select></div>
+      <div><label>Employee</label><select id="fDoer" onchange="applyFilter()"><option value="">All employees</option></select></div>
       <div><label>Machine</label><select id="fMac" onchange="applyFilter()"><option value="">All machines</option></select></div>
       <div><label>Status</label><select id="fStat" onchange="applyFilter()">
         <option value="">All status</option><option value="ok">Normal</option><option value="att">Attention</option></select></div>
@@ -396,16 +405,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* =====================================================================
  * CONFIG — paste your GAS /exec URL here
  * ===================================================================== */
-var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbwCHdTZ-Fb4C0sbCwR7fCi4bCNprj3zzYAKPVjEP-WChAqEJaCthFwsL6qbn2kJUffO/exec';
+var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbzV0tFmm7LfahG27sGP9kJdc9stkmdE4vOcd4m-VfgYcrxhPhPex0ow6xpi7Gg1vMWS/exec';
 var API = localStorage.getItem('mmc_api') || API_DEFAULT;
 
 var ST = {
-  doers: [], machines: [], tasks: [], entries: [],
-  mode: 'Checklist', doer: '', dept: '', machine: null,
-  answers: {}, linked: true
+  employees: [], machines: [], items: [], last: {}, entries: [],
+  mode: 'Checklist', emp: '', machine: null, otherText: '',
+  answers: {}, weeklyDays: 7, monthlyDays: 30
 };
-
-var READ_RE = /temperature|voltage|current|insulation|pressure|reading|level|km|kilometre|kilometer|hours|meter/i;
 
 /* ---------------- helpers ---------------- */
 function $(id){ return document.getElementById(id); }
@@ -443,6 +450,15 @@ function api(payload){
   });
 }
 
+function todayStr(){
+  var d = new Date();
+  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+}
+function daysBetween(a, b){
+  if(!a) return 9999;
+  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
+}
+
 /* ---------------- boot ---------------- */
 function boot(){
   if(!API || API.indexOf('macros') < 0){
@@ -451,15 +467,18 @@ function boot(){
   }
   api({ action:'boot' }).then(function(r){
     if(!r.ok) throw new Error(r.error || 'Boot failed');
-    ST.doers = r.doers || [];
+    ST.employees = r.employees || [];
     ST.machines = r.machines || [];
-    ST.linked = !!r.checklist_linked;
+    ST.items = r.items || [];
+    ST.last = r.last || {};
+    ST.weeklyDays = r.weekly_days || 7;
+    ST.monthlyDays = r.monthly_days || 30;
     $('coName').textContent = String(r.company || 'S.P. Group').toUpperCase();
     $('verFoot').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
-    fillDoers();
+    fillEmployees();
     fillMachines();
-    if(!ST.doers.length){
-      $('linkWarn').innerHTML = '<div class="linkwarn">Koi doer nahi mila. Sheet me menu → Maintenance → Setup → Doers me naam daal, phir Create Checklist chala.</div>';
+    if(!ST.employees.length){
+      $('linkWarn').innerHTML = '<div class="linkwarn">Koi employee nahi mila. Sheet me menu → Maintenance → ➕ ADD se naam daal.</div>';
     }
     banner('ok', 'Connected');
     setTimeout(function(){ banner('', ''); }, 1800);
@@ -477,45 +496,42 @@ function askUrl(){
   location.reload();
 }
 
-function fillDoers(){
-  var s = $('doerSel'), f = $('fDoer');
+function fillEmployees(){
+  var s = $('empSel'), f = $('fDoer');
   s.innerHTML = '<option value="">Select your name</option>';
-  f.innerHTML = '<option value="">All doers</option>';
-  ST.doers.forEach(function(d, i){
+  f.innerHTML = '<option value="">All employees</option>';
+  ST.employees.forEach(function(e){
     var o = document.createElement('option');
-    o.value = String(i);
-    o.textContent = d.name + (d.dept ? ' — ' + d.dept : '');
+    o.value = e.name;
+    o.textContent = e.name + (e.role ? ' · ' + e.role : '');
     s.appendChild(o);
     var o2 = document.createElement('option');
-    o2.value = d.name; o2.textContent = d.name;
+    o2.value = e.name; o2.textContent = e.name;
     f.appendChild(o2);
   });
-  var saved = localStorage.getItem('mmc_doer');
-  if(saved !== null && ST.doers[saved]){ s.value = saved; onDoer(); }
+  var saved = localStorage.getItem('mmc_emp');
+  if(saved){ s.value = saved; if(s.value) onEmp(); }
 }
 
 function fillMachines(){
-  var o = '<option value="">Not linked to a machine</option>';
+  var o = '<option value="">Select machine</option>';
   var f = '<option value="">All machines</option>';
   ST.machines.forEach(function(m){
     o += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + (m.location ? ' — ' + esc(m.location) : '') + '</option>';
     f += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + '</option>';
   });
+  o += '<option value="__OTHER__">Other / not in list</option>';
   $('macSel').innerHTML = o;
   $('fMac').innerHTML = f;
 }
 
 /* ---------------- flow ---------------- */
-function onDoer(){
-  var idx = $('doerSel').value;
-  var d = ST.doers[idx];
-  if(!d){ ST.doer = ''; return; }
-  ST.doer = d.name;
-  ST.dept = d.dept || '';
-  localStorage.setItem('mmc_doer', idx);
+function onEmp(){
+  ST.emp = $('empSel').value;
+  if(!ST.emp) return;
+  localStorage.setItem('mmc_emp', ST.emp);
   $('cardMode').classList.remove('hide');
   $('cardMachine').classList.remove('hide');
-  loadTasks();
 }
 
 function setMode(m){
@@ -528,29 +544,48 @@ function setMode(m){
 
 function onMachine(){
   var v = $('macSel').value;
-  ST.machine = null;
-  ST.machines.forEach(function(m){ if(m.machine_id === v) ST.machine = m; });
-  renderSummary();
+  if(v === '__OTHER__'){
+    ST.machine = null;
+    $('otherBox').classList.remove('hide');
+  }else{
+    $('otherBox').classList.add('hide');
+    ST.otherText = '';
+    ST.machine = null;
+    ST.machines.forEach(function(m){ if(m.machine_id === v) ST.machine = m; });
+  }
+  ST.answers = {};
+  render();
 }
 
-function loadTasks(){
-  if(!ST.doer) return;
-  $('taskArea').innerHTML = '<div class="panel"><div class="loading">Loading your tasks</div></div>';
-  api({ action:'myTasks', doer:ST.doer, dept:ST.dept }).then(function(r){
-    if(!r.ok){ $('taskArea').innerHTML = '<div class="panel"><div class="empty">' + esc(r.error) + '</div></div>'; return; }
-    ST.tasks = r.tasks || [];
-    ST.answers = {};
-    render();
-  }).catch(function(e){
-    $('taskArea').innerHTML = '<div class="panel"><div class="empty">' + esc(e.message) + '</div></div>';
-  });
+function onOther(){ ST.otherText = $('macOther').value.trim(); render(); }
+
+function curType(){ return ST.machine ? (ST.machine.type || 'MOTOR') : ($('macOtherType').value || 'MOTOR'); }
+function hasMachine(){ return !!(ST.machine || ST.otherText); }
+
+function lastDone(freq){
+  var mid = ST.machine ? ST.machine.machine_id : '';
+  if(!mid || !ST.last[mid]) return '';
+  return ST.last[mid][freq] || '';
+}
+function dueInfo(freq){
+  if(freq === 'Daily') return { due:true, last:lastDone('Daily') };
+  var days = (freq === 'Weekly') ? ST.weeklyDays : ST.monthlyDays;
+  var l = lastDone(freq);
+  return { due: daysBetween(l, todayStr()) >= days, last:l };
 }
 
 /* ---------------- machine summary ---------------- */
 function renderSummary(){
   var host = $('macSummary');
-  if(!ST.machine){ host.innerHTML = ''; return; }
-  var m = ST.machine, spec = [];
+  if(!hasMachine()){ host.innerHTML = ''; return; }
+  var m = ST.machine;
+  if(!m){
+    host.innerHTML = '<div class="msum"><div class="lab">MACHINE ID</div>' +
+      '<div class="id">' + esc(ST.otherText) + '</div>' +
+      '<div class="spec">Not in list · ' + esc(curType()) + '</div></div>';
+    return;
+  }
+  var spec = [];
   if(m.make) spec.push(esc(m.make));
   if(m.hp) spec.push(esc(m.hp));
   if(m.voltage) spec.push(esc(m.voltage) + 'V');
@@ -573,72 +608,72 @@ function toggleDet(){
   if(b) b.textContent = d.classList.contains('on') ? 'Hide details' : 'View details';
 }
 
-/* ---------------- task list (from Master) ---------------- */
+/* ---------------- checklist ---------------- */
 function render(){
+  var show = hasMachine();
+  renderSummary();
   var chk = (ST.mode === 'Checklist');
-  $('bdArea').classList.toggle('hide', chk);
-  $('cardExtra').classList.toggle('hide', !ST.doer);
-  $('dock').classList.toggle('hide', !ST.doer);
+  $('bdArea').classList.toggle('hide', !(show && !chk));
+  $('cardExtra').classList.toggle('hide', !show);
+  $('dock').classList.toggle('hide', !show);
 
-  if(!chk){
+  if(!show || !chk){
     $('taskArea').innerHTML = '';
     $('progWrap').innerHTML = '';
     updateProgress();
     return;
   }
 
-  if(!ST.tasks.length){
-    $('taskArea').innerHTML = '<div class="panel"><div class="empty">No pending tasks for you today.<br>আজ আপনার কোনো কাজ বাকি নেই।</div></div>';
-    $('progWrap').innerHTML = '';
-    updateProgress();
-    return;
-  }
-
-  var groups = {}, order = [];
-  ST.tasks.forEach(function(t){
-    var g = t.freq_label || 'Other';
-    if(!groups[g]){ groups[g] = []; order.push(g); }
-    groups[g].push(t);
-  });
-
+  var type = curType();
   var html = '';
-  order.forEach(function(g, gi){
-    var list = groups[g];
-    var late = list.filter(function(t){ return t.late > 0; }).length;
-    html += '<div class="sect' + (gi === 0 ? ' open' : '') + '" id="sect' + gi + '">' +
-      '<div class="sect-h" onclick="toggleSect(' + gi + ')">' +
-        '<span class="nm">' + esc(g).toUpperCase() + '</span>' +
-        '<span class="st' + (late ? ' due' : '') + '" id="cnt' + gi + '" data-total="' + list.length + '">0 / ' + list.length + '</span>' +
+  var firstOpen = true;
+
+  ['Daily','Weekly','Monthly'].forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length) return;
+    var di = dueInfo(f);
+    var open = false;
+    if(f === 'Daily'){ open = true; firstOpen = false; }
+    else if(di.due && firstOpen){ open = true; firstOpen = false; }
+
+    var stTxt, stCls;
+    if(f === 'Daily'){ stTxt = '0 / ' + list.length; stCls = ''; }
+    else if(di.due){ stTxt = 'Due now'; stCls = 'due'; }
+    else { stTxt = 'Done ' + (di.last || '—'); stCls = 'ok'; }
+
+    html += '<div class="sect' + (open ? ' open' : '') + '" id="sect' + f + '">' +
+      '<div class="sect-h" onclick="toggleSect(\'' + f + '\')">' +
+        '<span class="nm">' + f.toUpperCase() + ' INSPECTION</span>' +
+        '<span class="st ' + stCls + '" id="st' + f + '" data-base="' + esc(stTxt) + '">' + esc(stTxt) + '</span>' +
         '<span class="chev"></span>' +
       '</div><div class="sect-b">';
 
-    list.forEach(function(t){
-      var key = 'r' + t.row;
-      html += '<div class="chk" id="it_' + key + '">' +
-        '<div class="q"><span class="tid">#' + esc(t.task_id) + '</span>' + esc(t.task) + '</div>' +
-        (t.task_bn ? '<div class="hint">' + esc(t.task_bn) + '</div>' : '') +
-        '<div class="plan">Planned ' + esc(t.planned) +
-          (t.late > 0 ? ' · <span class="late">' + t.late + ' day' + (t.late > 1 ? 's' : '') + ' pending</span>' : ' · today') +
-        '</div>' +
-        (READ_RE.test(t.task) ?
-          '<div class="read"><div class="f"><input inputmode="decimal" placeholder="Reading (optional)" oninput="setReading(\'' + key + '\',this.value)"></div></div>' : '') +
+    list.forEach(function(it){
+      var key = it.item_id;
+      html += '<div class="chk" id="it_' + esc(key) + '">' +
+        '<div class="q">' + esc(it.item_en) + '</div>' +
+        (it.item_bn ? '<div class="hint">' + esc(it.item_bn) + '</div>' : '') +
+        (it.tier === 'Technician' ? '<div class="plan"><span class="late">TECHNICIAN</span></div>' : '') +
+        (it.unit ? '<div class="read"><div class="f">' +
+            '<input inputmode="decimal" placeholder="Reading" oninput="setReading(\'' + key + '\',this.value)">' +
+            '<span class="u">' + esc(it.unit) + '</span></div></div>' : '') +
         '<div class="pick">' +
           '<button data-r="OK" onclick="pick(\'' + key + '\',\'OK\')">✓ OK</button>' +
           '<button data-r="Issue" onclick="pick(\'' + key + '\',\'Issue\')">✕ Issue</button>' +
           '<button data-r="N/A" onclick="pick(\'' + key + '\',\'N/A\')">— N/A</button>' +
         '</div>' +
-        '<div class="reveal" id="rv_' + key + '">' +
+        '<div class="reveal" id="rv_' + esc(key) + '">' +
           '<label>Issue remark</label>' +
           '<textarea placeholder="Describe the problem observed" oninput="setRemark(\'' + key + '\',this.value)"></textarea>' +
           '<div class="sev-lab"><label style="margin:0 0 6px">Severity</label></div>' +
-          '<div class="sev" id="sev_' + key + '">' +
+          '<div class="sev" id="sev_' + esc(key) + '">' +
             '<button data-s="Low" onclick="setSev(\'' + key + '\',\'Low\')">Low</button>' +
             '<button data-s="Medium" onclick="setSev(\'' + key + '\',\'Medium\')">Medium</button>' +
             '<button data-s="Critical" onclick="setSev(\'' + key + '\',\'Critical\')">Critical</button>' +
           '</div>' +
-          '<div class="ph-row" id="ph_' + key + '">' +
-            '<input type="file" accept="image/*" capture="environment" class="hide" id="file_' + key + '" onchange="onPhoto(\'' + key + '\',this)">' +
-            '<button class="ph-btn" id="phb_' + key + '" onclick="document.getElementById(\'file_' + key + '\').click()">' +
+          '<div class="ph-row" id="ph_' + esc(key) + '">' +
+            '<input type="file" accept="image/*" capture="environment" class="hide" id="file_' + esc(key) + '" onchange="onPhoto(\'' + key + '\',this)">' +
+            '<button class="ph-btn" id="phb_' + esc(key) + '" onclick="document.getElementById(\'file_' + key + '\').click()">' +
               '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>' +
               'Add photo</button>' +
           '</div>' +
@@ -648,29 +683,34 @@ function render(){
     html += '</div></div>';
   });
 
+  if(!html){
+    $('taskArea').innerHTML = '<div class="panel"><div class="empty">No check items for this machine type.</div></div>';
+    $('progWrap').innerHTML = '';
+    return;
+  }
+
   $('progWrap').innerHTML =
-    '<div class="prog"><div class="top"><span class="t1">Checklist progress</span>' +
-    '<span class="t2" id="progTxt">0 of ' + ST.tasks.length + ' tasks done</span></div>' +
+    '<div class="prog"><div class="top"><span class="t1">Inspection progress</span>' +
+    '<span class="t2" id="progTxt">0 of 0 checks done</span></div>' +
     '<div class="track"><div class="fill" id="progFill"></div></div></div>';
   $('taskArea').innerHTML = html;
   updateProgress();
 }
 
-function toggleSect(i){ $('sect' + i).classList.toggle('open'); }
+function toggleSect(f){ $('sect' + f).classList.toggle('open'); }
 
-function taskOf(key){
-  var row = Number(key.slice(1));
-  var t = null;
-  ST.tasks.forEach(function(x){ if(x.row === row) t = x; });
-  return t;
+function itemOf(key){
+  var it = null;
+  ST.items.forEach(function(i){ if(i.item_id === key) it = i; });
+  return it;
 }
 
 function ensureAns(key){
   if(!ST.answers[key]){
-    var t = taskOf(key);
-    if(!t) return null;
+    var it = itemOf(key);
+    if(!it) return null;
     ST.answers[key] = {
-      row:t.row, task_id:t.task_id, freq:t.freq, task:t.task, planned:t.planned,
+      item_id:key, freq:it.freq, item_en:it.item_en,
       result:'', severity:'', reading:'', remark:'', photo:''
     };
   }
@@ -681,7 +721,6 @@ function pick(key, result){
   var a = ensureAns(key);
   if(!a) return;
 
-  // second tap on the same button clears the answer
   var off = (a.result === result);
   a.result = off ? '' : result;
   var shown = a.result;
@@ -697,7 +736,6 @@ function pick(key, result){
       ? (r === 'OK' ? 'sel-ok' : (r === 'Issue' ? 'sel-bad' : 'sel-na'))
       : '';
   }
-
   box.classList.toggle('flag', shown === 'Issue');
   $('rv_' + key).classList.toggle('on', shown === 'Issue');
 
@@ -708,13 +746,11 @@ function pick(key, result){
     if(ta) ta.value = '';
     resetPhoto(key);
   }
-
   if(!shown){
     var ri = box.querySelector('.read input');
     if(ri) ri.value = '';
     delete ST.answers[key];
   }
-
   updateProgress();
 }
 
@@ -768,7 +804,7 @@ function onPhoto(key, input){
       c.getContext('2d').drawImage(img, 0, 0, w, h);
       var dataUrl = c.toDataURL('image/jpeg', 0.68);
       btn.lastChild.nodeValue = 'Uploading…';
-      api({ action:'uploadPhoto', b64:dataUrl.split(',')[1], mime:'image/jpeg', name:'task' + a.task_id })
+      api({ action:'uploadPhoto', b64:dataUrl.split(',')[1], mime:'image/jpeg', name:key })
         .then(function(r){
           if(!r.ok){ toast(r.error || 'Upload failed', true); btn.lastChild.nodeValue = 'Add photo'; return; }
           a.photo = r.url;
@@ -802,42 +838,45 @@ function updateProgress(){
   }
   $('submitBtn').textContent = 'Submit checklist →';
 
-  var groups = {}, order = [];
-  ST.tasks.forEach(function(t){
-    var g = t.freq_label || 'Other';
-    if(!groups[g]){ groups[g] = []; order.push(g); }
-    groups[g].push(t);
-  });
-
-  var done = 0, bad = 0;
-  order.forEach(function(g, gi){
-    var dn = groups[g].filter(function(t){
-      var a = ST.answers['r' + t.row];
-      return a && a.result;
-    }).length;
-    var el = $('cnt' + gi);
+  var type = curType();
+  var total = 0, done = 0;
+  ['Daily','Weekly','Monthly'].forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length) return;
+    var dn = list.filter(function(i){ return ST.answers[i.item_id] && ST.answers[i.item_id].result; }).length;
+    var el = $('st' + f);
     if(el){
-      el.textContent = dn + ' / ' + groups[g].length;
-      el.className = 'st' + (dn === groups[g].length ? ' ok' : '');
-      if(dn === groups[g].length && gi !== 0) $('sect' + gi).classList.remove('open');
+      if(f === 'Daily' || dn > 0){
+        el.textContent = dn + ' / ' + list.length;
+        el.className = 'st' + (dn === list.length ? ' ok' : '');
+      }else{
+        el.textContent = el.getAttribute('data-base');
+      }
+      if(dn === list.length && dn > 0 && f !== 'Daily'){
+        var sect = $('sect' + f);
+        if(sect) sect.classList.remove('open');
+      }
     }
+    total += list.length;
     done += dn;
   });
+
+  var bad = 0;
   Object.keys(ST.answers).forEach(function(k){ if(ST.answers[k].result === 'Issue') bad++; });
 
-  var total = ST.tasks.length;
   if($('progTxt')){
-    $('progTxt').textContent = done + ' of ' + total + ' tasks done';
-    var f = $('progFill');
-    f.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
-    f.className = 'fill' + (done === total && total ? ' done' : '');
+    $('progTxt').textContent = done + ' of ' + total + ' checks done';
+    var f2 = $('progFill');
+    f2.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+    f2.className = 'fill' + (done === total && total ? ' done' : '');
   }
   $('dockCnt').innerHTML = '<b>' + done + ' of ' + total + '</b>' + (bad ? bad + ' issue' + (bad > 1 ? 's' : '') : 'done');
 }
 
 /* ---------------- submit ---------------- */
 function submitEntry(){
-  if(!ST.doer){ toast('Select your name first', true); return; }
+  if(!ST.emp){ toast('Select your name first', true); return; }
+  if(!hasMachine()){ toast('Select a machine first', true); return; }
 
   if(ST.mode === 'Breakdown'){
     if(!$('bdProblem').value){ toast('Select problem type', true); return; }
@@ -845,13 +884,27 @@ function submitEntry(){
     return doSubmit();
   }
 
-  var answered = Object.keys(ST.answers).filter(function(k){ return ST.answers[k].result; });
-  if(!answered.length){ toast('Tick at least one task', true); return; }
+  var type = curType();
+  var daily = ST.items.filter(function(i){ return i.type === type && i.freq === 'Daily'; });
+  var missing = daily.filter(function(i){ return !(ST.answers[i.item_id] && ST.answers[i.item_id].result); });
+  if(missing.length){
+    toast(missing.length + ' daily check pending', true);
+    var g = $('sectDaily'); if(g) g.classList.add('open');
+    var el = $('it_' + missing[0].item_id);
+    if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
 
-  var left = ST.tasks.length - answered.length;
-  if(left > 0){
-    modal('Some tasks left', '<b>' + left + '</b> task abhi baaki hai. Submit karega to wo Master me Pending hi rahenge.',
-      'Submit anyway', doSubmit, 'Go back');
+  var pend = [];
+  ['Weekly','Monthly'].forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length) return;
+    var dn = list.filter(function(i){ return ST.answers[i.item_id] && ST.answers[i.item_id].result; }).length;
+    if(dueInfo(f).due && dn < list.length) pend.push(f + ' (' + dn + '/' + list.length + ')');
+  });
+  if(pend.length){
+    modal('Pending checks', 'Due but not finished: <b>' + esc(pend.join(', ')) +
+      '</b>. Submit anyway? Report me wo not-done dikhega.', 'Submit anyway', doSubmit, 'Go back');
     return;
   }
   doSubmit();
@@ -863,8 +916,9 @@ function doSubmit(){
   btn.textContent = 'Saving…';
 
   var payload = {
-    action:'submit', mode:ST.mode, doer:ST.doer, dept:ST.dept,
+    action:'submit', mode:ST.mode, emp_name:ST.emp,
     machine_id: ST.machine ? ST.machine.machine_id : '',
+    machine_other: ST.machine ? '' : ST.otherText,
     running_hrs: $('runHrs').value.trim(),
     remarks: $('remarks').value.trim(),
     answers: Object.keys(ST.answers).map(function(k){ return ST.answers[k]; })
@@ -899,15 +953,15 @@ function doSubmit(){
 
 function showDone(r){
   var bad = Number(r.issue) || 0;
-  $('dnWho').textContent = ST.doer + (ST.dept ? ' · ' + ST.dept : '');
-  $('dnId').textContent = r.entry_id + (ST.machine ? ' · ' + ST.machine.machine_id : '');
+  $('dnWho').textContent = ST.emp;
+  $('dnId').textContent = r.entry_id + ' · ' + (ST.machine ? ST.machine.machine_id : ST.otherText);
   $('dnOk').textContent = r.ok_count || 0;
   $('dnBad').textContent = bad;
   $('dnNa').textContent = r.na || 0;
   var v = $('dnVerdict');
   v.className = 'verdict ' + (bad ? 'att' : 'ok');
   v.textContent = bad ? 'ATTENTION REQUIRED' : 'NORMAL';
-  $('dnClosed').textContent = (r.closed || 0) + ' task(s) marked Done in the Master sheet.';
+  $('dnClosed').textContent = '';
   $('dnReport').onclick = function(){ openReport(r.entry_id); };
   $('dnPdf').onclick = function(){ downloadPdf(r.entry_id, $('dnPdf')); };
 
@@ -919,12 +973,22 @@ function showDone(r){
 }
 
 function backToTasks(){
-  $('pgDone').classList.add('hide');
-  $('pgNew').classList.remove('hide');
+  ST.answers = {};
+  ST.machine = null;
+  ST.otherText = '';
+  $('macSel').value = '';
+  $('macOther').value = '';
+  $('otherBox').classList.add('hide');
   $('runHrs').value = '';
   $('remarks').value = '';
   ['bdProblem','bdDesc','bdAction','bdParts','bdCost','bdVendor','bdFrom','bdTo'].forEach(function(id){ $(id).value = ''; });
-  loadTasks();
+  $('taskArea').innerHTML = '';
+  $('progWrap').innerHTML = '';
+  $('macSummary').innerHTML = '';
+  $('pgDone').classList.add('hide');
+  $('pgNew').classList.remove('hide');
+  render();
+  api({ action:'boot' }).then(function(r){ if(r.ok) ST.last = r.last || {}; }).catch(function(){});
   window.scrollTo({ top:0 });
 }
 
@@ -958,7 +1022,7 @@ function go(p){
   $('pgDone').classList.add('hide');
   $('tabNew').classList.toggle('on', p === 'new');
   $('tabRec').classList.toggle('on', p === 'rec');
-  $('dock').classList.toggle('hide', p !== 'new' || !ST.doer);
+  $('dock').classList.toggle('hide', p !== 'new' || !hasMachine());
   if(p === 'rec') loadEntries();
   window.scrollTo({ top:0 });
 }
@@ -975,9 +1039,9 @@ function loadEntries(){
 }
 
 function applyFilter(){
-  var doer = $('fDoer').value, mac = $('fMac').value, stat = $('fStat').value;
+  var emp = $('fDoer').value, mac = $('fMac').value, stat = $('fStat').value;
   var rows = ST.entries.filter(function(e){
-    if(doer && e.doer !== doer) return false;
+    if(emp && e.employee !== emp) return false;
     if(mac && e.machine_id !== mac) return false;
     var bad = Number(e.issue) > 0;
     if(stat === 'ok' && bad) return false;
@@ -992,8 +1056,7 @@ function applyFilter(){
     var bad = Number(e.issue) > 0;
     return '<div class="rec" onclick="openReport(\'' + esc(e.entry_id) + '\')">' +
       '<div><div class="id">' + esc(e.machine_id || e.entry_id) + '</div>' +
-      '<div class="mt">' + esc(e.doer) + (e.department ? ' · ' + esc(e.department) : '') +
-      (e.freqs ? ' · ' + esc(e.freqs) : '') + '</div></div>' +
+      '<div class="mt">' + esc(e.employee) + (e.freqs ? ' · ' + esc(e.freqs) : '') + '</div></div>' +
       '<div class="rt"><div class="dt">' + esc(e.date) + '</div>' +
       '<span class="pill ' + (bad ? 'att' : 'ok') + '">' + (bad ? 'ATTENTION' : 'NORMAL') + '</span></div></div>';
   }).join('');
