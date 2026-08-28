@@ -14,11 +14,11 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{font-family:'Jost',system-ui,Arial,sans-serif;background:#f2f4f7;color:var(--ink);font-size:15px;line-height:1.45}
-.wrap{max-width:640px;margin:0 auto;padding:0 14px 130px}
+.wrap{width:90%;max-width:1000px;margin:0 auto;padding:0 0 130px}
 
 /* ---------- top bar ---------- */
 .top{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
-.top-in{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.top-in{width:90%;max-width:1000px;margin:0 auto;padding:12px 0;display:flex;align-items:center;gap:10px}
 .logo{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
 .tt{font-weight:600;font-size:16px;line-height:1.1}
 .ts{font-size:11.5px;color:var(--muted)}
@@ -41,8 +41,9 @@ label:first-child{margin-top:0}
 input,select,textarea{width:100%;font-family:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none}
 input:focus,select:focus,textarea:focus{border-color:var(--brand)}
 textarea{min-height:78px;resize:vertical}
-.row2{display:flex;gap:10px}
-.row2>div{flex:1}
+.row2{display:flex;flex-wrap:wrap;gap:0 12px}
+.row2>div{flex:1 1 220px;min-width:0}
+@media(max-width:520px){.row2>div{flex:1 1 100%}}
 
 /* ---------- buttons ---------- */
 .btn{font-family:inherit;font-size:15px;font-weight:600;border-radius:11px;padding:13px 18px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer;width:100%}
@@ -70,7 +71,7 @@ textarea{min-height:78px;resize:vertical}
 .grp.open .arw{transform:rotate(180deg)}
 .grpb{display:none;padding:4px 0}
 .grp.open .grpb{display:block}
-.item{padding:12px 14px;border-bottom:1px solid #f0f2f5}
+.item{padding:13px 16px;border-bottom:1px solid #f0f2f5}
 .item:last-child{border-bottom:0}
 .item .en{font-size:14px;font-weight:500}
 .item .bn{font-size:13px;color:#4b5563;margin-top:2px}
@@ -94,13 +95,13 @@ textarea{min-height:78px;resize:vertical}
 
 /* ---------- sticky submit ---------- */
 .sticky{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:11px 14px calc(11px + env(safe-area-inset-bottom));z-index:40}
-.sticky-in{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.sticky-in{width:90%;max-width:1000px;margin:0 auto;display:flex;gap:10px;align-items:center}
 .sticky .sum{font-size:12px;color:var(--muted);flex:none}
 
 /* ---------- modal + toast ---------- */
 .mask{position:fixed;inset:0;background:rgba(15,18,25,.45);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;z-index:9998;padding:18px}
 .mask.on{display:flex}
-.modal{background:#fff;border-radius:16px;width:100%;max-width:440px;margin:auto;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modal{background:#fff;border-radius:16px;width:90%;max-width:520px;margin:auto;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
 .modal h3{margin:0 0 6px;font-size:17px;font-weight:600}
 .modal p{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
 .mbtns{display:flex;gap:10px;margin-top:16px}
@@ -124,7 +125,6 @@ textarea{min-height:78px;resize:vertical}
     <div class="tabs">
       <button class="tab on" id="tabNew" onclick="go('new')">New</button>
       <button class="tab" id="tabRec" onclick="go('rec')">Records</button>
-      <button class="tab" id="tabAdm" onclick="go('adm')">⚙</button>
     </div>
   </div>
 </div>
@@ -237,101 +237,6 @@ textarea{min-height:78px;resize:vertical}
     <div class="card"><div id="entList" class="loading">Loading…</div></div>
   </div>
 
-  <!-- ================= ADMIN ================= -->
-  <div id="pgAdm" class="hide">
-
-    <div class="card" id="admLock">
-      <h2>Admin panel</h2>
-      <p class="hint">Machines aur employees yahin se add hote hain. PIN daal.</p>
-      <label>Admin PIN</label>
-      <input id="admPin" type="password" inputmode="numeric" placeholder="••••">
-      <div style="margin-top:12px"><button class="btn" onclick="admUnlock()">Unlock 🔓</button></div>
-    </div>
-
-    <div id="admBody" class="hide">
-
-      <div class="card">
-        <h2 id="macFormTitle">Add machine</h2>
-        <p class="hint">Motor ka tag/serial number ID me daal — wahi report me chhapta hai.</p>
-        <div class="row2">
-          <div><label>Machine ID / Tag *</label><input id="aMacId" placeholder="K-2216200"></div>
-          <div><label>Type</label>
-            <select id="aMacType"><option value="MOTOR">Motor</option><option value="PUMP">Pump</option><option value="FILTER">Filter</option></select>
-          </div>
-        </div>
-        <label>Machine name *</label>
-        <input id="aMacName" placeholder="Kaparbagan 3PH Motor (Washing)">
-        <div class="row2">
-          <div><label>Location</label><input id="aMacLoc" placeholder="Kaparbagan"></div>
-          <div><label>Make</label><input id="aMacMake" placeholder="Bharat Bijlee"></div>
-        </div>
-        <div class="row2">
-          <div><label>Model</label><input id="aMacModel"></div>
-          <div><label>HP / kW</label><input id="aMacHp" placeholder="2.2 HP"></div>
-        </div>
-        <div class="row2">
-          <div><label>Voltage</label><input id="aMacVolt" placeholder="415"></div>
-          <div><label>RPM</label><input id="aMacRpm" placeholder="1430"></div>
-        </div>
-        <div class="row2">
-          <div><label>Frame size</label><input id="aMacFrame" placeholder='24" x 16"'></div>
-          <div><label>FLA</label><input id="aMacFla"></div>
-        </div>
-        <label>Installation date</label>
-        <input id="aMacInst" type="date">
-        <div class="row2" style="margin-top:14px">
-          <button class="btn" onclick="admSaveMachine()" id="macSaveBtn">Save machine 💾</button>
-          <button class="btn ghost hide" id="macCancelBtn" onclick="admResetMacForm()">Cancel edit</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Bulk add machines</h2>
-        <p class="hint">Ek line = ek machine. Comma se alag karo. Sirf pehle 2 zaroori hain.</p>
-        <div style="font-size:11.5px;color:#6b7280;background:#f6f7fa;border:1px solid #e3e6ec;border-radius:9px;padding:9px;margin-bottom:10px">
-          ID, Name, Type, Location, Make, Model, HP, Voltage, RPM, Frame<br>
-          <b>K-2216200, Washing Motor, MOTOR, Kaparbagan, Bharat Bijlee, , 2.2 HP, 415, 1430, 24x16</b>
-        </div>
-        <textarea id="aBulk" style="min-height:120px" placeholder="K-2216201, Service Bay Motor, MOTOR, Workshop&#10;K-2216202, Overhead Pump, PUMP, Roof"></textarea>
-        <div style="margin-top:12px"><button class="btn ghost" onclick="admBulk()">Import lines 📥</button></div>
-      </div>
-
-      <div class="card">
-        <h2>Machines <span id="macCount" style="color:#6b7280;font-weight:400;font-size:13px"></span></h2>
-        <p class="hint">Tap to edit · On/Off se dropdown me chhupega</p>
-        <div id="macList" class="loading">Loading…</div>
-      </div>
-
-      <div class="card">
-        <h2 id="empFormTitle">Add employee</h2>
-        <p class="hint">Jo naam yahan hai wahi operator ke dropdown me aayega.</p>
-        <label>Name *</label>
-        <input id="aEmpName" placeholder="Chandan">
-        <div class="row2">
-          <div><label>Role</label>
-            <select id="aEmpRole"><option>Operator</option><option>Supervisor</option><option>Technician</option><option>Manager</option></select>
-          </div>
-          <div><label>Site</label><input id="aEmpSite" placeholder="Kaparbagan"></div>
-        </div>
-        <div class="row2" style="margin-top:14px">
-          <button class="btn" onclick="admSaveEmp()" id="empSaveBtn">Save employee 💾</button>
-          <button class="btn ghost hide" id="empCancelBtn" onclick="admResetEmpForm()">Cancel edit</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Employees <span id="empCount" style="color:#6b7280;font-weight:400;font-size:13px"></span></h2>
-        <p class="hint">Tap to edit</p>
-        <div id="empList" class="loading">Loading…</div>
-      </div>
-
-      <div class="card">
-        <p class="hint" style="margin:0">Check items (<span id="ciCount">—</span> rows) sheet <b>MMC_CheckItems</b> me edit hote hain — English/Bangla text, frequency, tier sab wahin.</p>
-      </div>
-
-    </div>
-  </div>
-
 </div>
 
 <!-- sticky submit -->
@@ -361,7 +266,7 @@ textarea{min-height:78px;resize:vertical}
 /* =====================================================================
  * CONFIG — paste your GAS /exec URL here after deploying
  * ===================================================================== */
-var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbzDKgoq5KygjwV0_SK7ZW3mtIwWiIVqOQ4jxaMIXItn60cCOmD6bjIVMGvSU-h4pzc/exec';
+var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbxW2-nDZR5J2HX-9jJCLscgHxrEIEvVO4mOKZAxIsaoEtS_Rgegiwdd8BdJ6K5AkaFC/exec';
 var API = localStorage.getItem('mmc_api') || API_DEFAULT;
 
 /* ---------------- state ---------------- */
@@ -786,195 +691,11 @@ function resetForm(){
 function go(p){
   $('pgNew').classList.toggle('hide', p !== 'new');
   $('pgRec').classList.toggle('hide', p !== 'rec');
-  $('pgAdm').classList.toggle('hide', p !== 'adm');
   $('tabNew').classList.toggle('on', p === 'new');
   $('tabRec').classList.toggle('on', p === 'rec');
-  $('tabAdm').classList.toggle('on', p === 'adm');
   $('stickyBar').classList.toggle('hide', p !== 'new' || !hasMachine());
   if(p === 'rec') loadEntries();
-  if(p === 'adm' && ADM.pin) admLoad();
   window.scrollTo({ top:0 });
-}
-
-/* ---------------- admin ---------------- */
-var ADM = { pin:'', machines:[], employees:[], editMac:null, editEmp:null };
-
-function admUnlock(){
-  var pin = $('admPin').value.trim();
-  if(!pin){ toast('Enter PIN', true); return; }
-  api({ action:'adminLogin', pin:pin }).then(function(r){
-    if(!r.ok){ toast(r.error || 'Wrong PIN', true); return; }
-    ADM.pin = pin;
-    sessionStorage.setItem('mmc_pin', pin);
-    $('admLock').classList.add('hide');
-    $('admBody').classList.remove('hide');
-    admLoad();
-  }).catch(function(e){ toast(e.message, true); });
-}
-
-function admLoad(){
-  api({ action:'adminData', pin:ADM.pin }).then(function(r){
-    if(!r.ok){ toast(r.error || 'Failed', true); return; }
-    ADM.machines = r.machines || [];
-    ADM.employees = r.employees || [];
-    $('ciCount').textContent = r.item_count;
-    admRenderMachines();
-    admRenderEmps();
-  }).catch(function(e){ toast(e.message, true); });
-}
-
-function admRenderMachines(){
-  $('macCount').textContent = '· ' + ADM.machines.length;
-  var el = $('macList');
-  if(!ADM.machines.length){ el.className = 'loading'; el.textContent = 'No machines yet. Add one above.'; return; }
-  el.className = '';
-  el.innerHTML = ADM.machines.map(function(m){
-    return '<div class="ent">' +
-      '<span class="dot' + (m.active ? '' : ' bad') + '"></span>' +
-      '<div onclick="admEditMac(' + m._row + ')" style="flex:1">' +
-        '<div class="n">' + esc(m.name) + '</div>' +
-        '<div class="m">' + esc(m.machine_id) + ' · ' + esc(m.type) + (m.location ? ' · ' + esc(m.location) : '') + '</div>' +
-      '</div>' +
-      '<button class="btn ghost sm" onclick="admToggle(\'machine\',' + m._row + ')">' + (m.active ? 'On' : 'Off') + '</button>' +
-    '</div>';
-  }).join('');
-}
-
-function admRenderEmps(){
-  $('empCount').textContent = '· ' + ADM.employees.length;
-  var el = $('empList');
-  if(!ADM.employees.length){ el.className = 'loading'; el.textContent = 'No employees yet. Add one above.'; return; }
-  el.className = '';
-  el.innerHTML = ADM.employees.map(function(x){
-    return '<div class="ent">' +
-      '<span class="dot' + (x.active ? '' : ' bad') + '"></span>' +
-      '<div onclick="admEditEmp(' + x._row + ')" style="flex:1">' +
-        '<div class="n">' + esc(x.name) + '</div>' +
-        '<div class="m">' + esc(x.role) + (x.site ? ' · ' + esc(x.site) : '') + '</div>' +
-      '</div>' +
-      '<button class="btn ghost sm" onclick="admToggle(\'employee\',' + x._row + ')">' + (x.active ? 'On' : 'Off') + '</button>' +
-    '</div>';
-  }).join('');
-}
-
-function admEditMac(row){
-  var m = null;
-  ADM.machines.forEach(function(x){ if(x._row === row) m = x; });
-  if(!m) return;
-  ADM.editMac = row;
-  $('macFormTitle').textContent = 'Edit machine';
-  $('macSaveBtn').textContent = 'Update machine 💾';
-  $('macCancelBtn').classList.remove('hide');
-  $('aMacId').value = m.machine_id; $('aMacType').value = m.type || 'MOTOR';
-  $('aMacName').value = m.name; $('aMacLoc').value = m.location || '';
-  $('aMacMake').value = m.make || ''; $('aMacModel').value = m.model || '';
-  $('aMacHp').value = m.hp || ''; $('aMacVolt').value = m.voltage || '';
-  $('aMacRpm').value = m.rpm || ''; $('aMacFrame').value = m.frame || '';
-  $('aMacFla').value = m.fla || ''; $('aMacInst').value = m.install_date || '';
-  $('macFormTitle').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function admResetMacForm(){
-  ADM.editMac = null;
-  $('macFormTitle').textContent = 'Add machine';
-  $('macSaveBtn').textContent = 'Save machine 💾';
-  $('macCancelBtn').classList.add('hide');
-  ['aMacId','aMacName','aMacLoc','aMacMake','aMacModel','aMacHp','aMacVolt','aMacRpm','aMacFrame','aMacFla','aMacInst'].forEach(function(id){ $(id).value = ''; });
-  $('aMacType').value = 'MOTOR';
-}
-
-function admSaveMachine(){
-  var p = {
-    action:'saveMachine', pin:ADM.pin, _row:ADM.editMac,
-    machine_id:$('aMacId').value.trim(), name:$('aMacName').value.trim(),
-    type:$('aMacType').value, location:$('aMacLoc').value.trim(),
-    make:$('aMacMake').value.trim(), model:$('aMacModel').value.trim(),
-    hp:$('aMacHp').value.trim(), voltage:$('aMacVolt').value.trim(),
-    rpm:$('aMacRpm').value.trim(), frame:$('aMacFrame').value.trim(),
-    fla:$('aMacFla').value.trim(), install_date:$('aMacInst').value
-  };
-  if(!p.name){ toast('Machine name required', true); return; }
-  var b = $('macSaveBtn'); b.disabled = true; b.textContent = 'Saving…';
-  api(p).then(function(r){
-    b.disabled = false;
-    if(!r.ok){ toast(r.error || 'Failed', true); b.textContent = ADM.editMac ? 'Update machine 💾' : 'Save machine 💾'; return; }
-    toast(r.updated ? 'Machine updated' : 'Machine added ' + r.machine_id);
-    admResetMacForm();
-    admLoad();
-    refreshLists();
-  }).catch(function(e){ b.disabled = false; b.textContent = 'Save machine 💾'; toast(e.message, true); });
-}
-
-function admEditEmp(row){
-  var x = null;
-  ADM.employees.forEach(function(e){ if(e._row === row) x = e; });
-  if(!x) return;
-  ADM.editEmp = row;
-  $('empFormTitle').textContent = 'Edit employee';
-  $('empSaveBtn').textContent = 'Update employee 💾';
-  $('empCancelBtn').classList.remove('hide');
-  $('aEmpName').value = x.name; $('aEmpRole').value = x.role || 'Operator'; $('aEmpSite').value = x.site || '';
-  $('empFormTitle').scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function admResetEmpForm(){
-  ADM.editEmp = null;
-  $('empFormTitle').textContent = 'Add employee';
-  $('empSaveBtn').textContent = 'Save employee 💾';
-  $('empCancelBtn').classList.add('hide');
-  $('aEmpName').value = ''; $('aEmpSite').value = ''; $('aEmpRole').value = 'Operator';
-}
-
-function admSaveEmp(){
-  var p = {
-    action:'saveEmployee', pin:ADM.pin, _row:ADM.editEmp,
-    name:$('aEmpName').value.trim(), role:$('aEmpRole').value, site:$('aEmpSite').value.trim()
-  };
-  if(!p.name){ toast('Name required', true); return; }
-  var b = $('empSaveBtn'); b.disabled = true; b.textContent = 'Saving…';
-  api(p).then(function(r){
-    b.disabled = false;
-    if(!r.ok){ toast(r.error || 'Failed', true); b.textContent = 'Save employee 💾'; return; }
-    toast(r.updated ? 'Employee updated' : 'Employee added');
-    admResetEmpForm();
-    admLoad();
-    refreshLists();
-  }).catch(function(e){ b.disabled = false; b.textContent = 'Save employee 💾'; toast(e.message, true); });
-}
-
-function admToggle(kind, row){
-  api({ action:'toggleRow', pin:ADM.pin, kind:kind, _row:row }).then(function(r){
-    if(!r.ok){ toast(r.error || 'Failed', true); return; }
-    toast(kind + ' → ' + r.active);
-    admLoad();
-    refreshLists();
-  }).catch(function(e){ toast(e.message, true); });
-}
-
-function admBulk(){
-  var text = $('aBulk').value.trim();
-  if(!text){ toast('Paste some lines first', true); return; }
-  api({ action:'bulkMachines', pin:ADM.pin, text:text }).then(function(r){
-    if(!r.ok){ toast(r.error || 'Failed', true); return; }
-    $('aBulk').value = '';
-    admLoad();
-    refreshLists();
-    var msg = '<b>' + r.added + '</b> machine(s) added.';
-    if(r.errors && r.errors.length) msg += '<br><br>Skipped:<br>' + r.errors.map(esc).join('<br>');
-    modal('Import done', msg, 'OK', null);
-  }).catch(function(e){ toast(e.message, true); });
-}
-
-function refreshLists(){
-  api({ action:'boot' }).then(function(r){
-    if(!r.ok) return;
-    ST.machines = r.machines || [];
-    ST.employees = r.employees || [];
-    ST.last = r.last || {};
-    var curEmp = $('empSel').value, curMac = $('macSel').value;
-    fillEmployees(); fillMachines();
-    $('empSel').value = curEmp; $('macSel').value = curMac;
-  }).catch(function(){});
 }
 
 function loadEntries(){
@@ -999,10 +720,6 @@ function loadEntries(){
 
 /* ---------------- init ---------------- */
 $('mask').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
-(function(){
-  var sp = sessionStorage.getItem('mmc_pin');
-  if(sp){ ADM.pin = sp; $('admLock').classList.add('hide'); $('admBody').classList.remove('hide'); }
-})();
 boot();
 </script>
 </body>
