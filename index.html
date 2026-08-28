@@ -396,7 +396,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* =====================================================================
  * CONFIG — paste your GAS /exec URL here
  * ===================================================================== */
-var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbx4zn9lacbU4VdrLsOMMm9lpcYPEdx8ASjLcyHAdNUSUWoRUyChSTfOw_UYdry7s5a4/exec';
+var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbw4gz2PfJ9CRstfxr2s0cFKrO_p4Tm9HKG33pcm8aE-r1j8ek0HIZ1HDmBOJU9IU1CT/exec';
 var API = localStorage.getItem('mmc_api') || API_DEFAULT;
 
 var ST = {
@@ -616,6 +616,7 @@ function render(){
       var key = 'r' + t.row;
       html += '<div class="chk" id="it_' + key + '">' +
         '<div class="q"><span class="tid">#' + esc(t.task_id) + '</span>' + esc(t.task) + '</div>' +
+        (t.task_bn ? '<div class="hint">' + esc(t.task_bn) + '</div>' : '') +
         '<div class="plan">Planned ' + esc(t.planned) +
           (t.late > 0 ? ' · <span class="late">' + t.late + ' day' + (t.late > 1 ? 's' : '') + ' pending</span>' : ' · today') +
         '</div>' +
