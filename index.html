@@ -9,16 +9,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F7F8FA; --surface:#FFFFFF;
-  --text-primary:#1C2430; --text-secondary:#6B7280;
-  --border:#E8EBEF; --border-strong:#D8DDE4;
-  --primary:#1F2937;
-  --success:#16A36A; --success-bg:#ECF7F2;
-  --danger:#E5484D;  --danger-bg:#FDEDED;
-  --warning:#D97706; --warning-bg:#FDF4E7;
-  --muted-bg:#F1F3F6;
+  --bg:#F4F1EC; --surface:#FFFDF9; --surface-2:#FAF7F1;
+  --text-primary:#2B2620; --text-secondary:#7A7168;
+  --border:#E8E2D9; --border-strong:#DCD5CB;
+  --primary:#2B2620;
+  --success:#2F7D4F; --success-bg:#E4F1E8;
+  --danger:#C4483F;  --danger-bg:#FBE7E4;
+  --warning:#B07A18; --warning-bg:#FBF0DE;
+  --muted-bg:#EFEBE4;
   --r-sm:8px; --r:12px; --r-lg:14px;
-  --pad:20px;
+  --pad:22px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -33,14 +33,14 @@ button,input,select,textarea{font-family:inherit}
 .hide{display:none !important}
 
 /* ---------------- header ---------------- */
-header{position:sticky;top:0;z-index:60;background:rgba(247,248,250,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+header{position:sticky;top:0;z-index:60;background:rgba(244,241,236,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
 .hd{width:100%;max-width:960px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:12px}
 .mark{width:34px;height:34px;border-radius:9px;background:var(--primary);display:flex;align-items:center;justify-content:center;flex:none}
 .brand-co{font-size:11px;font-weight:700;letter-spacing:1.4px;color:var(--text-secondary);line-height:1.2}
 .brand-app{font-size:14.5px;font-weight:600;letter-spacing:-.1px;line-height:1.25}
 nav{margin-left:auto;display:flex;gap:4px;background:var(--muted-bg);padding:3px;border-radius:10px}
 nav button{border:0;background:transparent;font-size:13px;font-weight:500;color:var(--text-secondary);padding:7px 13px;border-radius:8px;cursor:pointer}
-nav button.on{background:var(--surface);color:var(--text-primary);font-weight:600;box-shadow:0 1px 2px rgba(28,36,48,.06)}
+nav button.on{background:var(--surface);color:var(--text-primary);font-weight:600;box-shadow:0 1px 2px rgba(43,38,32,.08)}
 #banner{display:none;font-size:12.5px;text-align:center;padding:8px 18px;font-weight:500}
 #banner.ok{display:block;background:var(--success-bg);color:var(--success)}
 #banner.err{display:block;background:var(--danger-bg);color:var(--danger)}
@@ -58,9 +58,9 @@ input,select,textarea{
   border:1px solid var(--border-strong);border-radius:var(--r);background:var(--surface);outline:none;
 }
 input:focus,select:focus,textarea:focus{border-color:var(--primary)}
-input::placeholder,textarea::placeholder{color:#A6ADB8}
+input::placeholder,textarea::placeholder{color:#B3A99C}
 textarea{min-height:74px;resize:vertical;font-size:15px}
-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B7280' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A7168' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 .grid{display:flex;flex-wrap:wrap;gap:0 14px}
 .grid>div{flex:1 1 200px;min-width:0}
 .btn{font-size:15px;font-weight:600;border-radius:var(--r);padding:13px 20px;border:1px solid var(--primary);background:var(--primary);color:#fff;cursor:pointer;letter-spacing:-.1px}
@@ -72,7 +72,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* ---------------- segmented mode switch ---------------- */
 .seg{display:flex;gap:4px;background:var(--muted-bg);padding:4px;border-radius:var(--r);margin-top:14px}
 .seg button{flex:1;border:0;background:transparent;padding:11px 8px;border-radius:9px;font-size:14px;font-weight:500;color:var(--text-secondary);cursor:pointer}
-.seg button.on{background:var(--surface);color:var(--text-primary);font-weight:600;box-shadow:0 1px 3px rgba(28,36,48,.08)}
+.seg button.on{background:var(--surface);color:var(--text-primary);font-weight:600;box-shadow:0 1px 3px rgba(43,38,32,.09)}
 .seg small{display:block;font-size:10.5px;font-weight:400;color:var(--text-secondary);margin-top:1px}
 
 /* ---------------- motor summary ---------------- */
@@ -111,6 +111,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* ---------------- inspection row ---------------- */
 .chk{padding:14px 18px;border-bottom:1px solid var(--border)}
+.chk:nth-child(even){background:var(--surface-2)}
 .chk:last-child{border-bottom:0}
 .chk.flag{background:var(--danger-bg)}
 .chk .q{font-size:14.5px;font-weight:500;letter-spacing:-.1px}
@@ -121,8 +122,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   flex:1;min-height:42px;border:1px solid var(--border-strong);background:var(--surface);
   border-radius:10px;font-size:13.5px;font-weight:500;color:var(--text-primary);cursor:pointer;
 }
-.pick button.sel-ok{background:var(--success-bg);border-color:#B9E3D0;color:var(--success);font-weight:600}
-.pick button.sel-bad{background:var(--danger-bg);border-color:#F3C2C3;color:var(--danger);font-weight:600}
+.pick button.sel-ok{background:var(--success-bg);border-color:#B5D8C2;color:var(--success);font-weight:600}
+.pick button.sel-bad{background:var(--danger-bg);border-color:#EFC2BC;color:var(--danger);font-weight:600}
 .pick button.sel-na{background:var(--muted-bg);border-color:var(--border-strong);color:var(--text-secondary);font-weight:600}
 .reveal{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border-strong)}
 .reveal.on{display:block}
@@ -130,9 +131,9 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .reveal label+label,.sev-lab{margin-top:14px}
 .sev{display:flex;gap:7px}
 .sev button{flex:1;min-height:38px;border:1px solid var(--border-strong);background:var(--surface);border-radius:9px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer}
-.sev button.on{background:var(--danger-bg);border-color:#F3C2C3;color:var(--danger);font-weight:600}
+.sev button.on{background:var(--danger-bg);border-color:#EFC2BC;color:var(--danger);font-weight:600}
 .sev button.on.low{background:var(--muted-bg);border-color:var(--border-strong);color:var(--text-primary)}
-.sev button.on.med{background:var(--warning-bg);border-color:#F0D6AC;color:var(--warning)}
+.sev button.on.med{background:var(--warning-bg);border-color:#EBD5AD;color:var(--warning)}
 .read{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px}
 .read .f{flex:1 1 92px;min-width:0;position:relative}
 .read .f input{padding:10px 42px 10px 12px;font-size:15px;font-variant-numeric:tabular-nums}
@@ -151,7 +152,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* ---------------- photo ---------------- */
 .ph-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
 .ph-btn{min-height:40px;padding:0 14px;border:1px dashed var(--border-strong);background:var(--surface);border-radius:10px;font-size:13px;font-weight:500;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;gap:7px}
-.ph-btn.has{border-style:solid;border-color:#B9E3D0;color:var(--success);background:var(--success-bg);font-weight:600}
+.ph-btn.has{border-style:solid;border-color:#B5D8C2;color:var(--success);background:var(--success-bg);font-weight:600}
 .ph-thumb{width:44px;height:44px;border-radius:9px;object-fit:cover;border:1px solid var(--border)}
 .ph-x{border:0;background:none;color:var(--danger);font-size:12.5px;font-weight:500;cursor:pointer;padding:6px}
 
@@ -182,14 +183,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .acts{display:flex;flex-direction:column;gap:9px;margin-top:22px}
 
 /* ---------------- sticky ---------------- */
-.dock{position:fixed;left:0;right:0;bottom:0;z-index:55;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:11px 0 calc(11px + env(safe-area-inset-bottom))}
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:55;background:rgba(255,253,249,.97);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:11px 0 calc(11px + env(safe-area-inset-bottom))}
 .dock-in{width:100%;max-width:960px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:14px}
 .dock .cnt{font-size:12.5px;color:var(--text-secondary);flex:none;font-variant-numeric:tabular-nums}
 .dock .cnt b{display:block;color:var(--text-primary);font-size:13.5px;font-weight:600}
 .dock .btn{margin-left:auto;flex:0 1 260px}
 
 /* ---------------- modal / toast ---------------- */
-.mask{position:fixed;inset:0;background:rgba(28,36,48,.42);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;z-index:9998;padding:20px}
+.mask{position:fixed;inset:0;background:rgba(43,38,32,.42);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;z-index:9998;padding:20px}
 .mask.on{display:flex}
 .modal{background:var(--surface);border-radius:16px;width:100%;max-width:440px;margin:auto;padding:22px}
 .modal h3{margin:0 0 6px;font-size:17px;font-weight:600}
@@ -200,7 +201,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 #toast.on{opacity:1}
 #toast.err{background:var(--danger)}
 .loading{padding:26px;text-align:center;color:var(--text-secondary);font-size:13.5px}
-.foot{text-align:center;font-size:11px;color:#A6ADB8;margin:24px 0 6px;letter-spacing:.3px}
+.foot{text-align:center;font-size:11px;color:#A69C90;margin:24px 0 6px;letter-spacing:.3px}
 
 @media(max-width:520px){
   .wrap{padding:0 14px 140px}
@@ -213,13 +214,20 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   .stats b{font-size:19px}
 }
 </style>
+<style>
+.grpnote{font-size:12px;color:var(--text-secondary);padding:10px 18px 0}
+.tid{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.5px;color:var(--text-secondary);background:var(--muted-bg);padding:2px 7px;border-radius:5px;margin-right:7px;vertical-align:1px}
+.plan{font-size:11.5px;color:var(--text-secondary);margin-top:3px}
+.plan .late{color:var(--warning);font-weight:600}
+.linkwarn{background:var(--warning-bg);color:var(--warning);border:1px solid #EBD5AD;border-radius:var(--r);padding:13px 16px;font-size:13px;margin-top:14px}
+</style>
 </head>
 <body>
 
 <header>
   <div class="hd">
     <div class="mark">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#FFFDF9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"></circle>
         <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"></path>
       </svg>
@@ -229,7 +237,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div class="brand-app">Machine Maintenance</div>
     </div>
     <nav>
-      <button class="on" id="tabNew" onclick="go('new')">Inspect</button>
+      <button class="on" id="tabNew" onclick="go('new')">Checklist</button>
       <button id="tabRec" onclick="go('rec')">Records</button>
     </nav>
   </div>
@@ -238,62 +246,38 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <div class="wrap">
 
-<!-- ============ INSPECTION ============ -->
 <div id="pgNew">
 
   <div class="panel panel-pad">
     <div class="eyebrow">Step 1</div>
-    <h2 class="t">Technician</h2>
+    <h2 class="t">Who are you?</h2>
     <p class="sub">আপনার নাম বেছে নিন</p>
-    <label>Name</label>
-    <select id="empSel" onchange="onEmp()"><option value="">Select your name</option></select>
-  </div>
-
-  <div class="panel hide" id="cardTasks">
-    <div class="panel-pad" style="padding-bottom:12px">
-      <div class="eyebrow">My tasks</div>
-      <h2 class="t">Pending today</h2>
-      <p class="sub" id="taskSub">Tap a task to start it</p>
-    </div>
-    <div id="taskList"></div>
+    <label>Name — Department</label>
+    <select id="doerSel" onchange="onDoer()"><option value="">Select your name</option></select>
+    <div id="linkWarn"></div>
   </div>
 
   <div class="panel panel-pad hide" id="cardMode">
     <div class="eyebrow">Step 2</div>
-    <h2 class="t">Inspection type</h2>
+    <h2 class="t">What are you doing?</h2>
     <div class="seg">
-      <button class="on" id="tPrd" onclick="setMode('Periodic')">Checklist<small>Daily / Weekly / Monthly</small></button>
-      <button id="tMnt" onclick="setMode('Maintenance')">Breakdown<small>Repair &amp; problem log</small></button>
+      <button class="on" id="tChk" onclick="setMode('Checklist')">Checklist<small>Pending planned tasks</small></button>
+      <button id="tBrk" onclick="setMode('Breakdown')">Breakdown<small>Repair &amp; problem log</small></button>
     </div>
   </div>
 
   <div class="panel panel-pad hide" id="cardMachine">
-    <div class="eyebrow">Step 3</div>
-    <h2 class="t">Select motor</h2>
-    <p class="sub">তালিকায় না থাকলে Other বেছে নিন</p>
-    <label>Motor</label>
-    <select id="macSel" onchange="onMachine()"><option value="">Select machine</option></select>
-    <div id="otherBox" class="hide">
-      <div class="grid">
-        <div>
-          <label>Tag / model number</label>
-          <input id="macOther" placeholder="K-2216200" oninput="onOther()">
-        </div>
-        <div>
-          <label>Machine type</label>
-          <select id="macOtherType" onchange="renderChecklist()">
-            <option value="MOTOR">Motor</option><option value="PUMP">Pump</option><option value="FILTER">Filter</option>
-          </select>
-        </div>
-      </div>
-    </div>
+    <div class="eyebrow">Step 3 · optional</div>
+    <h2 class="t">Which machine?</h2>
+    <p class="sub">Report ke header ke liye. Chhod bhi sakta hai.</p>
+    <label>Machine</label>
+    <select id="macSel" onchange="onMachine()"><option value="">Not linked to a machine</option></select>
   </div>
 
   <div id="macSummary"></div>
   <div id="progWrap"></div>
-  <div id="checkArea"></div>
+  <div id="taskArea"></div>
 
-  <!-- breakdown -->
   <div id="bdArea" class="hide">
     <div class="panel panel-pad">
       <div class="eyebrow">Breakdown</div>
@@ -335,7 +319,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
     <div class="eyebrow">Optional</div>
     <h2 class="t">Additional notes</h2>
     <div class="grid">
-      <div><label>Running hours / meter</label><input id="runHrs" inputmode="numeric" placeholder="1240"></div>
+      <div><label>Running hours / KM reading</label><input id="runHrs" inputmode="numeric" placeholder="1240"></div>
     </div>
     <label>Remarks</label>
     <textarea id="remarks" placeholder="Anything the supervisor should know"></textarea>
@@ -344,15 +328,14 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
   <div class="foot" id="verFoot"></div>
 </div>
 
-<!-- ============ DONE ============ -->
 <div id="pgDone" class="hide">
   <div class="panel">
     <div class="done">
       <div class="tick">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16A36A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F7D4F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"></path></svg>
       </div>
-      <h3>Inspection completed</h3>
-      <div class="eyebrow" style="margin-top:14px" id="dnMotor"></div>
+      <h3>Checklist submitted</h3>
+      <div class="eyebrow" style="margin-top:14px" id="dnWho"></div>
       <div class="eid" id="dnId"></div>
       <div class="stats">
         <div><b id="dnOk">0</b><span>OK</span></div>
@@ -360,16 +343,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
         <div><b id="dnNa">0</b><span>N/A</span></div>
       </div>
       <div class="verdict ok" id="dnVerdict">NORMAL</div>
+      <p class="sub" id="dnClosed" style="margin-top:14px"></p>
       <div class="acts">
         <button class="btn" id="dnReport">View report</button>
         <button class="btn ghost" id="dnPdf">Download PDF</button>
-        <button class="btn ghost" onclick="checkAnother()">Check another motor</button>
+        <button class="btn ghost" onclick="backToTasks()">Back to my tasks</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ============ RECORDS ============ -->
 <div id="pgRec" class="hide">
   <div class="panel panel-pad">
     <div class="eyebrow">Filter</div>
@@ -379,13 +362,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
       <div><label>To</label><input id="fTo" type="date" onchange="loadEntries()"></div>
     </div>
     <div class="grid">
-      <div><label>Motor</label><select id="fMac" onchange="applyFilter()"><option value="">All motors</option></select></div>
-      <div><label>Employee</label><select id="fEmp" onchange="applyFilter()"><option value="">All employees</option></select></div>
-    </div>
-    <div class="grid">
-      <div><label>Location</label><select id="fLoc" onchange="applyFilter()"><option value="">All locations</option></select></div>
-      <div><label>Type</label><select id="fType" onchange="applyFilter()">
-        <option value="">All types</option><option>Periodic</option><option>Maintenance</option></select></div>
+      <div><label>Doer</label><select id="fDoer" onchange="applyFilter()"><option value="">All doers</option></select></div>
+      <div><label>Machine</label><select id="fMac" onchange="applyFilter()"><option value="">All machines</option></select></div>
       <div><label>Status</label><select id="fStat" onchange="applyFilter()">
         <option value="">All status</option><option value="ok">Normal</option><option value="att">Attention</option></select></div>
     </div>
@@ -397,8 +375,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 <div class="dock hide" id="dock">
   <div class="dock-in">
-    <div class="cnt" id="dockCnt"><b>0 of 0</b>completed</div>
-    <button class="btn" id="submitBtn" onclick="submitEntry()">Complete inspection →</button>
+    <div class="cnt" id="dockCnt"><b>0 of 0</b>done</div>
+    <button class="btn" id="submitBtn" onclick="submitEntry()">Submit checklist →</button>
   </div>
 </div>
 
@@ -418,14 +396,16 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 /* =====================================================================
  * CONFIG — paste your GAS /exec URL here
  * ===================================================================== */
-var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbylavQjYIxxu4Rf9JutPcS4TM6Q_gHNNSq6ani1IC9JpHBAMA2uJoVyVspPlm5U6GpI/exec';
+var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbwMX8ToBdDtey77ecVaSYBK7LxdKifeJ4m_so4cOr55boWr3QIjvk23-XPwySV8IBE7/exec';
 var API = localStorage.getItem('mmc_api') || API_DEFAULT;
 
 var ST = {
-  machines: [], employees: [], items: [], last: {},
-  mode: 'Periodic', emp: '', machine: null, otherText: '', otherType: 'MOTOR',
-  answers: {}, weeklyDays: 7, monthlyDays: 30, entries: [], tasks: [], focusFreq: ''
+  doers: [], machines: [], tasks: [], entries: [],
+  mode: 'Checklist', doer: '', dept: '', machine: null,
+  answers: {}, linked: true
 };
+
+var READ_RE = /temperature|voltage|current|insulation|pressure|reading|level|km|kilometre|kilometer|hours|meter/i;
 
 /* ---------------- helpers ---------------- */
 function $(id){ return document.getElementById(id); }
@@ -450,11 +430,12 @@ function modal(title, body, yesLabel, onYes, noLabel){
   $('mask').classList.add('on');
 }
 function closeModal(){ $('mask').classList.remove('on'); }
+function banner(cls, html){ var b = $('banner'); b.className = cls; b.innerHTML = html; }
 
 function api(payload){
   return fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    method:'POST',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
     body: JSON.stringify(payload)
   }).then(function(r){ return r.text(); }).then(function(t){
     try { return JSON.parse(t); }
@@ -462,34 +443,24 @@ function api(payload){
   });
 }
 
-function todayStr(){
-  var d = new Date();
-  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
-}
-function daysBetween(a, b){
-  if(!a) return 9999;
-  return Math.round((new Date(b + 'T00:00:00') - new Date(a + 'T00:00:00')) / 86400000);
-}
-function banner(cls, html){ var b = $('banner'); b.className = cls; b.innerHTML = html; }
-
 /* ---------------- boot ---------------- */
 function boot(){
   if(!API || API.indexOf('macros') < 0){
     banner('err', 'GAS URL not set. <a href="#" onclick="askUrl();return false">Set URL</a>');
     return;
   }
-  api({ action: 'boot' }).then(function(r){
+  api({ action:'boot' }).then(function(r){
     if(!r.ok) throw new Error(r.error || 'Boot failed');
+    ST.doers = r.doers || [];
     ST.machines = r.machines || [];
-    ST.employees = r.employees || [];
-    ST.items = r.items || [];
-    ST.last = r.last || {};
-    ST.weeklyDays = r.weekly_days || 7;
-    ST.monthlyDays = r.monthly_days || 30;
+    ST.linked = !!r.checklist_linked;
     $('coName').textContent = String(r.company || 'S.P. Group').toUpperCase();
     $('verFoot').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
-    fillEmployees();
+    fillDoers();
     fillMachines();
+    if(!ST.linked){
+      $('linkWarn').innerHTML = '<div class="linkwarn">Ultimate Checklist linked nahi hai. Sheet me menu → Maintenance → Setup se URL daal.<br><br>' + esc(r.checklist_error || '') + '</div>';
+    }
     banner('ok', 'Connected');
     setTimeout(function(){ banner('', ''); }, 1800);
   }).catch(function(e){
@@ -506,164 +477,92 @@ function askUrl(){
   location.reload();
 }
 
-function fillEmployees(){
-  var s = $('empSel');
+function fillDoers(){
+  var s = $('doerSel'), f = $('fDoer');
   s.innerHTML = '<option value="">Select your name</option>';
-  ST.employees.forEach(function(e){
+  f.innerHTML = '<option value="">All doers</option>';
+  ST.doers.forEach(function(d, i){
     var o = document.createElement('option');
-    o.value = e.name;
-    o.textContent = e.name + (e.role ? ' · ' + e.role : '');
+    o.value = String(i);
+    o.textContent = d.name + (d.dept ? ' — ' + d.dept : '');
     s.appendChild(o);
+    var o2 = document.createElement('option');
+    o2.value = d.name; o2.textContent = d.name;
+    f.appendChild(o2);
   });
-  var f = $('fEmp');
-  f.innerHTML = '<option value="">All employees</option>';
-  ST.employees.forEach(function(e){
-    var o = document.createElement('option');
-    o.value = e.name; o.textContent = e.name;
-    f.appendChild(o);
-  });
-  var saved = localStorage.getItem('mmc_emp');
-  if(saved){ s.value = saved; if(s.value) onEmp(); }
+  var saved = localStorage.getItem('mmc_doer');
+  if(saved !== null && ST.doers[saved]){ s.value = saved; onDoer(); }
 }
 
 function fillMachines(){
-  var opts = '<option value="">Select machine</option>';
-  var locs = {};
+  var o = '<option value="">Not linked to a machine</option>';
+  var f = '<option value="">All machines</option>';
   ST.machines.forEach(function(m){
-    opts += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) +
-            (m.location ? ' — ' + esc(m.location) : '') + '</option>';
-    if(m.location) locs[m.location] = 1;
+    o += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + (m.location ? ' — ' + esc(m.location) : '') + '</option>';
+    f += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + '</option>';
   });
-  opts += '<option value="__OTHER__">Other / not in list</option>';
-  $('macSel').innerHTML = opts;
-
-  var f = '<option value="">All motors</option>';
-  ST.machines.forEach(function(m){ f += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + '</option>'; });
+  $('macSel').innerHTML = o;
   $('fMac').innerHTML = f;
-
-  var l = '<option value="">All locations</option>';
-  Object.keys(locs).forEach(function(k){ l += '<option value="' + esc(k) + '">' + esc(k) + '</option>'; });
-  $('fLoc').innerHTML = l;
 }
 
 /* ---------------- flow ---------------- */
-function onEmp(){
-  ST.emp = $('empSel').value;
-  localStorage.setItem('mmc_emp', ST.emp);
-  if(ST.emp){
-    $('cardMode').classList.remove('hide');
-    $('cardMachine').classList.remove('hide');
-    loadTasks();
-  }
-}
-
-/* ---------------- my tasks (planner) ---------------- */
-function loadTasks(){
-  if(!ST.emp) return;
-  api({ action:'myTasks', emp_name: ST.emp }).then(function(r){
-    if(!r.ok) return;
-    ST.tasks = r.tasks || [];
-    renderTasks();
-  }).catch(function(){});
-}
-
-function renderTasks(){
-  var card = $('cardTasks'), list = $('taskList');
-  if(!ST.tasks.length){ card.classList.add('hide'); return; }
-  card.classList.remove('hide');
-  $('taskSub').textContent = ST.tasks.length + ' pending · tap a task to start it';
-  list.innerHTML = ST.tasks.map(function(t, i){
-    var late = t.late > 0;
-    return '<div class="task" onclick="startTask(' + i + ')">' +
-      '<div><div class="tn">' + esc(t.machine_name || t.machine_id) + '</div>' +
-      '<div class="tm">' + esc(t.freq) + ' · ' + esc(t.machine_id) + ' · planned ' + esc(t.plan_date) + '</div></div>' +
-      '<span class="tp' + (late ? ' late' : '') + '">' + (late ? 'PENDING ' + t.late + 'd' : 'TODAY') + '</span>' +
-      '<span class="go"></span></div>';
-  }).join('');
-}
-
-function startTask(i){
-  var t = ST.tasks[i];
-  if(!t) return;
-  setMode('Periodic');
-  $('macSel').value = t.machine_id;
-  ST.focusFreq = t.freq;
-  onMachine();
-  ST.focusFreq = '';
-  var sect = $('sect' + t.freq);
-  if(sect){
-    sect.classList.add('open');
-    setTimeout(function(){ sect.scrollIntoView({ behavior:'smooth', block:'start' }); }, 60);
-  }
+function onDoer(){
+  var idx = $('doerSel').value;
+  var d = ST.doers[idx];
+  if(!d){ ST.doer = ''; return; }
+  ST.doer = d.name;
+  ST.dept = d.dept || '';
+  localStorage.setItem('mmc_doer', idx);
+  $('cardMode').classList.remove('hide');
+  $('cardMachine').classList.remove('hide');
+  loadTasks();
 }
 
 function setMode(m){
   ST.mode = m;
-  $('tPrd').classList.toggle('on', m === 'Periodic');
-  $('tMnt').classList.toggle('on', m === 'Maintenance');
+  $('tChk').classList.toggle('on', m === 'Checklist');
+  $('tBrk').classList.toggle('on', m === 'Breakdown');
   ST.answers = {};
-  renderChecklist();
+  render();
 }
 
 function onMachine(){
   var v = $('macSel').value;
-  if(v === '__OTHER__'){
-    ST.machine = null;
-    $('otherBox').classList.remove('hide');
-  }else{
-    $('otherBox').classList.add('hide');
-    ST.otherText = '';
-    ST.machine = null;
-    for(var i=0;i<ST.machines.length;i++){ if(ST.machines[i].machine_id === v) ST.machine = ST.machines[i]; }
-  }
-  ST.answers = {};
-  renderChecklist();
+  ST.machine = null;
+  ST.machines.forEach(function(m){ if(m.machine_id === v) ST.machine = m; });
+  renderSummary();
 }
 
-function onOther(){ ST.otherText = $('macOther').value.trim(); renderChecklist(); }
-
-function curType(){ return ST.machine ? (ST.machine.type || 'MOTOR') : ($('macOtherType').value || 'MOTOR'); }
-function hasMachine(){ return !!(ST.machine || ST.otherText); }
-
-function lastDone(freq){
-  var mid = ST.machine ? ST.machine.machine_id : '';
-  if(!mid || !ST.last[mid]) return '';
-  return ST.last[mid][freq] || '';
-}
-function dueInfo(freq){
-  if(freq === 'Daily') return { due: true, last: lastDone('Daily') };
-  var days = (freq === 'Weekly') ? ST.weeklyDays : ST.monthlyDays;
-  var l = lastDone(freq);
-  return { due: daysBetween(l, todayStr()) >= days, last: l };
+function loadTasks(){
+  if(!ST.doer) return;
+  $('taskArea').innerHTML = '<div class="panel"><div class="loading">Loading your tasks</div></div>';
+  api({ action:'myTasks', doer:ST.doer, dept:ST.dept }).then(function(r){
+    if(!r.ok){ $('taskArea').innerHTML = '<div class="panel"><div class="empty">' + esc(r.error) + '</div></div>'; return; }
+    ST.tasks = r.tasks || [];
+    ST.answers = {};
+    render();
+  }).catch(function(e){
+    $('taskArea').innerHTML = '<div class="panel"><div class="empty">' + esc(e.message) + '</div></div>';
+  });
 }
 
-/* ---------------- motor summary ---------------- */
+/* ---------------- machine summary ---------------- */
 function renderSummary(){
   var host = $('macSummary');
-  if(!hasMachine()){ host.innerHTML = ''; return; }
-  var m = ST.machine;
-  if(!m){
-    host.innerHTML = '<div class="msum"><div class="lab">MOTOR ID</div>' +
-      '<div class="id">' + esc(ST.otherText) + '</div>' +
-      '<div class="spec">Not in master list · ' + esc(curType()) + '</div></div>';
-    return;
-  }
-  var spec = [];
+  if(!ST.machine){ host.innerHTML = ''; return; }
+  var m = ST.machine, spec = [];
   if(m.make) spec.push(esc(m.make));
   if(m.hp) spec.push(esc(m.hp));
   if(m.voltage) spec.push(esc(m.voltage) + 'V');
   if(m.rpm) spec.push(esc(m.rpm) + ' RPM');
-
   var det = [['Model', m.model], ['Frame', m.frame], ['FLA', m.fla], ['Installed', m.install_date], ['Type', m.type]];
   var detHtml = det.filter(function(d){ return d[1]; })
     .map(function(d){ return '<div><span>' + esc(d[0]) + '</span><b>' + esc(d[1]) + '</b></div>'; }).join('');
-
-  host.innerHTML = '<div class="msum"><div class="lab">MOTOR ID</div>' +
+  host.innerHTML = '<div class="msum"><div class="lab">MACHINE ID</div>' +
     '<div class="id">' + esc(m.machine_id) + '</div>' +
     (m.location ? '<div class="loc">' + esc(m.location) + '</div>' : '') +
     (spec.length ? '<div class="spec">' + spec.join(' • ') + '</div>' : '') +
-    (detHtml ? '<button class="more" onclick="toggleDet()">View details</button>' +
-      '<div class="det" id="macDet">' + detHtml + '</div>' : '') +
+    (detHtml ? '<button class="more" onclick="toggleDet()">View details</button><div class="det" id="macDet">' + detHtml + '</div>' : '') +
     '</div>';
 }
 function toggleDet(){
@@ -674,69 +573,71 @@ function toggleDet(){
   if(b) b.textContent = d.classList.contains('on') ? 'Hide details' : 'View details';
 }
 
-/* ---------------- checklist ---------------- */
-function renderChecklist(){
-  var show = hasMachine();
-  renderSummary();
-  $('bdArea').classList.toggle('hide', !(show && ST.mode === 'Maintenance'));
-  $('cardExtra').classList.toggle('hide', !show);
-  $('dock').classList.toggle('hide', !show);
+/* ---------------- task list (from Master) ---------------- */
+function render(){
+  var chk = (ST.mode === 'Checklist');
+  $('bdArea').classList.toggle('hide', chk);
+  $('cardExtra').classList.toggle('hide', !ST.doer);
+  $('dock').classList.toggle('hide', !ST.doer);
 
-  if(!show || ST.mode === 'Maintenance'){
-    $('checkArea').innerHTML = '';
+  if(!chk){
+    $('taskArea').innerHTML = '';
     $('progWrap').innerHTML = '';
     updateProgress();
     return;
   }
 
-  var type = curType();
+  if(!ST.tasks.length){
+    $('taskArea').innerHTML = '<div class="panel"><div class="empty">No pending tasks for you today.<br>আজ আপনার কোনো কাজ বাকি নেই।</div></div>';
+    $('progWrap').innerHTML = '';
+    updateProgress();
+    return;
+  }
+
+  var groups = {}, order = [];
+  ST.tasks.forEach(function(t){
+    var g = t.freq_label || 'Other';
+    if(!groups[g]){ groups[g] = []; order.push(g); }
+    groups[g].push(t);
+  });
+
   var html = '';
-  var firstOpen = true;
-
-  ['Daily','Weekly','Monthly'].forEach(function(f){
-    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
-    if(!list.length) return;
-    var di = dueInfo(f);
-    var open = false;
-    if(ST.focusFreq){ open = (f === ST.focusFreq); }
-    else if(f === 'Daily'){ open = true; firstOpen = false; }
-    else if(di.due && firstOpen){ open = true; firstOpen = false; }
-
-    var stTxt, stCls;
-    if(f === 'Daily'){ stTxt = '0 / ' + list.length; stCls = ''; }
-    else if(di.due){ stTxt = 'Due now'; stCls = 'due'; }
-    else { stTxt = 'Done ' + (di.last || '—'); stCls = 'ok'; }
-
-    html += '<div class="sect' + (open ? ' open' : '') + '" id="sect' + f + '">' +
-      '<div class="sect-h" onclick="toggleSect(\'' + f + '\')">' +
-        '<span class="nm">' + f.toUpperCase() + ' INSPECTION</span>' +
-        '<span class="st ' + stCls + '" id="st' + f + '" data-base="' + esc(stTxt) + '" data-total="' + list.length + '">' + esc(stTxt) + '</span>' +
+  order.forEach(function(g, gi){
+    var list = groups[g];
+    var late = list.filter(function(t){ return t.late > 0; }).length;
+    html += '<div class="sect' + (gi === 0 ? ' open' : '') + '" id="sect' + gi + '">' +
+      '<div class="sect-h" onclick="toggleSect(' + gi + ')">' +
+        '<span class="nm">' + esc(g).toUpperCase() + '</span>' +
+        '<span class="st' + (late ? ' due' : '') + '" id="cnt' + gi + '" data-total="' + list.length + '">0 / ' + list.length + '</span>' +
         '<span class="chev"></span>' +
       '</div><div class="sect-b">';
 
-    list.forEach(function(it){
-      html += '<div class="chk" id="it_' + esc(it.item_id) + '">' +
-        '<div class="q">' + esc(it.item_en) + '</div>' +
-        (it.item_bn ? '<div class="hint">' + esc(it.item_bn) + '</div>' : '') +
-        (it.needs_tool ? '<div class="tool">INSTRUMENT · ' + esc(it.tier).toUpperCase() + '</div>' : '') +
-        readingHtml(it) +
-        '<div class="pick">' +
-          '<button data-r="OK" onclick="pick(\'' + it.item_id + '\',\'OK\')">✓ OK</button>' +
-          '<button data-r="Not OK" onclick="pick(\'' + it.item_id + '\',\'Not OK\')">✕ Issue</button>' +
-          '<button data-r="N/A" onclick="pick(\'' + it.item_id + '\',\'N/A\')">— N/A</button>' +
+    list.forEach(function(t){
+      var key = 'r' + t.row;
+      html += '<div class="chk" id="it_' + key + '">' +
+        '<div class="q"><span class="tid">#' + esc(t.task_id) + '</span>' + esc(t.task) + '</div>' +
+        '<div class="plan">Planned ' + esc(t.planned) +
+          (t.late > 0 ? ' · <span class="late">' + t.late + ' day' + (t.late > 1 ? 's' : '') + ' pending</span>' : ' · today') +
         '</div>' +
-        '<div class="reveal" id="rv_' + esc(it.item_id) + '">' +
+        (READ_RE.test(t.task) ?
+          '<div class="read"><div class="f"><input inputmode="decimal" placeholder="Reading (optional)" oninput="setReading(\'' + key + '\',this.value)"></div></div>' : '') +
+        '<div class="pick">' +
+          '<button data-r="OK" onclick="pick(\'' + key + '\',\'OK\')">✓ OK</button>' +
+          '<button data-r="Issue" onclick="pick(\'' + key + '\',\'Issue\')">✕ Issue</button>' +
+          '<button data-r="N/A" onclick="pick(\'' + key + '\',\'N/A\')">— N/A</button>' +
+        '</div>' +
+        '<div class="reveal" id="rv_' + key + '">' +
           '<label>Issue remark</label>' +
-          '<textarea placeholder="Describe the problem observed" oninput="setRemark(\'' + it.item_id + '\',this.value)"></textarea>' +
+          '<textarea placeholder="Describe the problem observed" oninput="setRemark(\'' + key + '\',this.value)"></textarea>' +
           '<div class="sev-lab"><label style="margin:0 0 6px">Severity</label></div>' +
-          '<div class="sev" id="sev_' + esc(it.item_id) + '">' +
-            '<button data-s="Low" onclick="setSev(\'' + it.item_id + '\',\'Low\')">Low</button>' +
-            '<button data-s="Medium" onclick="setSev(\'' + it.item_id + '\',\'Medium\')">Medium</button>' +
-            '<button data-s="Critical" onclick="setSev(\'' + it.item_id + '\',\'Critical\')">Critical</button>' +
+          '<div class="sev" id="sev_' + key + '">' +
+            '<button data-s="Low" onclick="setSev(\'' + key + '\',\'Low\')">Low</button>' +
+            '<button data-s="Medium" onclick="setSev(\'' + key + '\',\'Medium\')">Medium</button>' +
+            '<button data-s="Critical" onclick="setSev(\'' + key + '\',\'Critical\')">Critical</button>' +
           '</div>' +
-          '<div class="ph-row" id="ph_' + esc(it.item_id) + '">' +
-            '<input type="file" accept="image/*" capture="environment" class="hide" id="file_' + esc(it.item_id) + '" onchange="onPhoto(\'' + it.item_id + '\',this)">' +
-            '<button class="ph-btn" id="phb_' + esc(it.item_id) + '" onclick="document.getElementById(\'file_' + it.item_id + '\').click()">' +
+          '<div class="ph-row" id="ph_' + key + '">' +
+            '<input type="file" accept="image/*" capture="environment" class="hide" id="file_' + key + '" onchange="onPhoto(\'' + key + '\',this)">' +
+            '<button class="ph-btn" id="phb_' + key + '" onclick="document.getElementById(\'file_' + key + '\').click()">' +
               '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>' +
               'Add photo</button>' +
           '</div>' +
@@ -746,132 +647,117 @@ function renderChecklist(){
     html += '</div></div>';
   });
 
-  if(!html){
-    $('checkArea').innerHTML = '<div class="panel panel-pad"><p class="sub">No check items for this machine type. Add rows in the MMC_CheckItems sheet.</p></div>';
-    $('progWrap').innerHTML = '';
-    return;
-  }
-
   $('progWrap').innerHTML =
-    '<div class="prog"><div class="top"><span class="t1">Inspection progress</span>' +
-    '<span class="t2" id="progTxt">0 of 0 checks completed</span></div>' +
+    '<div class="prog"><div class="top"><span class="t1">Checklist progress</span>' +
+    '<span class="t2" id="progTxt">0 of ' + ST.tasks.length + ' tasks done</span></div>' +
     '<div class="track"><div class="fill" id="progFill"></div></div></div>';
-  $('checkArea').innerHTML = html;
+  $('taskArea').innerHTML = html;
   updateProgress();
 }
 
-function readingHtml(it){
-  if(it.input_type === 'number'){
-    return '<div class="read"><div class="f">' +
-      '<input inputmode="decimal" placeholder="0" oninput="setReading(\'' + it.item_id + '\',this.value)">' +
-      '<span class="u">' + esc(it.unit || '') + '</span></div></div>';
-  }
-  if(it.input_type === 'three_phase'){
-    return '<div class="read">' +
-      ['R','Y','B'].map(function(ph){
-        return '<div class="f"><div class="ph">' + ph + ' Phase</div>' +
-          '<input inputmode="decimal" placeholder="0" data-ph="' + ph + '" oninput="setPhase(\'' + it.item_id + '\')">' +
-          '<span class="u" style="top:auto;bottom:11px;transform:none">' + esc(it.unit || '') + '</span></div>';
-      }).join('') + '</div>';
-  }
-  return '';
+function toggleSect(i){ $('sect' + i).classList.toggle('open'); }
+
+function taskOf(key){
+  var row = Number(key.slice(1));
+  var t = null;
+  ST.tasks.forEach(function(x){ if(x.row === row) t = x; });
+  return t;
 }
 
-function toggleSect(f){ $('sect' + f).classList.toggle('open'); }
-
-function ensureAns(itemId){
-  var it = null;
-  for(var i=0;i<ST.items.length;i++){ if(ST.items[i].item_id === itemId) it = ST.items[i]; }
-  if(!it) return null;
-  if(!ST.answers[itemId]){
-    ST.answers[itemId] = {
-      item_id: itemId, freq: it.freq, tier: it.tier,
-      item_en: it.item_en, item_bn: it.item_bn,
-      result: '', severity: '', reading: '', remark: '', photo: ''
+function ensureAns(key){
+  if(!ST.answers[key]){
+    var t = taskOf(key);
+    if(!t) return null;
+    ST.answers[key] = {
+      row:t.row, task_id:t.task_id, freq:t.freq, task:t.task, planned:t.planned,
+      result:'', severity:'', reading:'', remark:'', photo:''
     };
   }
-  return ST.answers[itemId];
+  return ST.answers[key];
 }
 
-function pick(itemId, result){
-  var a = ensureAns(itemId);
+function pick(key, result){
+  var a = ensureAns(key);
   if(!a) return;
-  a.result = result;
-  if(result !== 'Not OK') a.severity = '';
 
-  var box = $('it_' + itemId);
+  // second tap on the same button clears the answer
+  var off = (a.result === result);
+  a.result = off ? '' : result;
+  var shown = a.result;
+
+  if(shown !== 'Issue'){ a.severity = ''; a.photo = ''; }
+  if(!shown){ a.reading = ''; a.remark = ''; }
+
+  var box = $('it_' + key);
   var btns = box.querySelectorAll('.pick button');
   for(var b=0;b<btns.length;b++){
     var r = btns[b].getAttribute('data-r');
-    btns[b].className = (r === result)
-      ? (r === 'OK' ? 'sel-ok' : (r === 'Not OK' ? 'sel-bad' : 'sel-na'))
+    btns[b].className = (shown && r === shown)
+      ? (r === 'OK' ? 'sel-ok' : (r === 'Issue' ? 'sel-bad' : 'sel-na'))
       : '';
   }
-  box.classList.toggle('flag', result === 'Not OK');
-  $('rv_' + itemId).classList.toggle('on', result === 'Not OK');
-  if(result !== 'Not OK'){
-    var sv = $('sev_' + itemId).querySelectorAll('button');
+
+  box.classList.toggle('flag', shown === 'Issue');
+  $('rv_' + key).classList.toggle('on', shown === 'Issue');
+
+  if(shown !== 'Issue'){
+    var sv = $('sev_' + key).querySelectorAll('button');
     for(var s=0;s<sv.length;s++) sv[s].className = '';
-    a.photo = '';
-    resetPhoto(itemId);
+    var ta = $('rv_' + key).querySelector('textarea');
+    if(ta) ta.value = '';
+    resetPhoto(key);
   }
+
+  if(!shown){
+    var ri = box.querySelector('.read input');
+    if(ri) ri.value = '';
+    delete ST.answers[key];
+  }
+
   updateProgress();
 }
 
-function setSev(itemId, sev){
-  var a = ensureAns(itemId);
+function setSev(key, sev){
+  var a = ensureAns(key);
   if(!a) return;
   a.severity = sev;
-  var btns = $('sev_' + itemId).querySelectorAll('button');
+  var btns = $('sev_' + key).querySelectorAll('button');
   for(var i=0;i<btns.length;i++){
     var s = btns[i].getAttribute('data-s');
-    btns[i].className = (s === sev)
-      ? 'on ' + (s === 'Low' ? 'low' : (s === 'Medium' ? 'med' : ''))
-      : '';
+    btns[i].className = (s === sev) ? 'on ' + (s === 'Low' ? 'low' : (s === 'Medium' ? 'med' : '')) : '';
   }
 }
 
-function setRemark(itemId, val){ var a = ensureAns(itemId); if(a) a.remark = val; }
-function setReading(itemId, val){ var a = ensureAns(itemId); if(a) a.reading = val; }
-function setPhase(itemId){
-  var a = ensureAns(itemId);
-  if(!a) return;
-  var ins = $('it_' + itemId).querySelectorAll('.read input[data-ph]');
-  var parts = [];
-  for(var i=0;i<ins.length;i++){
-    if(ins[i].value.trim() !== '') parts.push(ins[i].getAttribute('data-ph') + ':' + ins[i].value.trim());
-  }
-  a.reading = parts.join(' ');
-}
+function setRemark(key, val){ var a = ensureAns(key); if(a) a.remark = val; }
+function setReading(key, val){ var a = ensureAns(key); if(a) a.reading = val; }
 
 /* ---------------- photo ---------------- */
-function resetPhoto(itemId){
-  var host = $('ph_' + itemId);
+function resetPhoto(key){
+  var host = $('ph_' + key);
   if(!host) return;
   var thumb = host.querySelector('.ph-thumb');
   if(thumb) thumb.remove();
   var x = host.querySelector('.ph-x');
   if(x) x.remove();
-  var b = $('phb_' + itemId);
+  var b = $('phb_' + key);
   if(b){ b.className = 'ph-btn'; b.lastChild.nodeValue = 'Add photo'; }
-  var f = $('file_' + itemId);
+  var f = $('file_' + key);
   if(f) f.value = '';
 }
 
-function onPhoto(itemId, input){
+function onPhoto(key, input){
   var file = input.files && input.files[0];
   if(!file) return;
-  var a = ensureAns(itemId);
+  var a = ensureAns(key);
   if(!a) return;
-  var btn = $('phb_' + itemId);
+  var btn = $('phb_' + key);
   btn.lastChild.nodeValue = 'Compressing…';
 
   var reader = new FileReader();
   reader.onload = function(ev){
     var img = new Image();
     img.onload = function(){
-      var max = 1280;
-      var w = img.width, h = img.height;
+      var max = 1280, w = img.width, h = img.height;
       if(w > max || h > max){
         if(w > h){ h = Math.round(h * max / w); w = max; }
         else { w = Math.round(w * max / h); h = max; }
@@ -880,21 +766,18 @@ function onPhoto(itemId, input){
       c.width = w; c.height = h;
       c.getContext('2d').drawImage(img, 0, 0, w, h);
       var dataUrl = c.toDataURL('image/jpeg', 0.68);
-      var b64 = dataUrl.split(',')[1];
       btn.lastChild.nodeValue = 'Uploading…';
-      api({ action:'uploadPhoto', b64:b64, mime:'image/jpeg', name: itemId })
+      api({ action:'uploadPhoto', b64:dataUrl.split(',')[1], mime:'image/jpeg', name:'task' + a.task_id })
         .then(function(r){
           if(!r.ok){ toast(r.error || 'Upload failed', true); btn.lastChild.nodeValue = 'Add photo'; return; }
           a.photo = r.url;
-          var host = $('ph_' + itemId);
+          var host = $('ph_' + key);
           var im = document.createElement('img');
-          im.className = 'ph-thumb';
-          im.src = dataUrl;
+          im.className = 'ph-thumb'; im.src = dataUrl;
           host.appendChild(im);
           var x = document.createElement('button');
-          x.className = 'ph-x';
-          x.textContent = 'Remove';
-          x.onclick = function(){ a.photo = ''; resetPhoto(itemId); };
+          x.className = 'ph-x'; x.textContent = 'Remove';
+          x.onclick = function(){ a.photo = ''; resetPhoto(key); };
           host.appendChild(x);
           btn.className = 'ph-btn has';
           btn.lastChild.nodeValue = 'Photo attached';
@@ -909,82 +792,64 @@ function onPhoto(itemId, input){
   reader.readAsDataURL(file);
 }
 
-function answered(itemId){ return ST.answers[itemId] && ST.answers[itemId].result; }
-
+/* ---------------- progress ---------------- */
 function updateProgress(){
-  if(ST.mode === 'Maintenance'){
+  if(ST.mode === 'Breakdown'){
     $('dockCnt').innerHTML = '<b>Breakdown</b>problem log';
     $('submitBtn').textContent = 'Save breakdown →';
     return;
   }
-  $('submitBtn').textContent = 'Complete inspection →';
+  $('submitBtn').textContent = 'Submit checklist →';
 
-  var type = curType();
-  var total = 0, done = 0;
-  ['Daily','Weekly','Monthly'].forEach(function(f){
-    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
-    if(!list.length) return;
-    var dn = list.filter(function(i){ return answered(i.item_id); }).length;
-    var el = $('st' + f);
-    if(el){
-      if(f === 'Daily' || dn > 0){
-        el.textContent = dn + ' / ' + list.length;
-        el.className = 'st' + (dn === list.length ? ' ok' : '');
-      }else{
-        el.textContent = el.getAttribute('data-base');
-      }
-      if(dn === list.length && dn > 0){
-        var sect = $('sect' + f);
-        if(sect && f !== 'Daily') sect.classList.remove('open');
-      }
-    }
-    total += list.length;
-    done += dn;
+  var groups = {}, order = [];
+  ST.tasks.forEach(function(t){
+    var g = t.freq_label || 'Other';
+    if(!groups[g]){ groups[g] = []; order.push(g); }
+    groups[g].push(t);
   });
 
-  var bad = Object.keys(ST.answers).filter(function(k){ return ST.answers[k].result === 'Not OK'; }).length;
+  var done = 0, bad = 0;
+  order.forEach(function(g, gi){
+    var dn = groups[g].filter(function(t){
+      var a = ST.answers['r' + t.row];
+      return a && a.result;
+    }).length;
+    var el = $('cnt' + gi);
+    if(el){
+      el.textContent = dn + ' / ' + groups[g].length;
+      el.className = 'st' + (dn === groups[g].length ? ' ok' : '');
+      if(dn === groups[g].length && gi !== 0) $('sect' + gi).classList.remove('open');
+    }
+    done += dn;
+  });
+  Object.keys(ST.answers).forEach(function(k){ if(ST.answers[k].result === 'Issue') bad++; });
+
+  var total = ST.tasks.length;
   if($('progTxt')){
-    $('progTxt').textContent = done + ' of ' + total + ' checks completed';
-    var f2 = $('progFill');
-    f2.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
-    f2.className = 'fill' + (done === total && total ? ' done' : '');
+    $('progTxt').textContent = done + ' of ' + total + ' tasks done';
+    var f = $('progFill');
+    f.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+    f.className = 'fill' + (done === total && total ? ' done' : '');
   }
-  $('dockCnt').innerHTML = '<b>' + done + ' of ' + total + '</b>' + (bad ? bad + ' issue' + (bad > 1 ? 's' : '') : 'completed');
+  $('dockCnt').innerHTML = '<b>' + done + ' of ' + total + '</b>' + (bad ? bad + ' issue' + (bad > 1 ? 's' : '') : 'done');
 }
 
 /* ---------------- submit ---------------- */
 function submitEntry(){
-  if(!ST.emp){ toast('Select your name first', true); return; }
-  if(!hasMachine()){ toast('Select a motor first', true); return; }
+  if(!ST.doer){ toast('Select your name first', true); return; }
 
-  if(ST.mode === 'Maintenance'){
+  if(ST.mode === 'Breakdown'){
     if(!$('bdProblem').value){ toast('Select problem type', true); return; }
     if(!$('bdDesc').value.trim()){ toast('Describe the problem', true); return; }
     return doSubmit();
   }
 
-  var type = curType();
-  var daily = ST.items.filter(function(i){ return i.type === type && i.freq === 'Daily'; });
-  var missing = daily.filter(function(i){ return !answered(i.item_id); });
-  if(missing.length){
-    toast(missing.length + ' daily check pending', true);
-    var g = $('sectDaily'); if(g) g.classList.add('open');
-    var el = $('it_' + missing[0].item_id);
-    if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-    return;
-  }
+  var answered = Object.keys(ST.answers).filter(function(k){ return ST.answers[k].result; });
+  if(!answered.length){ toast('Tick at least one task', true); return; }
 
-  var pend = [];
-  ['Weekly','Monthly'].forEach(function(f){
-    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
-    if(!list.length) return;
-    var dn = list.filter(function(i){ return answered(i.item_id); }).length;
-    if(dueInfo(f).due && dn < list.length) pend.push(f + ' (' + dn + '/' + list.length + ')');
-  });
-
-  if(pend.length){
-    modal('Pending checks', 'Due but not finished: <b>' + esc(pend.join(', ')) +
-      '</b>. Submit anyway? The report will show them as not done.',
+  var left = ST.tasks.length - answered.length;
+  if(left > 0){
+    modal('Some tasks left', '<b>' + left + '</b> task abhi baaki hai. Submit karega to wo Master me Pending hi rahenge.',
       'Submit anyway', doSubmit, 'Go back');
     return;
   }
@@ -996,22 +861,16 @@ function doSubmit(){
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
-  var answers = Object.keys(ST.answers)
-    .map(function(k){ return ST.answers[k]; })
-    .filter(function(a){ return a.result; });
-
   var payload = {
-    action: 'submit',
-    mode: ST.mode,
-    emp_name: ST.emp,
+    action:'submit', mode:ST.mode, doer:ST.doer, dept:ST.dept,
     machine_id: ST.machine ? ST.machine.machine_id : '',
-    machine_other: ST.machine ? '' : ST.otherText,
     running_hrs: $('runHrs').value.trim(),
     remarks: $('remarks').value.trim(),
-    answers: answers
+    answers: Object.keys(ST.answers).map(function(k){ return ST.answers[k]; })
+              .filter(function(a){ return a.result; })
   };
 
-  if(ST.mode === 'Maintenance'){
+  if(ST.mode === 'Breakdown'){
     payload.breakdown = {
       problem: $('bdProblem').value,
       description: $('bdDesc').value.trim(),
@@ -1038,19 +897,19 @@ function doSubmit(){
 }
 
 function showDone(r){
-  var bad = Number(r.not_ok) || 0;
-  $('dnMotor').textContent = ST.machine ? ST.machine.machine_id : ST.otherText;
-  $('dnId').textContent = r.entry_id + ' · ' + (ST.machine ? ST.machine.name : 'Not in master list');
+  var bad = Number(r.issue) || 0;
+  $('dnWho').textContent = ST.doer + (ST.dept ? ' · ' + ST.dept : '');
+  $('dnId').textContent = r.entry_id + (ST.machine ? ' · ' + ST.machine.machine_id : '');
   $('dnOk').textContent = r.ok_count || 0;
   $('dnBad').textContent = bad;
   $('dnNa').textContent = r.na || 0;
   var v = $('dnVerdict');
   v.className = 'verdict ' + (bad ? 'att' : 'ok');
   v.textContent = bad ? 'ATTENTION REQUIRED' : 'NORMAL';
+  $('dnClosed').textContent = (r.closed || 0) + ' task(s) marked Done in the Master sheet.';
   $('dnReport').onclick = function(){ openReport(r.entry_id); };
   $('dnPdf').onclick = function(){ downloadPdf(r.entry_id, $('dnPdf')); };
 
-  loadTasks();
   $('pgNew').classList.add('hide');
   $('pgRec').classList.add('hide');
   $('pgDone').classList.remove('hide');
@@ -1058,23 +917,13 @@ function showDone(r){
   window.scrollTo({ top:0 });
 }
 
-function checkAnother(){
-  ST.answers = {};
-  ST.machine = null;
-  ST.otherText = '';
-  $('macSel').value = '';
-  $('macOther').value = '';
-  $('otherBox').classList.add('hide');
+function backToTasks(){
+  $('pgDone').classList.add('hide');
+  $('pgNew').classList.remove('hide');
   $('runHrs').value = '';
   $('remarks').value = '';
   ['bdProblem','bdDesc','bdAction','bdParts','bdCost','bdVendor','bdFrom','bdTo'].forEach(function(id){ $(id).value = ''; });
-  $('checkArea').innerHTML = '';
-  $('progWrap').innerHTML = '';
-  $('macSummary').innerHTML = '';
-  $('pgDone').classList.add('hide');
-  $('pgNew').classList.remove('hide');
-  renderChecklist();
-  api({ action:'boot' }).then(function(r){ if(r.ok) ST.last = r.last || {}; }).catch(function(){});
+  loadTasks();
   window.scrollTo({ top:0 });
 }
 
@@ -1108,7 +957,7 @@ function go(p){
   $('pgDone').classList.add('hide');
   $('tabNew').classList.toggle('on', p === 'new');
   $('tabRec').classList.toggle('on', p === 'rec');
-  $('dock').classList.toggle('hide', p !== 'new' || !hasMachine());
+  $('dock').classList.toggle('hide', p !== 'new' || !ST.doer);
   if(p === 'rec') loadEntries();
   window.scrollTo({ top:0 });
 }
@@ -1124,21 +973,12 @@ function loadEntries(){
     }).catch(function(e){ $('entList').textContent = e.message; });
 }
 
-function locOf(mid){
-  for(var i=0;i<ST.machines.length;i++){ if(ST.machines[i].machine_id === mid) return ST.machines[i].location || ''; }
-  return '';
-}
-
 function applyFilter(){
-  var mac = $('fMac').value, emp = $('fEmp').value, loc = $('fLoc').value,
-      typ = $('fType').value, stat = $('fStat').value;
-
+  var doer = $('fDoer').value, mac = $('fMac').value, stat = $('fStat').value;
   var rows = ST.entries.filter(function(e){
+    if(doer && e.doer !== doer) return false;
     if(mac && e.machine_id !== mac) return false;
-    if(emp && e.emp_name !== emp) return false;
-    if(loc && locOf(e.machine_id) !== loc) return false;
-    if(typ && e.mode !== typ) return false;
-    var bad = Number(e.not_ok) > 0;
+    var bad = Number(e.issue) > 0;
     if(stat === 'ok' && bad) return false;
     if(stat === 'att' && !bad) return false;
     return true;
@@ -1148,11 +988,11 @@ function applyFilter(){
   if(!rows.length){ el.className = 'empty'; el.textContent = 'No records match these filters.'; return; }
   el.className = '';
   el.innerHTML = rows.map(function(e){
-    var bad = Number(e.not_ok) > 0;
-    var l = locOf(e.machine_id);
+    var bad = Number(e.issue) > 0;
     return '<div class="rec" onclick="openReport(\'' + esc(e.entry_id) + '\')">' +
-      '<div><div class="id">' + esc(e.machine_id || e.machine_name || '—') + '</div>' +
-      '<div class="mt">' + esc(e.mode) + ' · ' + esc(e.emp_name) + (l ? ' · ' + esc(l) : '') + '</div></div>' +
+      '<div><div class="id">' + esc(e.machine_id || e.entry_id) + '</div>' +
+      '<div class="mt">' + esc(e.doer) + (e.department ? ' · ' + esc(e.department) : '') +
+      (e.freqs ? ' · ' + esc(e.freqs) : '') + '</div></div>' +
       '<div class="rt"><div class="dt">' + esc(e.date) + '</div>' +
       '<span class="pill ' + (bad ? 'att' : 'ok') + '">' + (bad ? 'ATTENTION' : 'NORMAL') + '</span></div></div>';
   }).join('');
@@ -1161,6 +1001,7 @@ function applyFilter(){
 /* ---------------- init ---------------- */
 $('mask').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
 boot();
+
 </script>
 </body>
 </html>
