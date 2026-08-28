@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Machine Maintenance</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14161c; --muted:#6b7280; --line:#e3e6ec; --soft:#f6f7fa;
+  --brand:#1f2430; --ok:#12805c; --okbg:#e7f6f0; --bad:#c22b2b; --badbg:#fdecec;
+  --na:#7a7f8a; --nabg:#f0f1f4; --amber:#a86a00; --amberbg:#fff5e3;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:'Jost',system-ui,Arial,sans-serif;background:#f2f4f7;color:var(--ink);font-size:15px;line-height:1.45}
+.wrap{max-width:640px;margin:0 auto;padding:0 14px 130px}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid var(--line)}
+.top-in{max-width:640px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px}
+.tt{font-weight:600;font-size:16px;line-height:1.1}
+.ts{font-size:11.5px;color:var(--muted)}
+.tabs{display:flex;gap:6px;margin-left:auto}
+.tab{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 13px;font-family:inherit;font-size:13px;color:var(--muted);cursor:pointer}
+.tab.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+/* ---------- banner ---------- */
+#banner{display:none;padding:9px 14px;font-size:13px;text-align:center}
+#banner.ok{display:block;background:var(--okbg);color:var(--ok)}
+#banner.err{display:block;background:var(--badbg);color:var(--bad)}
+#banner a{color:inherit;font-weight:600}
+
+/* ---------- cards ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:14px}
+.card h2{margin:0 0 3px;font-size:16px;font-weight:600}
+.card p.hint{margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+label{display:block;font-size:12.5px;font-weight:500;color:var(--muted);margin:12px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+label:first-child{margin-top:0}
+input,select,textarea{width:100%;font-family:inherit;font-size:16px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink);outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--brand)}
+textarea{min-height:78px;resize:vertical}
+.row2{display:flex;gap:10px}
+.row2>div{flex:1}
+
+/* ---------- buttons ---------- */
+.btn{font-family:inherit;font-size:15px;font-weight:600;border-radius:11px;padding:13px 18px;border:1px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.sm{width:auto;padding:9px 15px;font-size:13.5px}
+.btn:disabled{opacity:.5}
+
+/* ---------- pick tiles ---------- */
+.tiles{display:flex;gap:10px}
+.tile{flex:1;border:1px solid var(--line);border-radius:12px;background:#fff;padding:16px 12px;text-align:center;cursor:pointer;font-family:inherit}
+.tile.on{border-color:var(--brand);background:var(--soft);box-shadow:inset 0 0 0 1px var(--brand)}
+.tile b{display:block;font-size:15px;font-weight:600}
+.tile span{font-size:11.5px;color:var(--muted)}
+.tile .em{font-size:22px;display:block;margin-bottom:4px}
+
+/* ---------- checklist ---------- */
+.grp{border:1px solid var(--line);border-radius:13px;background:#fff;margin-top:12px;overflow:hidden}
+.grph{display:flex;align-items:center;gap:9px;padding:13px 14px;cursor:pointer;background:var(--soft);border-bottom:1px solid var(--line)}
+.grph b{font-size:14.5px;font-weight:600}
+.chip{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:20px;letter-spacing:.3px}
+.chip.due{background:var(--amberbg);color:var(--amber)}
+.chip.done{background:var(--okbg);color:var(--ok)}
+.chip.cnt{background:var(--nabg);color:var(--na);margin-left:auto}
+.arw{font-size:12px;color:var(--muted);transition:.2s}
+.grp.open .arw{transform:rotate(180deg)}
+.grpb{display:none;padding:4px 0}
+.grp.open .grpb{display:block}
+.item{padding:12px 14px;border-bottom:1px solid #f0f2f5}
+.item:last-child{border-bottom:0}
+.item .en{font-size:14px;font-weight:500}
+.item .bn{font-size:13px;color:#4b5563;margin-top:2px}
+.item .tag{display:inline-block;font-size:10px;background:var(--amberbg);color:var(--amber);padding:2px 7px;border-radius:20px;margin-top:5px;font-weight:600}
+.opts{display:flex;gap:7px;margin-top:9px}
+.opt{flex:1;font-family:inherit;font-size:13.5px;font-weight:600;padding:11px 4px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+.opt.on-ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.opt.on-bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.opt.on-na{background:var(--nabg);border-color:#c9ccd3;color:#4b5563}
+.rmk{margin-top:8px;display:none}
+.rmk.show{display:block}
+
+/* ---------- list ---------- */
+.ent{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid #f0f2f5;cursor:pointer}
+.ent:last-child{border-bottom:0}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none}
+.dot.bad{background:var(--bad)}
+.ent .n{font-size:14px;font-weight:500}
+.ent .m{font-size:11.5px;color:var(--muted)}
+.ent .r{margin-left:auto;font-size:12px;color:var(--muted);text-align:right}
+
+/* ---------- sticky submit ---------- */
+.sticky{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:11px 14px calc(11px + env(safe-area-inset-bottom));z-index:40}
+.sticky-in{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.sticky .sum{font-size:12px;color:var(--muted);flex:none}
+
+/* ---------- modal + toast ---------- */
+.mask{position:fixed;inset:0;background:rgba(15,18,25,.45);display:none;align-items:flex-start;justify-content:center;overflow-y:auto;z-index:9998;padding:18px}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:440px;margin:auto;padding:20px;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.modal h3{margin:0 0 6px;font-size:17px;font-weight:600}
+.modal p{margin:0 0 14px;font-size:13.5px;color:var(--muted)}
+.mbtns{display:flex;gap:10px;margin-top:16px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:88px;background:#14161c;color:#fff;font-size:13.5px;padding:11px 18px;border-radius:10px;z-index:10001;opacity:0;transition:.25s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.on{opacity:1}
+#toast.err{background:var(--bad)}
+.loading{text-align:center;color:var(--muted);font-size:13.5px;padding:26px 0}
+.foot{text-align:center;font-size:11px;color:#9aa0ac;margin:22px 0 4px}
+.hide{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="logo">🔧</div>
+    <div>
+      <div class="tt" id="coName">Machine Maintenance</div>
+      <div class="ts" id="whoLine">Loading…</div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" id="tabNew" onclick="go('new')">New</button>
+      <button class="tab" id="tabRec" onclick="go('rec')">Records</button>
+    </div>
+  </div>
+</div>
+<div id="banner"></div>
+
+<div class="wrap">
+
+  <!-- ================= NEW ENTRY ================= -->
+  <div id="pgNew">
+
+    <div class="card" id="cardWho">
+      <h2>Who is filling this?</h2>
+      <p class="hint">আপনার নাম বেছে নিন</p>
+      <select id="empSel" onchange="onEmp()"><option value="">— Select your name —</option></select>
+    </div>
+
+    <div class="card hide" id="cardMode">
+      <h2>What are you doing?</h2>
+      <p class="hint">আপনি কী করছেন?</p>
+      <div class="tiles">
+        <button class="tile on" id="tPrd" onclick="setMode('Periodic')">
+          <span class="em">📋</span><b>Checklist</b><span>Daily / Weekly / Monthly</span>
+        </button>
+        <button class="tile" id="tMnt" onclick="setMode('Maintenance')">
+          <span class="em">🛠</span><b>Breakdown</b><span>Repair / problem entry</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="card hide" id="cardMachine">
+      <h2>Which machine?</h2>
+      <p class="hint">কোন মেশিন? তালিকায় না থাকলে "Other" বেছে নিয়ে নম্বর লিখুন</p>
+      <select id="macSel" onchange="onMachine()"><option value="">— Select machine —</option></select>
+      <div id="otherBox" class="hide">
+        <label>Machine tag / model number</label>
+        <input id="macOther" placeholder="e.g. K-2216200 or Bharat Bijlee 2.2 HP" oninput="onOther()">
+        <label>Machine type</label>
+        <select id="macOtherType" onchange="renderChecklist()">
+          <option value="MOTOR">Motor</option>
+          <option value="PUMP">Pump</option>
+          <option value="FILTER">Filter</option>
+        </select>
+      </div>
+      <div id="macInfo" class="hint" style="margin-top:10px"></div>
+    </div>
+
+    <!-- periodic checklist -->
+    <div id="checkArea" class="hide"></div>
+
+    <div class="card hide" id="cardExtra">
+      <label>Running hours / meter reading (optional)</label>
+      <input id="runHrs" placeholder="e.g. 1240">
+      <label>Remarks (optional)</label>
+      <textarea id="remarks" placeholder="Anything the supervisor should know…"></textarea>
+    </div>
+
+    <!-- breakdown form -->
+    <div id="bdArea" class="hide">
+      <div class="card">
+        <h2>Breakdown details</h2>
+        <p class="hint">কী সমস্যা হয়েছে, কে সারিয়েছে, কত খরচ</p>
+        <label>Problem type *</label>
+        <select id="bdProblem">
+          <option value="">— Select —</option>
+          <option>Breakdown — machine not running</option>
+          <option>Abnormal noise / vibration</option>
+          <option>Overheating</option>
+          <option>Water / oil leakage</option>
+          <option>Electrical fault</option>
+          <option>Bearing failure</option>
+          <option>Belt / coupling problem</option>
+          <option>Routine servicing</option>
+          <option>Other</option>
+        </select>
+        <label>What happened? *</label>
+        <textarea id="bdDesc" placeholder="Describe the problem in simple words"></textarea>
+        <label>Action taken</label>
+        <textarea id="bdAction" placeholder="What was done to fix it"></textarea>
+        <label>Parts changed</label>
+        <input id="bdParts" placeholder="e.g. bearing 6205, capacitor">
+        <div class="row2">
+          <div><label>Cost (₹)</label><input id="bdCost" inputmode="numeric" placeholder="10000"></div>
+          <div><label>Vendor / technician</label><input id="bdVendor" placeholder="e.g. Chandan"></div>
+        </div>
+        <div class="row2">
+          <div><label>Down from</label><input id="bdFrom" type="datetime-local"></div>
+          <div><label>Down to</label><input id="bdTo" type="datetime-local"></div>
+        </div>
+        <label>Status</label>
+        <select id="bdStatus"><option>Closed</option><option>Open</option></select>
+      </div>
+    </div>
+
+    <div class="foot" id="verFoot"></div>
+  </div>
+
+  <!-- ================= RECORDS ================= -->
+  <div id="pgRec" class="hide">
+    <div class="card">
+      <h2>Recent entries</h2>
+      <p class="hint">Tap any row to open its A4 report</p>
+      <div class="row2">
+        <div><label>From</label><input id="fFrom" type="date"></div>
+        <div><label>To</label><input id="fTo" type="date"></div>
+      </div>
+      <label>Machine</label>
+      <select id="fMac"><option value="">All machines</option></select>
+      <div style="margin-top:12px"><button class="btn ghost sm" onclick="loadEntries()">Apply filter</button></div>
+    </div>
+    <div class="card"><div id="entList" class="loading">Loading…</div></div>
+  </div>
+
+</div>
+
+<!-- sticky submit -->
+<div class="sticky hide" id="stickyBar">
+  <div class="sticky-in">
+    <div class="sum" id="progSum">0 / 0</div>
+    <button class="btn" id="submitBtn" onclick="submitEntry()">Submit ✅</button>
+  </div>
+</div>
+
+<!-- modal -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <h3 id="mTitle">Title</h3>
+    <p id="mBody">Body</p>
+    <div id="mExtra"></div>
+    <div class="mbtns">
+      <button class="btn ghost" id="mNo" onclick="closeModal()">Cancel</button>
+      <button class="btn" id="mYes">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* =====================================================================
+ * CONFIG — paste your GAS /exec URL here after deploying
+ * ===================================================================== */
+var API_DEFAULT = 'PASTE_YOUR_GAS_EXEC_URL_HERE';
+var API = localStorage.getItem('mmc_api') || API_DEFAULT;
+
+/* ---------------- state ---------------- */
+var ST = {
+  machines: [], employees: [], items: [], last: {},
+  mode: 'Periodic', emp: '', machine: null, otherText: '', otherType: 'MOTOR',
+  answers: {}, weeklyDays: 7, monthlyDays: 30, version: ''
+};
+
+/* ---------------- helpers ---------------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function toast(msg, isErr){
+  var t = $('toast');
+  t.textContent = msg;
+  t.className = 'on' + (isErr ? ' err' : '');
+  setTimeout(function(){ t.className = ''; }, 2600);
+}
+function modal(title, body, yesLabel, onYes, noLabel){
+  $('mTitle').textContent = title;
+  $('mBody').innerHTML = body;
+  $('mYes').textContent = yesLabel || 'OK';
+  $('mNo').textContent = noLabel || 'Cancel';
+  $('mNo').style.display = onYes ? '' : 'none';
+  $('mYes').onclick = function(){ closeModal(); if(onYes) onYes(); };
+  $('mask').classList.add('on');
+}
+function closeModal(){ $('mask').classList.remove('on'); $('mExtra').innerHTML = ''; }
+
+function api(payload){
+  return fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(function(r){ return r.text(); }).then(function(t){
+    try { return JSON.parse(t); }
+    catch(e){ throw new Error('Bad response from server. Check deployment access = Anyone.'); }
+  });
+}
+
+function todayStr(){
+  var d = new Date();
+  return d.getFullYear() + '-' + ('0'+(d.getMonth()+1)).slice(-2) + '-' + ('0'+d.getDate()).slice(-2);
+}
+function daysBetween(a, b){
+  if(!a) return 9999;
+  var d1 = new Date(a + 'T00:00:00'), d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000);
+}
+
+/* ---------------- boot ---------------- */
+function boot(){
+  if(!API || API.indexOf('macros') < 0){
+    banner('err', 'GAS URL not set. <a href="#" onclick="askUrl();return false">Set URL</a>');
+    return;
+  }
+  api({ action: 'boot' }).then(function(r){
+    if(!r.ok) throw new Error(r.error || 'Boot failed');
+    ST.machines = r.machines || [];
+    ST.employees = r.employees || [];
+    ST.items = r.items || [];
+    ST.last = r.last || {};
+    ST.weeklyDays = r.weekly_days || 7;
+    ST.monthlyDays = r.monthly_days || 30;
+    ST.version = r.version;
+    $('coName').textContent = r.company || 'Machine Maintenance';
+    $('whoLine').textContent = r.app || '';
+    $('verFoot').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
+    fillEmployees();
+    fillMachines();
+    banner('ok', 'Connected ✅');
+    setTimeout(function(){ banner('', ''); }, 2200);
+  }).catch(function(e){
+    banner('err', esc(e.message) + ' &nbsp;<a href="#" onclick="askUrl();return false">Set URL</a>');
+  });
+}
+
+function banner(cls, html){
+  var b = $('banner');
+  b.className = cls;
+  b.innerHTML = html;
+}
+
+function askUrl(){
+  $('mExtra').innerHTML = '<input id="urlIn" placeholder="https://script.google.com/macros/s/.../exec" value="' + esc(API) + '">';
+  modal('Set GAS URL', 'Paste the web app /exec URL.', 'Save', function(){}, 'Cancel');
+  $('mYes').onclick = function(){
+    var v = ($('urlIn') ? $('urlIn').value : '').trim();
+    if(v.indexOf('/exec') < 0){ toast('URL must end with /exec', true); return; }
+    localStorage.setItem('mmc_api', v);
+    location.reload();
+  };
+}
+
+function fillEmployees(){
+  var s = $('empSel');
+  s.innerHTML = '<option value="">— Select your name —</option>';
+  ST.employees.forEach(function(e){
+    var o = document.createElement('option');
+    o.value = e.name;
+    o.textContent = e.name + (e.role ? ' · ' + e.role : '');
+    s.appendChild(o);
+  });
+  var saved = localStorage.getItem('mmc_emp');
+  if(saved){ s.value = saved; if(s.value) onEmp(); }
+}
+
+function fillMachines(){
+  var opts = '<option value="">— Select machine —</option>';
+  ST.machines.forEach(function(m){
+    opts += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) +
+            (m.location ? ' — ' + esc(m.location) : '') + '</option>';
+  });
+  opts += '<option value="__OTHER__">➕ Other / not in list</option>';
+  $('macSel').innerHTML = opts;
+  var f = '<option value="">All machines</option>';
+  ST.machines.forEach(function(m){ f += '<option value="' + esc(m.machine_id) + '">' + esc(m.name) + '</option>'; });
+  $('fMac').innerHTML = f;
+}
+
+/* ---------------- flow ---------------- */
+function onEmp(){
+  ST.emp = $('empSel').value;
+  localStorage.setItem('mmc_emp', ST.emp);
+  if(ST.emp){
+    $('cardMode').classList.remove('hide');
+    $('cardMachine').classList.remove('hide');
+  }
+}
+
+function setMode(m){
+  ST.mode = m;
+  $('tPrd').classList.toggle('on', m === 'Periodic');
+  $('tMnt').classList.toggle('on', m === 'Maintenance');
+  ST.answers = {};
+  renderChecklist();
+}
+
+function onMachine(){
+  var v = $('macSel').value;
+  if(v === '__OTHER__'){
+    ST.machine = null;
+    $('otherBox').classList.remove('hide');
+    $('macInfo').textContent = '';
+  }else{
+    $('otherBox').classList.add('hide');
+    ST.otherText = '';
+    ST.machine = null;
+    for(var i=0;i<ST.machines.length;i++){ if(ST.machines[i].machine_id === v) ST.machine = ST.machines[i]; }
+    if(ST.machine){
+      var m = ST.machine, bits = [];
+      if(m.make) bits.push(m.make);
+      if(m.hp) bits.push(m.hp);
+      if(m.voltage) bits.push(m.voltage + 'V');
+      if(m.rpm) bits.push(m.rpm + ' RPM');
+      $('macInfo').textContent = bits.join(' · ');
+    }else{
+      $('macInfo').textContent = '';
+    }
+  }
+  ST.answers = {};
+  renderChecklist();
+}
+
+function onOther(){ ST.otherText = $('macOther').value.trim(); renderChecklist(); }
+
+function curType(){
+  if(ST.machine) return ST.machine.type || 'MOTOR';
+  return $('macOtherType').value || 'MOTOR';
+}
+function hasMachine(){ return !!(ST.machine || ST.otherText); }
+
+function dueInfo(freq){
+  if(freq === 'Daily') return { due: true, last: lastDone('Daily') };
+  var days = (freq === 'Weekly') ? ST.weeklyDays : ST.monthlyDays;
+  var l = lastDone(freq);
+  return { due: daysBetween(l, todayStr()) >= days, last: l };
+}
+function lastDone(freq){
+  var mid = ST.machine ? ST.machine.machine_id : '';
+  if(!mid || !ST.last[mid]) return '';
+  return ST.last[mid][freq] || '';
+}
+
+function renderChecklist(){
+  var show = hasMachine();
+  $('checkArea').classList.toggle('hide', !(show && ST.mode === 'Periodic'));
+  $('bdArea').classList.toggle('hide', !(show && ST.mode === 'Maintenance'));
+  $('cardExtra').classList.toggle('hide', !show);
+  $('stickyBar').classList.toggle('hide', !show);
+  if(!show) return;
+
+  if(ST.mode === 'Maintenance'){ updateProgress(); return; }
+
+  var type = curType();
+  var freqs = ['Daily','Weekly','Monthly'];
+  var html = '';
+
+  freqs.forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length) return;
+    var di = dueInfo(f);
+    var open = (f === 'Daily' || di.due);
+    var chip = (f === 'Daily')
+      ? '<span class="chip due">EVERY DAY</span>'
+      : (di.due ? '<span class="chip due">DUE NOW</span>'
+                : '<span class="chip done">DONE ' + esc(di.last || '—') + '</span>');
+
+    html += '<div class="grp' + (open ? ' open' : '') + '" id="grp' + f + '">' +
+      '<div class="grph" onclick="toggleGrp(\'' + f + '\')">' +
+        '<b>' + f.toUpperCase() + '</b>' + chip +
+        '<span class="chip cnt" id="cnt' + f + '">0/' + list.length + '</span>' +
+        '<span class="arw">▼</span>' +
+      '</div><div class="grpb">';
+
+    list.forEach(function(it){
+      html += '<div class="item" id="it_' + esc(it.item_id) + '">' +
+        '<div class="en">' + esc(it.item_en) + '</div>' +
+        (it.item_bn ? '<div class="bn">' + esc(it.item_bn) + '</div>' : '') +
+        (it.needs_tool ? '<div class="tag">🔧 NEEDS INSTRUMENT · ' + esc(it.tier) + '</div>' : '') +
+        '<div class="opts">' +
+          '<button class="opt" data-r="OK"     onclick="pick(\'' + it.item_id + '\',\'OK\')">✅ OK</button>' +
+          '<button class="opt" data-r="Not OK" onclick="pick(\'' + it.item_id + '\',\'Not OK\')">❌ Not OK</button>' +
+          '<button class="opt" data-r="N/A"    onclick="pick(\'' + it.item_id + '\',\'N/A\')">➖ N/A</button>' +
+        '</div>' +
+        '<div class="rmk" id="rmk_' + esc(it.item_id) + '">' +
+          '<input placeholder="What is the problem? / কী সমস্যা?" oninput="setRemark(\'' + it.item_id + '\',this.value)">' +
+        '</div>' +
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  if(!html) html = '<div class="card"><p class="hint">No check items for this machine type. Add rows in the MMC_CheckItems sheet.</p></div>';
+  $('checkArea').innerHTML = html;
+  updateProgress();
+}
+
+function toggleGrp(f){ $('grp' + f).classList.toggle('open'); }
+
+function pick(itemId, result){
+  var it = null;
+  for(var i=0;i<ST.items.length;i++){ if(ST.items[i].item_id === itemId) it = ST.items[i]; }
+  if(!it) return;
+  var prev = ST.answers[itemId] || {};
+  ST.answers[itemId] = {
+    item_id: itemId, freq: it.freq, tier: it.tier,
+    item_en: it.item_en, item_bn: it.item_bn,
+    result: result, remark: prev.remark || ''
+  };
+  var box = $('it_' + itemId);
+  var btns = box.querySelectorAll('.opt');
+  for(var b=0;b<btns.length;b++){
+    var r = btns[b].getAttribute('data-r');
+    btns[b].className = 'opt' + (r === result ? (r === 'OK' ? ' on-ok' : (r === 'Not OK' ? ' on-bad' : ' on-na')) : '');
+  }
+  var rm = $('rmk_' + itemId);
+  if(result === 'Not OK' || result === 'N/A') rm.classList.add('show'); else rm.classList.remove('show');
+  updateProgress();
+}
+
+function setRemark(itemId, val){
+  if(ST.answers[itemId]) ST.answers[itemId].remark = val;
+}
+
+function updateProgress(){
+  if(ST.mode === 'Maintenance'){
+    $('progSum').textContent = 'Breakdown entry';
+    $('submitBtn').textContent = 'Save breakdown 🛠';
+    return;
+  }
+  var type = curType();
+  ['Daily','Weekly','Monthly'].forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length || !$('cnt' + f)) return;
+    var done = list.filter(function(i){ return ST.answers[i.item_id]; }).length;
+    $('cnt' + f).textContent = done + '/' + list.length;
+  });
+  var daily = ST.items.filter(function(i){ return i.type === type && i.freq === 'Daily'; });
+  var dDone = daily.filter(function(i){ return ST.answers[i.item_id]; }).length;
+  var bad = Object.keys(ST.answers).filter(function(k){ return ST.answers[k].result === 'Not OK'; }).length;
+  $('progSum').textContent = 'Daily ' + dDone + '/' + daily.length + (bad ? ' · ⚠ ' + bad : '');
+  $('submitBtn').textContent = 'Submit ✅';
+}
+
+/* ---------------- submit ---------------- */
+function submitEntry(){
+  if(!ST.emp){ toast('Select your name first', true); return; }
+  if(!hasMachine()){ toast('Select a machine first', true); return; }
+
+  if(ST.mode === 'Maintenance'){
+    if(!$('bdProblem').value){ toast('Select problem type', true); return; }
+    if(!$('bdDesc').value.trim()){ toast('Describe the problem', true); return; }
+    return doSubmit();
+  }
+
+  var type = curType();
+  var daily = ST.items.filter(function(i){ return i.type === type && i.freq === 'Daily'; });
+  var missing = daily.filter(function(i){ return !ST.answers[i.item_id]; });
+  if(missing.length){
+    toast(missing.length + ' daily item left · ' + missing.length + ' টি বাকি আছে', true);
+    var g = $('grpDaily'); if(g) g.classList.add('open');
+    var el = $('it_' + missing[0].item_id);
+    if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+
+  var pend = [];
+  ['Weekly','Monthly'].forEach(function(f){
+    var list = ST.items.filter(function(i){ return i.type === type && i.freq === f; });
+    if(!list.length) return;
+    var answered = list.filter(function(i){ return ST.answers[i.item_id]; }).length;
+    if(dueInfo(f).due && answered < list.length) pend.push(f + ' (' + answered + '/' + list.length + ')');
+  });
+
+  if(pend.length){
+    modal('Pending checks', 'These are due but not finished:<br><b>' + esc(pend.join(', ')) +
+      '</b><br><br>Submit anyway? The report will show them as not done.',
+      'Submit anyway', doSubmit, 'Go back');
+    return;
+  }
+  doSubmit();
+}
+
+function doSubmit(){
+  var btn = $('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  var payload = {
+    action: 'submit',
+    mode: ST.mode,
+    emp_name: ST.emp,
+    machine_id: ST.machine ? ST.machine.machine_id : '',
+    machine_other: ST.machine ? '' : ST.otherText,
+    running_hrs: $('runHrs').value.trim(),
+    remarks: $('remarks').value.trim(),
+    answers: Object.keys(ST.answers).map(function(k){ return ST.answers[k]; })
+  };
+
+  if(ST.mode === 'Maintenance'){
+    payload.breakdown = {
+      problem: $('bdProblem').value,
+      description: $('bdDesc').value.trim(),
+      action: $('bdAction').value.trim(),
+      parts: $('bdParts').value.trim(),
+      cost: $('bdCost').value.trim(),
+      vendor: $('bdVendor').value.trim(),
+      down_from: $('bdFrom').value,
+      down_to: $('bdTo').value,
+      status: $('bdStatus').value
+    };
+  }
+
+  api(payload).then(function(r){
+    btn.disabled = false;
+    updateProgress();
+    if(!r.ok){ toast(r.error || 'Save failed', true); return; }
+    showDone(r);
+  }).catch(function(e){
+    btn.disabled = false;
+    updateProgress();
+    toast(e.message, true);
+  });
+}
+
+function showDone(r){
+  var body = 'Entry <b>' + esc(r.entry_id) + '</b> saved.<br>' +
+    (ST.mode === 'Periodic'
+      ? ('✅ OK: ' + r.ok_count + ' &nbsp; ❌ Not OK: ' + r.not_ok + ' &nbsp; ➖ N/A: ' + r.na)
+      : 'Breakdown recorded.');
+  $('mExtra').innerHTML =
+    '<button class="btn ghost" style="margin-top:10px" onclick="openReport(\'' + r.entry_id + '\')">Open A4 report 🖨</button>' +
+    '<button class="btn ghost" style="margin-top:8px" onclick="downloadPdf(\'' + r.entry_id + '\',this)">Download PDF ⬇</button>';
+  modal('Saved ✅', body, 'New entry', function(){ resetForm(); });
+}
+
+function openReport(id){ window.open(API + '?report=' + encodeURIComponent(id), '_blank'); }
+
+function downloadPdf(id, btn){
+  btn.disabled = true;
+  btn.textContent = 'Building PDF…';
+  api({ action:'makePdf', entry_id:id }).then(function(r){
+    btn.disabled = false;
+    btn.textContent = 'Download PDF ⬇';
+    if(!r.ok){ toast(r.error || 'PDF failed', true); return; }
+    var bin = atob(r.b64), arr = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([arr], { type:'application/pdf' }));
+    var a = document.createElement('a');
+    a.href = url; a.download = r.name; a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
+  }).catch(function(e){
+    btn.disabled = false;
+    btn.textContent = 'Download PDF ⬇';
+    toast(e.message, true);
+  });
+}
+
+function resetForm(){
+  ST.answers = {};
+  ST.machine = null;
+  ST.otherText = '';
+  $('macSel').value = '';
+  $('macOther').value = '';
+  $('otherBox').classList.add('hide');
+  $('macInfo').textContent = '';
+  $('runHrs').value = '';
+  $('remarks').value = '';
+  ['bdProblem','bdDesc','bdAction','bdParts','bdCost','bdVendor','bdFrom','bdTo'].forEach(function(id){ $(id).value = ''; });
+  $('checkArea').innerHTML = '';
+  renderChecklist();
+  api({ action:'boot' }).then(function(r){ if(r.ok) ST.last = r.last || {}; }).catch(function(){});
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+/* ---------------- records ---------------- */
+function go(p){
+  $('pgNew').classList.toggle('hide', p !== 'new');
+  $('pgRec').classList.toggle('hide', p !== 'rec');
+  $('tabNew').classList.toggle('on', p === 'new');
+  $('tabRec').classList.toggle('on', p === 'rec');
+  $('stickyBar').classList.toggle('hide', p !== 'new' || !hasMachine());
+  if(p === 'rec') loadEntries();
+}
+
+function loadEntries(){
+  $('entList').className = 'loading';
+  $('entList').textContent = 'Loading…';
+  api({ action:'listEntries', from:$('fFrom').value, to:$('fTo').value, machine_id:$('fMac').value, limit:60 })
+    .then(function(r){
+      if(!r.ok){ $('entList').textContent = r.error || 'Failed'; return; }
+      if(!r.entries.length){ $('entList').textContent = 'No entries yet.'; return; }
+      $('entList').className = '';
+      $('entList').innerHTML = r.entries.map(function(e){
+        var bad = Number(e.not_ok) > 0;
+        return '<div class="ent" onclick="openReport(\'' + esc(e.entry_id) + '\')">' +
+          '<span class="dot' + (bad ? ' bad' : '') + '"></span>' +
+          '<div><div class="n">' + esc(e.machine_name || e.machine_id || '—') + '</div>' +
+          '<div class="m">' + esc(e.entry_id) + ' · ' + esc(e.emp_name) + ' · ' + esc(e.mode) +
+          (e.freqs ? ' · ' + esc(e.freqs) : '') + '</div></div>' +
+          '<div class="r">' + esc(e.date) + '<br>' + (bad ? '⚠ ' + esc(e.not_ok) : '✅') + '</div></div>';
+      }).join('');
+    }).catch(function(e){ $('entList').textContent = e.message; });
+}
+
+/* ---------------- init ---------------- */
+$('mask').addEventListener('click', function(e){ if(e.target === this) closeModal(); });
+boot();
+</script>
+</body>
+</html>
