@@ -204,6 +204,13 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
 .note{background:var(--warnbg);color:var(--warn);border:1px solid #EBD5AD;border-radius:12px;
       padding:13px 16px;font-size:13px;margin-top:14px}
 .foot{text-align:center;font-size:11px;color:#A69C90;margin:24px 0 6px}
+.how{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px}
+.how b{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--dim);text-transform:uppercase}
+.how ol{margin:9px 0 0;padding-left:20px}
+.how li{font-size:13.5px;margin-bottom:5px}
+.how li:last-child{margin-bottom:0}
+.help{width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);
+      color:var(--dim);font-size:14px;font-weight:600;cursor:pointer;flex:0 0 auto;margin-left:8px}
 
 @media (max-width:520px){
   .two > div{flex:1 1 100%}
@@ -228,9 +235,10 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       <div class="app">Motor Maintenance</div>
     </div>
     <div class="tabs">
-      <button class="on" id="tabCheck" onclick="showPage('check')">Checklist</button>
-      <button id="tabRec" onclick="showPage('records')">Records</button>
+      <button class="on" id="tabCheck" onclick="openTab('check')">Checklist</button>
+      <button id="tabRec" onclick="openTab('records')">Records</button>
     </div>
+    <button class="help" onclick="showHelp()" title="Kaise use karein">?</button>
   </div>
   <div id="msg"></div>
 </div>
@@ -245,20 +253,28 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       <div class="h2">Who are you?</div>
       <p class="sub">আপনার নাম বেছে নিন</p>
       <label>Name</label>
-      <select id="empSel" onchange="pickEmp()">
+      <select id="empSel" onchange="chooseName()">
         <option value="">Select your name</option>
       </select>
       <div id="setupNote"></div>
+      <div class="how">
+        <b>Teen step me kaam khatam</b>
+        <ol>
+          <li>Apna naam chuno</li>
+          <li>Machine chuno — uski checklist khud khul jayegi</li>
+          <li>Har line pe <b>Thik hai</b> / <b>Kharab hai</b> dabao, phir niche <b>Jama karo</b></li>
+        </ol>
+      </div>
     </div>
 
     <div class="card pad hidden" id="cardMode">
       <div class="eyebrow">Step 2</div>
       <div class="h2">What are you doing?</div>
       <div class="seg">
-        <button class="on" id="modeCheck" onclick="pickMode('Checklist')">
+        <button class="on" id="modeCheck" onclick="chooseWork('Checklist')">
           Checklist<small>Daily / Weekly / Monthly</small>
         </button>
-        <button id="modeBreak" onclick="pickMode('Breakdown')">
+        <button id="modeBreak" onclick="chooseWork('Breakdown')">
           Breakdown<small>Repair &amp; problem log</small>
         </button>
       </div>
@@ -269,18 +285,18 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       <div class="h2">Which machine?</div>
       <p class="sub">তালিকায় না থাকলে Other বেছে নিন</p>
       <label>Machine</label>
-      <select id="macSel" onchange="pickMachine()">
+      <select id="macSel" onchange="chooseMachine()">
         <option value="">Select machine</option>
       </select>
       <div id="otherWrap" class="hidden">
         <div class="two">
           <div>
             <label>Tag / model number</label>
-            <input id="macOther" placeholder="K-2216200" oninput="typeOther()">
+            <input id="macOther" placeholder="K-2216200" oninput="typeMachineId()">
           </div>
           <div>
             <label>Machine type</label>
-            <select id="macOtherType" onchange="drawChecklist()">
+            <select id="macOtherType" onchange="showChecklist()">
               <option value="MOTOR">Motor</option>
               <option value="PUMP">Pump</option>
               <option value="FILTER">Filter</option>
@@ -295,7 +311,7 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       <div class="mid" id="sumId"></div>
       <div class="mloc" id="sumLoc"></div>
       <div class="mspec" id="sumSpec"></div>
-      <button class="more hidden" id="sumMore" onclick="toggleDetails()">View details</button>
+      <button class="more hidden" id="sumMore" onclick="toggleMachineDetails()">View details</button>
       <div class="det" id="sumDet"></div>
     </div>
 
@@ -380,7 +396,7 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
         <div class="acts">
           <button class="btn" id="btnReport">View report</button>
           <button class="btn alt" id="btnPdf">Download PDF</button>
-          <button class="btn alt" onclick="startAgain()">Check another machine</button>
+          <button class="btn alt" onclick="startNew()">Check another machine</button>
         </div>
       </div>
     </div>
@@ -392,21 +408,21 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       <div class="eyebrow">Filter</div>
       <div class="h2">Records</div>
       <div class="two">
-        <div><label>From</label><input id="fFrom" type="date" onchange="loadRecords()"></div>
-        <div><label>To</label><input id="fTo" type="date" onchange="loadRecords()"></div>
+        <div><label>From</label><input id="fFrom" type="date" onchange="loadOldRecords()"></div>
+        <div><label>To</label><input id="fTo" type="date" onchange="loadOldRecords()"></div>
       </div>
       <div class="two">
         <div>
           <label>Employee</label>
-          <select id="fEmp" onchange="drawRecords()"><option value="">All employees</option></select>
+          <select id="fEmp" onchange="showOldRecords()"><option value="">All employees</option></select>
         </div>
         <div>
           <label>Machine</label>
-          <select id="fMac" onchange="drawRecords()"><option value="">All machines</option></select>
+          <select id="fMac" onchange="showOldRecords()"><option value="">All machines</option></select>
         </div>
         <div>
           <label>Status</label>
-          <select id="fStatus" onchange="drawRecords()">
+          <select id="fStatus" onchange="showOldRecords()">
             <option value="">All</option>
             <option value="ok">Normal</option>
             <option value="att">Attention</option>
@@ -422,7 +438,7 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
 <div class="dock hidden" id="dock">
   <div class="dock-in">
     <div class="info" id="dockInfo"><b>0 of 0</b>done</div>
-    <button class="btn" id="btnSubmit" onclick="trySubmit()">Submit checklist →</button>
+    <button class="btn" id="btnSubmit" onclick="checkThenSave()">Submit checklist →</button>
   </div>
 </div>
 
@@ -431,7 +447,7 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
     <h3 id="popTitle"></h3>
     <p id="popBody"></p>
     <div class="row">
-      <button class="btn alt" id="popNo" onclick="closePop()">Cancel</button>
+      <button class="btn alt" id="popNo" onclick="closePopup()">Cancel</button>
       <button class="btn" id="popYes">OK</button>
     </div>
   </div>
@@ -441,10 +457,34 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
 
 <script>
 /* =====================================================================
-   CONFIG — apna GAS /exec URL yahan paste kar
+   ==  1. SETTINGS  ====================================================
+   Kuch badalna ho to SIRF ye box chhedna. Neeche kuch mat chhuo.
    ===================================================================== */
-var API_DEFAULT = 'https://script.google.com/macros/s/AKfycbymHQHFjC4Lc0vwykJs-iUVM1e1g1rH5lrWb8ijRiW3J3fEtV6hqzczvK0Qepcv4u49/exec';
-var API = localStorage.getItem('mmc_api') || API_DEFAULT;
+var SETTINGS = {
+
+  // Google Apps Script ka web app URL. Deploy karne ke baad milta hai.
+  // Aisa dikhta hai: https://script.google.com/macros/s/AKfy....../exec
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbyN_lF3Hribc4JhdullAuCi7KbNH0ILqxj5lH3u_47jkzpxs_rbEwqws6Njb8Xc0npI/exec',
+
+  // Header me upar jo naam dikhega
+  COMPANY: 'S.P. GROUP',
+  APP_NAME: 'Motor Maintenance',
+
+  // Screen pe dikhne wale shabd. Hindi/Bangla karna ho to yahin badlo.
+  WORDS: {
+    step1:    'Tum kaun ho?',
+    step1sub: 'আপনার নাম বেছে নিন',
+    step2:    'Kya karna hai?',
+    step3:    'Kaunsi machine?',
+    step3sub: 'তালিকায় না থাকলে Other বেছে নিন',
+    ok:       '✓ Thik hai',
+    issue:    '✕ Kharab hai',
+    na:       '— Nahi kiya',
+    submit:   'Jama karo →'
+  }
+};
+
+var API = localStorage.getItem('mmc_api') || SETTINGS.GAS_URL;
 
 var DATA = {
   employees: [],
@@ -464,10 +504,12 @@ var PICK = {
   answers: {}
 };
 
-/* ---------------- small helpers ---------------- */
-function el(id){ return document.getElementById(id); }
+/* =====================================================================
+   ==  2. CHHOTE HELPERS  — toast, popup, server ko call
+   ===================================================================== */
+function find(id){ return document.getElementById(id); }
 
-function safe(v){
+function clean(v){
   return String(v === undefined || v === null ? '' : v)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -476,33 +518,33 @@ function safe(v){
     .replace(/'/g, '&#39;');
 }
 
-function toast(text, isBad){
-  var t = el('toast');
+function showMessage(text, isBad){
+  var t = find('toast');
   t.textContent = text;
   t.className = 'on' + (isBad ? ' bad' : '');
   setTimeout(function(){ t.className = ''; }, 2600);
 }
 
-function popup(title, body, yesText, onYes){
-  el('popTitle').textContent = title;
-  el('popBody').innerHTML = body;
-  el('popYes').textContent = yesText || 'OK';
-  el('popNo').style.display = onYes ? '' : 'none';
-  el('popYes').onclick = function(){
-    closePop();
+function showPopup(title, body, yesText, onYes){
+  find('popTitle').textContent = title;
+  find('popBody').innerHTML = body;
+  find('popYes').textContent = yesText || 'OK';
+  find('popNo').style.display = onYes ? '' : 'none';
+  find('popYes').onclick = function(){
+    closePopup();
     if(onYes) onYes();
   };
-  el('mask').classList.add('on');
+  find('mask').classList.add('on');
 }
-function closePop(){ el('mask').classList.remove('on'); }
+function closePopup(){ find('mask').classList.remove('on'); }
 
-function setMsg(kind, html){
-  var m = el('msg');
+function showBanner(kind, html){
+  var m = find('msg');
   m.className = kind;
   m.innerHTML = html;
 }
 
-function call(payload){
+function askServer(payload){
   return fetch(API, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -518,25 +560,27 @@ function call(payload){
   });
 }
 
-function todayText(){
+function todayDate(){
   var d = new Date();
   return d.getFullYear() + '-' +
          ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
          ('0' + d.getDate()).slice(-2);
 }
 
-function daysGap(from, to){
+function daysBetween(from, to){
   if(!from) return 9999;
   return Math.round((new Date(to + 'T00:00:00') - new Date(from + 'T00:00:00')) / 86400000);
 }
 
-/* ---------------- startup ---------------- */
-function start(){
+/* =====================================================================
+   ==  3. APP KHULTE HI  — sheet se naam, machine, checklist laata hai
+   ===================================================================== */
+function startApp(){
   if(!API || API.indexOf('macros') < 0){
-    setMsg('bad', 'GAS URL set nahi hai. <a href="#" onclick="askUrl();return false">Set URL</a>');
+    showBanner('bad', 'GAS URL set nahi hai. <a href="#" onclick="askForUrl();return false">Set URL</a>');
     return;
   }
-  call({ action: 'boot' })
+  askServer({ action: 'boot' })
     .then(function(r){
       if(!r.ok) throw new Error(r.error || 'Boot failed');
       DATA.employees = r.employees || [];
@@ -546,40 +590,40 @@ function start(){
       DATA.weeklyDays = r.weekly_days || 7;
       DATA.monthlyDays = r.monthly_days || 30;
 
-      el('coName').textContent = String(r.company || 'S.P. Group').toUpperCase();
-      el('footNote').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
+      find('coName').textContent = String(r.company || SETTINGS.COMPANY).toUpperCase();
+      find('footNote').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
 
-      fillEmployees();
-      fillMachines();
+      loadNameList();
+      loadMachineList();
 
       if(!DATA.employees.length){
-        el('setupNote').innerHTML =
+        find('setupNote').innerHTML =
           '<div class="note">Koi employee nahi mila. Sheet me menu → 🔧 Maintenance → ➕ ADD se naam daal.</div>';
       }
 
-      setMsg('good', 'Connected');
-      setTimeout(function(){ setMsg('', ''); }, 1600);
+      showBanner('good', 'Connected');
+      setTimeout(function(){ showBanner('', ''); }, 1600);
     })
     .catch(function(err){
-      setMsg('bad', safe(err.message) + ' <a href="#" onclick="askUrl();return false">Set URL</a>');
+      showBanner('bad', clean(err.message) + ' <a href="#" onclick="askForUrl();return false">Set URL</a>');
     });
 }
 
-function askUrl(){
+function askForUrl(){
   var v = prompt('GAS web app /exec URL paste kar', API);
   if(!v) return;
   v = v.trim();
   if(v.indexOf('/exec') < 0){
-    toast('URL /exec pe khatam hona chahiye', true);
+    showMessage('URL /exec pe khatam hona chahiye', true);
     return;
   }
   localStorage.setItem('mmc_api', v);
   location.reload();
 }
 
-function fillEmployees(){
-  var sel = el('empSel');
-  var filter = el('fEmp');
+function loadNameList(){
+  var sel = find('empSel');
+  var filter = find('fEmp');
   sel.innerHTML = '<option value="">Select your name</option>';
   filter.innerHTML = '<option value="">All employees</option>';
 
@@ -598,49 +642,51 @@ function fillEmployees(){
   var saved = localStorage.getItem('mmc_emp');
   if(saved){
     sel.value = saved;
-    if(sel.value) pickEmp();
+    if(sel.value) chooseName();
   }
 }
 
-function fillMachines(){
+function loadMachineList(){
   var main = '<option value="">Select machine</option>';
   var filter = '<option value="">All machines</option>';
 
   DATA.machines.forEach(function(m){
-    var label = safe(m.name) + (m.location ? ' — ' + safe(m.location) : '');
-    main += '<option value="' + safe(m.machine_id) + '">' + label + '</option>';
-    filter += '<option value="' + safe(m.machine_id) + '">' + safe(m.name) + '</option>';
+    var label = clean(m.name) + (m.location ? ' — ' + clean(m.location) : '');
+    main += '<option value="' + clean(m.machine_id) + '">' + label + '</option>';
+    filter += '<option value="' + clean(m.machine_id) + '">' + clean(m.name) + '</option>';
   });
   main += '<option value="__OTHER__">Other / not in list</option>';
 
-  el('macSel').innerHTML = main;
-  el('fMac').innerHTML = filter;
+  find('macSel').innerHTML = main;
+  find('fMac').innerHTML = filter;
 }
 
-/* ---------------- steps ---------------- */
-function pickEmp(){
-  PICK.emp = el('empSel').value;
+/* =====================================================================
+   ==  4. TEEN STEP  — naam → kya karna hai → kaunsi machine
+   ===================================================================== */
+function chooseName(){
+  PICK.emp = find('empSel').value;
   if(!PICK.emp) return;
   localStorage.setItem('mmc_emp', PICK.emp);
-  el('cardMode').classList.remove('hidden');
-  el('cardMachine').classList.remove('hidden');
+  find('cardMode').classList.remove('hidden');
+  find('cardMachine').classList.remove('hidden');
 }
 
-function pickMode(mode){
+function chooseWork(mode){
   PICK.mode = mode;
-  el('modeCheck').classList.toggle('on', mode === 'Checklist');
-  el('modeBreak').classList.toggle('on', mode === 'Breakdown');
+  find('modeCheck').classList.toggle('on', mode === 'Checklist');
+  find('modeBreak').classList.toggle('on', mode === 'Breakdown');
   PICK.answers = {};
-  drawChecklist();
+  showChecklist();
 }
 
-function pickMachine(){
-  var v = el('macSel').value;
+function chooseMachine(){
+  var v = find('macSel').value;
   if(v === '__OTHER__'){
     PICK.machine = null;
-    el('otherWrap').classList.remove('hidden');
+    find('otherWrap').classList.remove('hidden');
   } else {
-    el('otherWrap').classList.add('hidden');
+    find('otherWrap').classList.add('hidden');
     PICK.otherId = '';
     PICK.machine = null;
     DATA.machines.forEach(function(m){
@@ -648,40 +694,42 @@ function pickMachine(){
     });
   }
   PICK.answers = {};
-  drawChecklist();
+  showChecklist();
 }
 
-function typeOther(){
-  PICK.otherId = el('macOther').value.trim();
-  drawChecklist();
+function typeMachineId(){
+  PICK.otherId = find('macOther').value.trim();
+  showChecklist();
 }
 
-function machineType(){
+function machineKind(){
   if(PICK.machine) return PICK.machine.type || 'MOTOR';
-  return el('macOtherType').value || 'MOTOR';
+  return find('macOtherType').value || 'MOTOR';
 }
 
-function haveMachine(){
+function machineChosen(){
   return !!(PICK.machine || PICK.otherId);
 }
 
-function lastDoneOn(freq){
+function lastCheckedOn(freq){
   var id = PICK.machine ? PICK.machine.machine_id : '';
   if(!id || !DATA.last[id]) return '';
   return DATA.last[id][freq] || '';
 }
 
-function freqDue(freq){
-  if(freq === 'Daily') return { due: true, last: lastDoneOn('Daily') };
+function isDueNow(freq){
+  if(freq === 'Daily') return { due: true, last: lastCheckedOn('Daily') };
   var limit = (freq === 'Weekly') ? DATA.weeklyDays : DATA.monthlyDays;
-  var last = lastDoneOn(freq);
-  return { due: daysGap(last, todayText()) >= limit, last: last };
+  var last = lastCheckedOn(freq);
+  return { due: daysBetween(last, todayDate()) >= limit, last: last };
 }
 
-/* ---------------- machine summary ---------------- */
-function drawSummary(){
-  var card = el('cardSummary');
-  if(!haveMachine()){
+/* =====================================================================
+   ==  5. MACHINE KA CARD  — upar machine ki detail dikhata hai
+   ===================================================================== */
+function showMachineCard(){
+  var card = find('cardSummary');
+  if(!machineChosen()){
     card.classList.add('hidden');
     return;
   }
@@ -689,24 +737,24 @@ function drawSummary(){
 
   var m = PICK.machine;
   if(!m){
-    el('sumId').textContent = PICK.otherId;
-    el('sumLoc').textContent = '';
-    el('sumSpec').textContent = 'Not in list · ' + machineType();
-    el('sumMore').classList.add('hidden');
-    el('sumDet').className = 'det';
-    el('sumDet').innerHTML = '';
+    find('sumId').textContent = PICK.otherId;
+    find('sumLoc').textContent = '';
+    find('sumSpec').textContent = 'Not in list · ' + machineKind();
+    find('sumMore').classList.add('hidden');
+    find('sumDet').className = 'det';
+    find('sumDet').innerHTML = '';
     return;
   }
 
-  el('sumId').textContent = m.machine_id;
-  el('sumLoc').textContent = m.location || '';
+  find('sumId').textContent = m.machine_id;
+  find('sumLoc').textContent = m.location || '';
 
   var spec = [];
   if(m.make) spec.push(m.make);
   if(m.hp) spec.push(m.hp);
   if(m.voltage) spec.push(m.voltage + 'V');
   if(m.rpm) spec.push(m.rpm + ' RPM');
-  el('sumSpec').textContent = spec.join(' • ');
+  find('sumSpec').textContent = spec.join(' • ');
 
   var rows = [
     ['Model', m.model], ['Frame', m.frame], ['FLA', m.fla],
@@ -714,45 +762,47 @@ function drawSummary(){
   ].filter(function(r){ return r[1]; });
 
   if(rows.length){
-    el('sumMore').classList.remove('hidden');
-    el('sumDet').innerHTML = rows.map(function(r){
-      return '<div><span>' + safe(r[0]) + '</span><b>' + safe(r[1]) + '</b></div>';
+    find('sumMore').classList.remove('hidden');
+    find('sumDet').innerHTML = rows.map(function(r){
+      return '<div><span>' + clean(r[0]) + '</span><b>' + clean(r[1]) + '</b></div>';
     }).join('');
   } else {
-    el('sumMore').classList.add('hidden');
-    el('sumDet').innerHTML = '';
+    find('sumMore').classList.add('hidden');
+    find('sumDet').innerHTML = '';
   }
-  el('sumDet').className = 'det';
-  el('sumMore').textContent = 'View details';
+  find('sumDet').className = 'det';
+  find('sumMore').textContent = 'View details';
 }
 
-function toggleDetails(){
-  var box = el('sumDet');
+function toggleMachineDetails(){
+  var box = find('sumDet');
   box.classList.toggle('on');
-  el('sumMore').textContent = box.classList.contains('on') ? 'Hide details' : 'View details';
+  find('sumMore').textContent = box.classList.contains('on') ? 'Hide details' : 'View details';
 }
 
-/* ---------------- checklist ---------------- */
-function itemsFor(freq){
-  var type = machineType();
+/* =====================================================================
+   ==  6. CHECKLIST  — Daily / Weekly / Monthly rows banata hai
+   ===================================================================== */
+function getItems(freq){
+  var type = machineKind();
   return DATA.items.filter(function(i){
     return i.type === type && i.freq === freq;
   });
 }
 
-function drawChecklist(){
-  var ready = haveMachine();
+function showChecklist(){
+  var ready = machineChosen();
   var isCheck = (PICK.mode === 'Checklist');
 
-  drawSummary();
-  el('breakArea').classList.toggle('hidden', !(ready && !isCheck));
-  el('cardExtra').classList.toggle('hidden', !ready);
-  el('dock').classList.toggle('hidden', !ready);
+  showMachineCard();
+  find('breakArea').classList.toggle('hidden', !(ready && !isCheck));
+  find('cardExtra').classList.toggle('hidden', !ready);
+  find('dock').classList.toggle('hidden', !ready);
 
   if(!ready || !isCheck){
-    el('listArea').innerHTML = '';
-    el('cardProgress').classList.add('hidden');
-    refreshProgress();
+    find('listArea').innerHTML = '';
+    find('cardProgress').classList.add('hidden');
+    updateCounts();
     return;
   }
 
@@ -760,10 +810,10 @@ function drawChecklist(){
   var openedOne = false;
 
   ['Daily', 'Weekly', 'Monthly'].forEach(function(freq){
-    var list = itemsFor(freq);
+    var list = getItems(freq);
     if(!list.length) return;
 
-    var info = freqDue(freq);
+    var info = isDueNow(freq);
     var open = false;
     if(freq === 'Daily'){
       open = true;
@@ -786,36 +836,36 @@ function drawChecklist(){
     }
 
     html += '<div class="sec' + (open ? ' open' : '') + '" id="sec' + freq + '">' +
-              '<div class="sec-h" onclick="toggleSection(\'' + freq + '\')">' +
+              '<div class="sec-h" onclick="openCloseSection(\'' + freq + '\')">' +
                 '<span class="name">' + freq.toUpperCase() + ' INSPECTION</span>' +
-                '<span class="cnt ' + cls + '" id="cnt' + freq + '" data-idle="' + safe(label) + '">' + safe(label) + '</span>' +
+                '<span class="cnt ' + cls + '" id="cnt' + freq + '" data-idle="' + clean(label) + '">' + clean(label) + '</span>' +
                 '<span class="arrow"></span>' +
               '</div>' +
               '<div class="sec-b">';
 
     list.forEach(function(item){
-      html += itemHtml(item);
+      html += buildOneRow(item);
     });
 
     html += '</div></div>';
   });
 
   if(!html){
-    el('listArea').innerHTML = '<div class="card"><div class="blank">Is machine type ke liye koi check item nahi hai.</div></div>';
-    el('cardProgress').classList.add('hidden');
+    find('listArea').innerHTML = '<div class="card"><div class="blank">Is machine type ke liye koi check item nahi hai.</div></div>';
+    find('cardProgress').classList.add('hidden');
     return;
   }
 
-  el('listArea').innerHTML = html;
-  el('cardProgress').classList.remove('hidden');
-  refreshProgress();
+  find('listArea').innerHTML = html;
+  find('cardProgress').classList.remove('hidden');
+  updateCounts();
 }
 
-function itemHtml(item){
+function buildOneRow(item){
   var id = item.item_id;
   var tag = '';
   if(item.needs_tool){
-    tag = '<div class="tool">NEEDS INSTRUMENT · ' + safe(item.tier).toUpperCase() + '</div>';
+    tag = '<div class="tool">NEEDS INSTRUMENT · ' + clean(item.tier).toUpperCase() + '</div>';
   } else if(item.tier === 'Technician'){
     tag = '<div class="tool">TECHNICIAN</div>';
   }
@@ -823,43 +873,43 @@ function itemHtml(item){
   var reading = '';
   if(item.unit){
     reading = '<div class="reading"><div class="wrap2">' +
-                '<input inputmode="decimal" placeholder="Reading" oninput="setReading(\'' + id + '\', this.value)">' +
-                '<span class="unit">' + safe(item.unit) + '</span>' +
+                '<input inputmode="decimal" placeholder="Reading" oninput="typeReading(\'' + id + '\', this.value)">' +
+                '<span class="unit">' + clean(item.unit) + '</span>' +
               '</div></div>';
   }
 
-  return '<div class="item" id="item_' + safe(id) + '">' +
-           '<div class="q">' + safe(item.item_en) + '</div>' +
-           (item.item_bn ? '<div class="bn">' + safe(item.item_bn) + '</div>' : '') +
+  return '<div class="item" id="item_' + clean(id) + '">' +
+           '<div class="q">' + clean(item.item_en) + '</div>' +
+           (item.item_bn ? '<div class="bn">' + clean(item.item_bn) + '</div>' : '') +
            tag +
            reading +
            '<div class="pick">' +
-             '<button data-val="OK" onclick="choose(\'' + id + '\', \'OK\')">✓ OK</button>' +
-             '<button data-val="Issue" onclick="choose(\'' + id + '\', \'Issue\')">✕ Issue</button>' +
-             '<button data-val="N/A" onclick="choose(\'' + id + '\', \'N/A\')">— N/A</button>' +
+             '<button data-val="OK" onclick="tapResult(\'' + id + '\', \'OK\')">' + SETTINGS.WORDS.ok + '</button>' +
+             '<button data-val="Issue" onclick="tapResult(\'' + id + '\', \'Issue\')">' + SETTINGS.WORDS.issue + '</button>' +
+             '<button data-val="N/A" onclick="tapResult(\'' + id + '\', \'N/A\')">' + SETTINGS.WORDS.na + '</button>' +
            '</div>' +
-           '<div class="more-box" id="extra_' + safe(id) + '">' +
+           '<div class="more-box" id="extra_' + clean(id) + '">' +
              '<label>Issue remark</label>' +
-             '<textarea placeholder="Kya problem dikhi?" oninput="setRemark(\'' + id + '\', this.value)"></textarea>' +
+             '<textarea placeholder="Kya problem dikhi?" oninput="typeRemark(\'' + id + '\', this.value)"></textarea>' +
              '<label>Severity</label>' +
-             '<div class="sev" id="sev_' + safe(id) + '">' +
-               '<button data-sev="Low" onclick="setSeverity(\'' + id + '\', \'Low\')">Low</button>' +
-               '<button data-sev="Medium" onclick="setSeverity(\'' + id + '\', \'Medium\')">Medium</button>' +
-               '<button data-sev="Critical" onclick="setSeverity(\'' + id + '\', \'Critical\')">Critical</button>' +
+             '<div class="sev" id="sev_' + clean(id) + '">' +
+               '<button data-sev="Low" onclick="tapSeverity(\'' + id + '\', \'Low\')">Low</button>' +
+               '<button data-sev="Medium" onclick="tapSeverity(\'' + id + '\', \'Medium\')">Medium</button>' +
+               '<button data-sev="Critical" onclick="tapSeverity(\'' + id + '\', \'Critical\')">Critical</button>' +
              '</div>' +
-             '<div class="photo" id="photo_' + safe(id) + '">' +
-               '<input type="file" accept="image/*" capture="environment" class="hidden" id="file_' + safe(id) + '" onchange="uploadPhoto(\'' + id + '\', this)">' +
-               '<button class="take" id="take_' + safe(id) + '" onclick="openCamera(\'' + id + '\')">Add photo</button>' +
+             '<div class="photo" id="photo_' + clean(id) + '">' +
+               '<input type="file" accept="image/*" capture="environment" class="hidden" id="file_' + clean(id) + '" onchange="sendPhoto(\'' + id + '\', this)">' +
+               '<button class="take" id="take_' + clean(id) + '" onclick="openCamera(\'' + id + '\')">Add photo</button>' +
              '</div>' +
            '</div>' +
          '</div>';
 }
 
-function toggleSection(freq){
-  el('sec' + freq).classList.toggle('open');
+function openCloseSection(freq){
+  find('sec' + freq).classList.toggle('open');
 }
 
-function findItem(id){
+function getOneItem(id){
   var found = null;
   DATA.items.forEach(function(i){
     if(i.item_id === id) found = i;
@@ -867,9 +917,9 @@ function findItem(id){
   return found;
 }
 
-function makeAnswer(id){
+function startAnswer(id){
   if(!PICK.answers[id]){
-    var item = findItem(id);
+    var item = getOneItem(id);
     if(!item) return null;
     PICK.answers[id] = {
       item_id: id,
@@ -885,15 +935,15 @@ function makeAnswer(id){
   return PICK.answers[id];
 }
 
-function choose(id, value){
-  var ans = makeAnswer(id);
+function tapResult(id, value){
+  var ans = startAnswer(id);
   if(!ans) return;
 
   var clearing = (ans.result === value);
   ans.result = clearing ? '' : value;
   var now = ans.result;
 
-  var box = el('item_' + id);
+  var box = find('item_' + id);
   var buttons = box.querySelectorAll('.pick button');
   for(var i = 0; i < buttons.length; i++){
     var val = buttons[i].getAttribute('data-val');
@@ -905,17 +955,17 @@ function choose(id, value){
   }
 
   box.classList.toggle('bad', now === 'Issue');
-  el('extra_' + id).classList.toggle('on', now === 'Issue');
+  find('extra_' + id).classList.toggle('on', now === 'Issue');
 
   if(now !== 'Issue'){
     ans.severity = '';
     ans.photo = '';
     ans.remark = '';
-    var sevButtons = el('sev_' + id).querySelectorAll('button');
+    var sevButtons = find('sev_' + id).querySelectorAll('button');
     for(var s = 0; s < sevButtons.length; s++) sevButtons[s].className = '';
-    var area = el('extra_' + id).querySelector('textarea');
+    var area = find('extra_' + id).querySelector('textarea');
     if(area) area.value = '';
-    clearPhoto(id);
+    removePhoto(id);
   }
 
   if(!now){
@@ -925,15 +975,15 @@ function choose(id, value){
     delete PICK.answers[id];
   }
 
-  refreshProgress();
+  updateCounts();
 }
 
-function setSeverity(id, level){
-  var ans = makeAnswer(id);
+function tapSeverity(id, level){
+  var ans = startAnswer(id);
   if(!ans) return;
   ans.severity = level;
 
-  var buttons = el('sev_' + id).querySelectorAll('button');
+  var buttons = find('sev_' + id).querySelectorAll('button');
   for(var i = 0; i < buttons.length; i++){
     var val = buttons[i].getAttribute('data-sev');
     if(val !== level){
@@ -944,44 +994,46 @@ function setSeverity(id, level){
   }
 }
 
-function setRemark(id, text){
-  var ans = makeAnswer(id);
+function typeRemark(id, text){
+  var ans = startAnswer(id);
   if(ans) ans.remark = text;
 }
 
-function setReading(id, text){
-  var ans = makeAnswer(id);
+function typeReading(id, text){
+  var ans = startAnswer(id);
   if(ans) ans.reading = text;
 }
 
-/* ---------------- photo ---------------- */
+/* =====================================================================
+   ==  7. PHOTO  — camera se photo le kar Drive pe bhejta hai
+   ===================================================================== */
 function openCamera(id){
-  el('file_' + id).click();
+  find('file_' + id).click();
 }
 
-function clearPhoto(id){
-  var box = el('photo_' + id);
+function removePhoto(id){
+  var box = find('photo_' + id);
   if(!box) return;
   var img = box.querySelector('img');
   if(img) img.remove();
   var drop = box.querySelector('.drop');
   if(drop) drop.remove();
-  var btn = el('take_' + id);
+  var btn = find('take_' + id);
   if(btn){
     btn.className = 'take';
     btn.textContent = 'Add photo';
   }
-  var file = el('file_' + id);
+  var file = find('file_' + id);
   if(file) file.value = '';
 }
 
-function uploadPhoto(id, input){
+function sendPhoto(id, input){
   var file = input.files && input.files[0];
   if(!file) return;
-  var ans = makeAnswer(id);
+  var ans = startAnswer(id);
   if(!ans) return;
 
-  var btn = el('take_' + id);
+  var btn = find('take_' + id);
   btn.textContent = 'Compressing…';
 
   var reader = new FileReader();
@@ -1002,16 +1054,16 @@ function uploadPhoto(id, input){
       var dataUrl = canvas.toDataURL('image/jpeg', 0.68);
 
       btn.textContent = 'Uploading…';
-      call({ action: 'uploadPhoto', b64: dataUrl.split(',')[1], mime: 'image/jpeg', name: id })
+      askServer({ action: 'uploadPhoto', b64: dataUrl.split(',')[1], mime: 'image/jpeg', name: id })
         .then(function(r){
           if(!r.ok){
             btn.textContent = 'Add photo';
-            toast(r.error || 'Upload fail', true);
+            showMessage(r.error || 'Upload fail', true);
             return;
           }
           ans.photo = r.url;
 
-          var box = el('photo_' + id);
+          var box = find('photo_' + id);
           var thumb = document.createElement('img');
           thumb.src = dataUrl;
           box.appendChild(thumb);
@@ -1021,56 +1073,58 @@ function uploadPhoto(id, input){
           drop.textContent = 'Remove';
           drop.onclick = function(){
             ans.photo = '';
-            clearPhoto(id);
+            removePhoto(id);
           };
           box.appendChild(drop);
 
           btn.className = 'take has';
           btn.textContent = 'Photo attached';
-          toast('Photo uploaded');
+          showMessage('Photo uploaded');
         })
         .catch(function(err){
           btn.textContent = 'Add photo';
-          toast(err.message, true);
+          showMessage(err.message, true);
         });
     };
     img.onerror = function(){
       btn.textContent = 'Add photo';
-      toast('Image padhi nahi ja rahi', true);
+      showMessage('Image padhi nahi ja rahi', true);
     };
     img.src = ev.target.result;
   };
   reader.onerror = function(){
     btn.textContent = 'Add photo';
-    toast('File padhi nahi ja rahi', true);
+    showMessage('File padhi nahi ja rahi', true);
   };
   reader.readAsDataURL(file);
 }
 
-/* ---------------- progress ---------------- */
-function answeredCount(freq){
-  return itemsFor(freq).filter(function(i){
+/* =====================================================================
+   ==  8. GINTI  — kitna ho gaya, kitna baaki
+   ===================================================================== */
+function countDone(freq){
+  return getItems(freq).filter(function(i){
     return PICK.answers[i.item_id] && PICK.answers[i.item_id].result;
   }).length;
 }
 
-function refreshProgress(){
+function updateCounts(){
   if(PICK.mode === 'Breakdown'){
-    el('dockInfo').innerHTML = '<b>Breakdown</b>problem log';
-    el('btnSubmit').textContent = 'Save breakdown →';
+    find('dockInfo').innerHTML = '<b>Breakdown</b>problem log';
+    find('btnSubmit').textContent = 'Save breakdown →';
     return;
   }
-  el('btnSubmit').textContent = 'Submit checklist →';
+  find('btnSubmit').textContent = SETTINGS.WORDS.submit;
 
   var total = 0;
   var done = 0;
 
   ['Daily', 'Weekly', 'Monthly'].forEach(function(freq){
-    var list = itemsFor(freq);
+    var list = getItems(freq);
     if(!list.length) return;
 
-    var count = answeredCount(freq);
-    var box = el('cnt' + freq);
+    var count = countDone(freq);
+    var box = find('cnt' + freq);
     if(box){
       if(freq === 'Daily' || count > 0){
         box.textContent = count + ' / ' + list.length;
@@ -1079,7 +1133,7 @@ function refreshProgress(){
         box.textContent = box.getAttribute('data-idle');
       }
       if(count === list.length && count > 0 && freq !== 'Daily'){
-        el('sec' + freq).classList.remove('open');
+        find('sec' + freq).classList.remove('open');
       }
     }
     total += list.length;
@@ -1091,64 +1145,66 @@ function refreshProgress(){
     if(PICK.answers[k].result === 'Issue') issues++;
   });
 
-  if(el('progText')){
-    el('progText').textContent = done + ' of ' + total + ' checks done';
-    var bar = el('progBar');
+  if(find('progText')){
+    find('progText').textContent = done + ' of ' + total + ' checks done';
+    var bar = find('progBar');
     bar.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
     bar.className = 'bar' + (total && done === total ? ' full' : '');
   }
 
-  el('dockInfo').innerHTML = '<b>' + done + ' of ' + total + '</b>' +
+  find('dockInfo').innerHTML = '<b>' + done + ' of ' + total + '</b>' +
     (issues ? issues + ' issue' + (issues > 1 ? 's' : '') : 'done');
 }
 
-/* ---------------- submit ---------------- */
-function trySubmit(){
-  if(!PICK.emp){ toast('Pehle apna naam chuno', true); return; }
-  if(!haveMachine()){ toast('Pehle machine chuno', true); return; }
+/* =====================================================================
+   ==  9. JAMA KARNA  — sheet me row banti hai
+   ===================================================================== */
+function checkThenSave(){
+  if(!PICK.emp){ showMessage('Pehle apna naam chuno', true); return; }
+  if(!machineChosen()){ showMessage('Pehle machine chuno', true); return; }
 
   if(PICK.mode === 'Breakdown'){
-    if(!el('bProblem').value){ toast('Problem type chuno', true); return; }
-    if(!el('bDesc').value.trim()){ toast('Problem likho', true); return; }
-    sendSubmit();
+    if(!find('bProblem').value){ showMessage('Problem type chuno', true); return; }
+    if(!find('bDesc').value.trim()){ showMessage('Problem likho', true); return; }
+    saveToSheet();
     return;
   }
 
-  var daily = itemsFor('Daily');
+  var daily = getItems('Daily');
   var missing = daily.filter(function(i){
     return !(PICK.answers[i.item_id] && PICK.answers[i.item_id].result);
   });
 
   if(missing.length){
-    toast(missing.length + ' daily check baaki hai', true);
-    el('secDaily').classList.add('open');
-    var first = el('item_' + missing[0].item_id);
+    showMessage(missing.length + ' daily check baaki hai', true);
+    find('secDaily').classList.add('open');
+    var first = find('item_' + missing[0].item_id);
     if(first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
   }
 
   var pending = [];
   ['Weekly', 'Monthly'].forEach(function(freq){
-    var list = itemsFor(freq);
+    var list = getItems(freq);
     if(!list.length) return;
-    var count = answeredCount(freq);
-    if(freqDue(freq).due && count < list.length){
+    var count = countDone(freq);
+    if(isDueNow(freq).due && count < list.length){
       pending.push(freq + ' (' + count + '/' + list.length + ')');
     }
   });
 
   if(pending.length){
-    popup('Kuch baaki hai',
-          'Ye due hai par poora nahi hua: <b>' + safe(pending.join(', ')) + '</b><br><br>Phir bhi submit karu?',
+    showPopup('Kuch baaki hai',
+          'Ye due hai par poora nahi hua: <b>' + clean(pending.join(', ')) + '</b><br><br>Phir bhi submit karu?',
           'Submit anyway', sendSubmit);
     return;
   }
 
-  sendSubmit();
+  saveToSheet();
 }
 
-function sendSubmit(){
-  var btn = el('btnSubmit');
+function saveToSheet(){
+  var btn = find('btnSubmit');
   btn.disabled = true;
   btn.textContent = 'Saving…';
 
@@ -1158,91 +1214,93 @@ function sendSubmit(){
     emp_name: PICK.emp,
     machine_id: PICK.machine ? PICK.machine.machine_id : '',
     machine_other: PICK.machine ? '' : PICK.otherId,
-    running_hrs: el('runHrs').value.trim(),
-    remarks: el('remarks').value.trim(),
+    running_hrs: find('runHrs').value.trim(),
+    remarks: find('remarks').value.trim(),
     answers: Object.keys(PICK.answers).map(function(k){ return PICK.answers[k]; })
              .filter(function(a){ return a.result; })
   };
 
   if(PICK.mode === 'Breakdown'){
     body.breakdown = {
-      problem: el('bProblem').value,
-      description: el('bDesc').value.trim(),
-      action: el('bAction').value.trim(),
-      parts: el('bParts').value.trim(),
-      cost: el('bCost').value.trim(),
-      vendor: el('bVendor').value.trim(),
-      down_from: el('bFrom').value,
-      down_to: el('bTo').value,
-      status: el('bStatus').value
+      problem: find('bProblem').value,
+      description: find('bDesc').value.trim(),
+      action: find('bAction').value.trim(),
+      parts: find('bParts').value.trim(),
+      cost: find('bCost').value.trim(),
+      vendor: find('bVendor').value.trim(),
+      down_from: find('bFrom').value,
+      down_to: find('bTo').value,
+      status: find('bStatus').value
     };
   }
 
-  call(body)
+  askServer(body)
     .then(function(r){
       btn.disabled = false;
-      refreshProgress();
-      if(!r.ok){ toast(r.error || 'Save fail', true); return; }
-      showDone(r);
+      updateCounts();
+      if(!r.ok){ showMessage(r.error || 'Save fail', true); return; }
+      showThankYou(r);
     })
     .catch(function(err){
       btn.disabled = false;
-      refreshProgress();
-      toast(err.message, true);
+      updateCounts();
+      showMessage(err.message, true);
     });
 }
 
-function showDone(r){
+function showThankYou(r){
   var issues = Number(r.issue) || 0;
   var machineName = PICK.machine ? PICK.machine.machine_id : PICK.otherId;
 
-  el('doneWho').textContent = PICK.emp + ' · ' + machineName + ' · ' + r.entry_id;
-  el('doneOk').textContent = r.ok_count || 0;
-  el('doneBad').textContent = issues;
-  el('doneNa').textContent = r.na || 0;
+  find('doneWho').textContent = PICK.emp + ' · ' + machineName + ' · ' + r.entry_id;
+  find('doneOk').textContent = r.ok_count || 0;
+  find('doneBad').textContent = issues;
+  find('doneNa').textContent = r.na || 0;
 
-  var verdict = el('doneVerdict');
+  var verdict = find('doneVerdict');
   verdict.className = 'verdict ' + (issues ? 'att' : 'good');
   verdict.textContent = issues ? 'ATTENTION REQUIRED' : 'NORMAL';
 
-  el('btnReport').onclick = function(){ openReport(r.entry_id); };
-  el('btnPdf').onclick = function(){ downloadPdf(r.entry_id, el('btnPdf')); };
+  find('btnReport').onclick = function(){ openReport(r.entry_id); };
+  find('btnPdf').onclick = function(){ downloadPdf(r.entry_id, find('btnPdf')); };
 
-  el('pageCheck').classList.add('hidden');
-  el('pageRecords').classList.add('hidden');
-  el('pageDone').classList.remove('hidden');
-  el('dock').classList.add('hidden');
+  find('pageCheck').classList.add('hidden');
+  find('pageRecords').classList.add('hidden');
+  find('pageDone').classList.remove('hidden');
+  find('dock').classList.add('hidden');
   window.scrollTo({ top: 0 });
 }
 
-function startAgain(){
+function startNew(){
   PICK.answers = {};
   PICK.machine = null;
   PICK.otherId = '';
 
-  el('macSel').value = '';
-  el('macOther').value = '';
-  el('otherWrap').classList.add('hidden');
-  el('runHrs').value = '';
-  el('remarks').value = '';
+  find('macSel').value = '';
+  find('macOther').value = '';
+  find('otherWrap').classList.add('hidden');
+  find('runHrs').value = '';
+  find('remarks').value = '';
   ['bProblem','bDesc','bAction','bParts','bCost','bVendor','bFrom','bTo'].forEach(function(id){
-    el(id).value = '';
+    find(id).value = '';
   });
 
-  el('listArea').innerHTML = '';
-  el('cardProgress').classList.add('hidden');
-  el('cardSummary').classList.add('hidden');
-  el('pageDone').classList.add('hidden');
-  el('pageCheck').classList.remove('hidden');
+  find('listArea').innerHTML = '';
+  find('cardProgress').classList.add('hidden');
+  find('cardSummary').classList.add('hidden');
+  find('pageDone').classList.add('hidden');
+  find('pageCheck').classList.remove('hidden');
 
-  drawChecklist();
-  call({ action: 'boot' })
+  showChecklist();
+  askServer({ action: 'boot' })
     .then(function(r){ if(r.ok) DATA.last = r.last || {}; })
     .catch(function(){});
   window.scrollTo({ top: 0 });
 }
 
-/* ---------------- report ---------------- */
+/* =====================================================================
+   == 10. REPORT  — A4 page aur PDF
+   ===================================================================== */
 function openReport(id){
   window.open(API + '?report=' + encodeURIComponent(id), '_blank');
 }
@@ -1252,11 +1310,11 @@ function downloadPdf(id, btn){
   btn.disabled = true;
   btn.textContent = 'Building PDF…';
 
-  call({ action: 'makePdf', entry_id: id })
+  askServer({ action: 'makePdf', entry_id: id })
     .then(function(r){
       btn.disabled = false;
       btn.textContent = original;
-      if(!r.ok){ toast(r.error || 'PDF fail', true); return; }
+      if(!r.ok){ showMessage(r.error || 'PDF fail', true); return; }
 
       var raw = atob(r.b64);
       var bytes = new Uint8Array(raw.length);
@@ -1272,40 +1330,42 @@ function downloadPdf(id, btn){
     .catch(function(err){
       btn.disabled = false;
       btn.textContent = original;
-      toast(err.message, true);
+      showMessage(err.message, true);
     });
 }
 
-/* ---------------- records ---------------- */
-function showPage(name){
-  el('pageCheck').classList.toggle('hidden', name !== 'check');
-  el('pageRecords').classList.toggle('hidden', name !== 'records');
-  el('pageDone').classList.add('hidden');
-  el('tabCheck').classList.toggle('on', name === 'check');
-  el('tabRec').classList.toggle('on', name === 'records');
-  el('dock').classList.toggle('hidden', name !== 'check' || !haveMachine());
-  if(name === 'records') loadRecords();
+/* =====================================================================
+   == 11. PURANE RECORD  — list aur filter
+   ===================================================================== */
+function openTab(name){
+  find('pageCheck').classList.toggle('hidden', name !== 'check');
+  find('pageRecords').classList.toggle('hidden', name !== 'records');
+  find('pageDone').classList.add('hidden');
+  find('tabCheck').classList.toggle('on', name === 'check');
+  find('tabRec').classList.toggle('on', name === 'records');
+  find('dock').classList.toggle('hidden', name !== 'check' || !machineChosen());
+  if(name === 'records') loadOldRecords();
   window.scrollTo({ top: 0 });
 }
 
-function loadRecords(){
-  var box = el('recList');
+function loadOldRecords(){
+  var box = find('recList');
   box.className = 'loading';
   box.textContent = 'Loading';
 
-  call({ action: 'listEntries', from: el('fFrom').value, to: el('fTo').value, limit: 100 })
+  askServer({ action: 'listEntries', from: find('fFrom').value, to: find('fTo').value, limit: 100 })
     .then(function(r){
       if(!r.ok){ box.textContent = r.error || 'Failed'; return; }
       DATA.records = r.entries || [];
-      drawRecords();
+      showOldRecords();
     })
     .catch(function(err){ box.textContent = err.message; });
 }
 
-function drawRecords(){
-  var emp = el('fEmp').value;
-  var mac = el('fMac').value;
-  var status = el('fStatus').value;
+function showOldRecords(){
+  var emp = find('fEmp').value;
+  var mac = find('fMac').value;
+  var status = find('fStatus').value;
 
   var rows = DATA.records.filter(function(e){
     if(emp && e.employee !== emp) return false;
@@ -1316,7 +1376,7 @@ function drawRecords(){
     return true;
   });
 
-  var box = el('recList');
+  var box = find('recList');
   if(!rows.length){
     box.className = 'blank';
     box.textContent = 'Koi record nahi mila.';
@@ -1326,24 +1386,39 @@ function drawRecords(){
   box.className = '';
   box.innerHTML = rows.map(function(e){
     var bad = Number(e.issue) > 0;
-    return '<div class="rec" onclick="openReport(\'' + safe(e.entry_id) + '\')">' +
+    return '<div class="rec" onclick="openReport(\'' + clean(e.entry_id) + '\')">' +
              '<div>' +
-               '<div class="rid">' + safe(e.machine_id || e.entry_id) + '</div>' +
-               '<div class="rsub">' + safe(e.employee) + (e.freqs ? ' · ' + safe(e.freqs) : '') + '</div>' +
+               '<div class="rid">' + clean(e.machine_id || e.entry_id) + '</div>' +
+               '<div class="rsub">' + clean(e.employee) + (e.freqs ? ' · ' + clean(e.freqs) : '') + '</div>' +
              '</div>' +
              '<div class="right">' +
-               '<div class="date">' + safe(e.date) + '</div>' +
+               '<div class="date">' + clean(e.date) + '</div>' +
                '<span class="tagpill ' + (bad ? 'att' : 'good') + '">' + (bad ? 'ATTENTION' : 'NORMAL') + '</span>' +
              '</div>' +
            '</div>';
   }).join('');
 }
 
-/* ---------------- go ---------------- */
-el('mask').addEventListener('click', function(e){
-  if(e.target === this) closePop();
+/* =====================================================================
+   == 12. MADAD  — "?" button ka popup
+   ===================================================================== */
+function showHelp(){
+  showPopup('Kaise chalega',
+    '<b>Thik hai</b> dabaya → sheet me hari row banegi, matlab kaam ho gaya.<br><br>' +
+    '<b>Kharab hai</b> dabaya → laal row banegi, aur neeche problem likhne, ' +
+    'kitna serious hai chunne aur photo lagane ka option khulega.<br><br>' +
+    '<b>Nahi kiya</b> dabaya → grey row, matlab ye check nahi hua.<br><br>' +
+    'Galti se daba gaya? Wahi button dobara dabao, selection hat jayega.<br><br>' +
+    '<b>Jama karo</b> dabate hi Google Sheet me row ban jati hai aur report ready ho jati hai.');
+}
+
+/* =====================================================================
+   == 13. START
+   ===================================================================== */
+find('mask').addEventListener('click', function(e){
+  if(e.target === this) closePopup();
 });
-start();
+startApp();
 </script>
 </body>
 </html>
