@@ -124,7 +124,10 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
 .bn{font-size:13px;color:#5C544B;margin-top:2px}
 .tool{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.6px;color:var(--warn);
       background:var(--warnbg);padding:3px 8px;border-radius:5px;margin-top:6px}
-.reading{display:flex;margin-top:10px}
+.addread{margin-top:10px;background:none;border:0;padding:0;width:auto;cursor:pointer;
+         font-size:12.5px;font-weight:500;color:var(--dim);text-decoration:underline;text-underline-offset:3px}
+.reading{display:none;margin-top:10px}
+.reading.on{display:flex}
 .reading .wrap2{position:relative;flex:1 1 150px;max-width:230px}
 .reading input{padding-right:48px}
 .reading .unit{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:12px;
@@ -258,11 +261,11 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
       </select>
       <div id="setupNote"></div>
       <div class="how">
-        <b>Teen step me kaam khatam</b>
+        <b>Three steps and you are done</b>
         <ol>
-          <li>Apna naam chuno</li>
-          <li>Machine chuno — uski checklist khud khul jayegi</li>
-          <li>Har line pe <b>Thik hai</b> / <b>Kharab hai</b> dabao, phir niche <b>Jama karo</b></li>
+          <li>Pick your name</li>
+          <li>Pick the machine — its checklist opens by itself</li>
+          <li>Tap <b>OK</b> or <b>Issue</b> on every line, then <b>Submit</b> at the bottom</li>
         </ol>
       </div>
     </div>
@@ -458,29 +461,24 @@ textarea{min-height:76px;resize:vertical;font-size:15px}
 <script>
 /* =====================================================================
    ==  1. SETTINGS  ====================================================
-   Kuch badalna ho to SIRF ye box chhedna. Neeche kuch mat chhuo.
+   Change things ONLY inside this box. Leave the rest alone.
    ===================================================================== */
 var SETTINGS = {
 
-  // Google Apps Script ka web app URL. Deploy karne ke baad milta hai.
-  // Aisa dikhta hai: https://script.google.com/macros/s/AKfy....../exec
-  GAS_URL: 'https://script.google.com/macros/s/AKfycbyN_lF3Hribc4JhdullAuCi7KbNH0ILqxj5lH3u_47jkzpxs_rbEwqws6Njb8Xc0npI/exec',
+  // Google Apps Script web app URL — you get it after deploying.
+  // Looks like: https://script.google.com/macros/s/AKfy....../exec
+  GAS_URL: 'https://script.google.com/macros/s/AKfycbxp1E75584fxTFi8Js7sQ2v3AVq_F-jyM3puJwDmcymCDQWEVet7_siKKDnlzO1Jjlw/exec',
 
-  // Header me upar jo naam dikhega
+  // Name shown in the header
   COMPANY: 'S.P. GROUP',
   APP_NAME: 'Motor Maintenance',
 
-  // Screen pe dikhne wale shabd. Hindi/Bangla karna ho to yahin badlo.
+  // On-screen words. Want to change the wording? Change it here only.
   WORDS: {
-    step1:    'Tum kaun ho?',
-    step1sub: 'আপনার নাম বেছে নিন',
-    step2:    'Kya karna hai?',
-    step3:    'Kaunsi machine?',
-    step3sub: 'তালিকায় না থাকলে Other বেছে নিন',
-    ok:       '✓ Thik hai',
-    issue:    '✕ Kharab hai',
-    na:       '— Nahi kiya',
-    submit:   'Jama karo →'
+    ok:     '✓ OK',
+    issue:  '✕ Issue',
+    na:     '— N/A',
+    submit: 'Submit checklist →'
   }
 };
 
@@ -505,7 +503,7 @@ var PICK = {
 };
 
 /* =====================================================================
-   ==  2. CHHOTE HELPERS  — toast, popup, server ko call
+   ==  2. HELPERS  — toast, popup, server call
    ===================================================================== */
 function find(id){ return document.getElementById(id); }
 
@@ -555,7 +553,7 @@ function askServer(payload){
     try {
       return JSON.parse(text);
     } catch(err){
-      throw new Error('Server ne galat jawab diya. Deployment access = Anyone check kar.');
+      throw new Error('Bad reply from the server. Check that deployment access is set to Anyone.');
     }
   });
 }
@@ -573,11 +571,11 @@ function daysBetween(from, to){
 }
 
 /* =====================================================================
-   ==  3. APP KHULTE HI  — sheet se naam, machine, checklist laata hai
+   ==  3. ON OPEN  — loads names, machines and check items from the sheet
    ===================================================================== */
 function startApp(){
   if(!API || API.indexOf('macros') < 0){
-    showBanner('bad', 'GAS URL set nahi hai. <a href="#" onclick="askForUrl();return false">Set URL</a>');
+    showBanner('bad', 'GAS URL not set. <a href="#" onclick="askForUrl();return false">Set URL</a>');
     return;
   }
   askServer({ action: 'boot' })
@@ -598,7 +596,7 @@ function startApp(){
 
       if(!DATA.employees.length){
         find('setupNote').innerHTML =
-          '<div class="note">Koi employee nahi mila. Sheet me menu → 🔧 Maintenance → ➕ ADD se naam daal.</div>';
+          '<div class="note">No employees found. In the sheet open menu → 🔧 Maintenance → ➕ ADD and add names.</div>';
       }
 
       showBanner('good', 'Connected');
@@ -610,11 +608,11 @@ function startApp(){
 }
 
 function askForUrl(){
-  var v = prompt('GAS web app /exec URL paste kar', API);
+  var v = prompt('Paste the GAS web app /exec URL', API);
   if(!v) return;
   v = v.trim();
   if(v.indexOf('/exec') < 0){
-    showMessage('URL /exec pe khatam hona chahiye', true);
+    showMessage('The URL must end with /exec', true);
     return;
   }
   localStorage.setItem('mmc_api', v);
@@ -662,7 +660,7 @@ function loadMachineList(){
 }
 
 /* =====================================================================
-   ==  4. TEEN STEP  — naam → kya karna hai → kaunsi machine
+   ==  4. THREE STEPS  — name -> what to do -> which machine
    ===================================================================== */
 function chooseName(){
   PICK.emp = find('empSel').value;
@@ -725,7 +723,7 @@ function isDueNow(freq){
 }
 
 /* =====================================================================
-   ==  5. MACHINE KA CARD  — upar machine ki detail dikhata hai
+   ==  5. MACHINE CARD  — shows machine details on top
    ===================================================================== */
 function showMachineCard(){
   var card = find('cardSummary');
@@ -781,7 +779,7 @@ function toggleMachineDetails(){
 }
 
 /* =====================================================================
-   ==  6. CHECKLIST  — Daily / Weekly / Monthly rows banata hai
+   ==  6. CHECKLIST  — builds the Daily / Weekly / Monthly rows
    ===================================================================== */
 function getItems(freq){
   var type = machineKind();
@@ -851,7 +849,7 @@ function showChecklist(){
   });
 
   if(!html){
-    find('listArea').innerHTML = '<div class="card"><div class="blank">Is machine type ke liye koi check item nahi hai.</div></div>';
+    find('listArea').innerHTML = '<div class="card"><div class="blank">No check items for this machine type.</div></div>';
     find('cardProgress').classList.add('hidden');
     return;
   }
@@ -870,13 +868,15 @@ function buildOneRow(item){
     tag = '<div class="tool">TECHNICIAN</div>';
   }
 
-  var reading = '';
-  if(item.unit){
-    reading = '<div class="reading"><div class="wrap2">' +
-                '<input inputmode="decimal" placeholder="Reading" oninput="typeReading(\'' + id + '\', this.value)">' +
-                '<span class="unit">' + clean(item.unit) + '</span>' +
-              '</div></div>';
-  }
+  // Reading stays hidden. A technician can open it if he wants to note a value.
+  var unit = item.unit ? clean(item.unit) : '';
+  var reading = '<button class="addread" id="link_' + clean(id) + '" onclick="openReading(\'' + id + '\')">' +
+                  '+ Add reading' + (unit ? ' (' + unit + ')' : '') +
+                '</button>' +
+                '<div class="reading" id="read_' + clean(id) + '"><div class="wrap2">' +
+                  '<input inputmode="decimal" placeholder="Value" oninput="typeReading(\'' + id + '\', this.value)">' +
+                  (unit ? '<span class="unit">' + unit + '</span>' : '') +
+                '</div></div>';
 
   return '<div class="item" id="item_' + clean(id) + '">' +
            '<div class="q">' + clean(item.item_en) + '</div>' +
@@ -890,7 +890,7 @@ function buildOneRow(item){
            '</div>' +
            '<div class="more-box" id="extra_' + clean(id) + '">' +
              '<label>Issue remark</label>' +
-             '<textarea placeholder="Kya problem dikhi?" oninput="typeRemark(\'' + id + '\', this.value)"></textarea>' +
+             '<textarea placeholder="What is the problem?" oninput="typeRemark(\'' + id + '\', this.value)"></textarea>' +
              '<label>Severity</label>' +
              '<div class="sev" id="sev_' + clean(id) + '">' +
                '<button data-sev="Low" onclick="tapSeverity(\'' + id + '\', \'Low\')">Low</button>' +
@@ -972,6 +972,8 @@ function tapResult(id, value){
     ans.reading = '';
     var readBox = box.querySelector('.reading input');
     if(readBox) readBox.value = '';
+    find('read_' + id).classList.remove('on');
+    find('link_' + id).textContent = '+ Add reading';
     delete PICK.answers[id];
   }
 
@@ -999,13 +1001,24 @@ function typeRemark(id, text){
   if(ans) ans.remark = text;
 }
 
+function openReading(id){
+  var box = find('read_' + id);
+  var link = find('link_' + id);
+  var open = box.classList.toggle('on');
+  link.textContent = open ? 'Hide reading' : '+ Add reading';
+  if(open){
+    var input = box.querySelector('input');
+    if(input) input.focus();
+  }
+}
+
 function typeReading(id, text){
   var ans = startAnswer(id);
   if(ans) ans.reading = text;
 }
 
 /* =====================================================================
-   ==  7. PHOTO  — camera se photo le kar Drive pe bhejta hai
+   ==  7. PHOTO  — takes a photo and sends it to Drive
    ===================================================================== */
 function openCamera(id){
   find('file_' + id).click();
@@ -1058,7 +1071,7 @@ function sendPhoto(id, input){
         .then(function(r){
           if(!r.ok){
             btn.textContent = 'Add photo';
-            showMessage(r.error || 'Upload fail', true);
+            showMessage(r.error || 'Upload failed', true);
             return;
           }
           ans.photo = r.url;
@@ -1088,19 +1101,19 @@ function sendPhoto(id, input){
     };
     img.onerror = function(){
       btn.textContent = 'Add photo';
-      showMessage('Image padhi nahi ja rahi', true);
+      showMessage('Could not read the image', true);
     };
     img.src = ev.target.result;
   };
   reader.onerror = function(){
     btn.textContent = 'Add photo';
-    showMessage('File padhi nahi ja rahi', true);
+    showMessage('Could not read the file', true);
   };
   reader.readAsDataURL(file);
 }
 
 /* =====================================================================
-   ==  8. GINTI  — kitna ho gaya, kitna baaki
+   ==  8. COUNTS  — how many done, how many left
    ===================================================================== */
 function countDone(freq){
   return getItems(freq).filter(function(i){
@@ -1157,15 +1170,15 @@ function updateCounts(){
 }
 
 /* =====================================================================
-   ==  9. JAMA KARNA  — sheet me row banti hai
+   ==  9. SUBMIT  — writes the rows into the sheet
    ===================================================================== */
 function checkThenSave(){
-  if(!PICK.emp){ showMessage('Pehle apna naam chuno', true); return; }
-  if(!machineChosen()){ showMessage('Pehle machine chuno', true); return; }
+  if(!PICK.emp){ showMessage('Pick your name first', true); return; }
+  if(!machineChosen()){ showMessage('Pick a machine first', true); return; }
 
   if(PICK.mode === 'Breakdown'){
-    if(!find('bProblem').value){ showMessage('Problem type chuno', true); return; }
-    if(!find('bDesc').value.trim()){ showMessage('Problem likho', true); return; }
+    if(!find('bProblem').value){ showMessage('Choose a problem type', true); return; }
+    if(!find('bDesc').value.trim()){ showMessage('Describe the problem', true); return; }
     saveToSheet();
     return;
   }
@@ -1176,7 +1189,7 @@ function checkThenSave(){
   });
 
   if(missing.length){
-    showMessage(missing.length + ' daily check baaki hai', true);
+    showMessage(missing.length + ' daily check(s) left', true);
     find('secDaily').classList.add('open');
     var first = find('item_' + missing[0].item_id);
     if(first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1194,9 +1207,9 @@ function checkThenSave(){
   });
 
   if(pending.length){
-    showPopup('Kuch baaki hai',
-          'Ye due hai par poora nahi hua: <b>' + clean(pending.join(', ')) + '</b><br><br>Phir bhi submit karu?',
-          'Submit anyway', sendSubmit);
+    showPopup('Some checks pending',
+          'These are due but not finished: <b>' + clean(pending.join(', ')) + '</b><br><br>Submit anyway?',
+          'Submit anyway', saveToSheet);
     return;
   }
 
@@ -1238,7 +1251,7 @@ function saveToSheet(){
     .then(function(r){
       btn.disabled = false;
       updateCounts();
-      if(!r.ok){ showMessage(r.error || 'Save fail', true); return; }
+      if(!r.ok){ showMessage(r.error || 'Save failed', true); return; }
       showThankYou(r);
     })
     .catch(function(err){
@@ -1299,7 +1312,7 @@ function startNew(){
 }
 
 /* =====================================================================
-   == 10. REPORT  — A4 page aur PDF
+   == 10. REPORT  — A4 page and PDF
    ===================================================================== */
 function openReport(id){
   window.open(API + '?report=' + encodeURIComponent(id), '_blank');
@@ -1314,7 +1327,7 @@ function downloadPdf(id, btn){
     .then(function(r){
       btn.disabled = false;
       btn.textContent = original;
-      if(!r.ok){ showMessage(r.error || 'PDF fail', true); return; }
+      if(!r.ok){ showMessage(r.error || 'PDF failed', true); return; }
 
       var raw = atob(r.b64);
       var bytes = new Uint8Array(raw.length);
@@ -1335,7 +1348,7 @@ function downloadPdf(id, btn){
 }
 
 /* =====================================================================
-   == 11. PURANE RECORD  — list aur filter
+   == 11. OLD RECORDS  — list and filters
    ===================================================================== */
 function openTab(name){
   find('pageCheck').classList.toggle('hidden', name !== 'check');
@@ -1379,7 +1392,7 @@ function showOldRecords(){
   var box = find('recList');
   if(!rows.length){
     box.className = 'blank';
-    box.textContent = 'Koi record nahi mila.';
+    box.textContent = 'No records found.';
     return;
   }
 
@@ -1400,16 +1413,16 @@ function showOldRecords(){
 }
 
 /* =====================================================================
-   == 12. MADAD  — "?" button ka popup
+   == 12. HELP  — the "?" button popup
    ===================================================================== */
 function showHelp(){
-  showPopup('Kaise chalega',
-    '<b>Thik hai</b> dabaya → sheet me hari row banegi, matlab kaam ho gaya.<br><br>' +
-    '<b>Kharab hai</b> dabaya → laal row banegi, aur neeche problem likhne, ' +
-    'kitna serious hai chunne aur photo lagane ka option khulega.<br><br>' +
-    '<b>Nahi kiya</b> dabaya → grey row, matlab ye check nahi hua.<br><br>' +
-    'Galti se daba gaya? Wahi button dobara dabao, selection hat jayega.<br><br>' +
-    '<b>Jama karo</b> dabate hi Google Sheet me row ban jati hai aur report ready ho jati hai.');
+  showPopup('How it works',
+    'Tap <b>OK</b> — a green row goes into the sheet. That check is done.<br><br>' +
+    '<b>Issue</b> — a red row, and a box opens below to describe the problem, ' +
+    'set how serious it is, and attach a photo.<br><br>' +
+    '<b>N/A</b> — a grey row. That check was not done.<br><br>' +
+    'Tapped by mistake? Tap the same button again to clear it.<br><br>' +
+    '<b>Submit</b> writes every row into the Google Sheet and opens the report.');
 }
 
 /* =====================================================================
