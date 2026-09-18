@@ -128,7 +128,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbxX4mthQ9NpvKQRnasU_OthSUPWkuFDToaK8kf3ChhSe8w3rBiyoH9l98OoSmWPgwXVtA/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbw500OAfkuJMjGBjQs9o-Z1jYJreMdkS25BuHyGHGV9m_7DbfQyfQYKG4OUyj7ow4IPlQ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -240,28 +240,64 @@ function loadToday(){
 
 /* ---------------- CHECKLIST EXECUTION ---------------- */
 function startChecklist(task){
-  run('api_checklistFor',[task.assetType,task.frequency],function(items){
-    if(!items.length){
-      openModal('<span class="close" onclick="closeModal()">&times;</span><h3>No checklist</h3>'+
-        '<p style="color:var(--muted);margin:8px 0 14px">No checklist items defined for type "'+esc(task.assetType||'?')+'". You can still mark the task done.</p>'+
-        '<button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+',[])\'>Mark task done</button>');
-      return;
-    }
-    var h='<span class="close" onclick="closeModal()">&times;</span>'+
-      '<h3>'+esc(task.task)+'</h3><p style="color:var(--muted);margin-bottom:14px">'+esc(task.assetId)+' &middot; '+esc(task.assetType)+' &middot; '+esc(task.location||'')+'</p><div id="chkList">';
-    items.forEach(function(it,i){
-      h+='<div class="chkitem" data-item="'+esc(it['Item ID'])+'" data-rt="'+esc(it['Response Type'])+'" data-mn="'+esc(it['Minimum Value'])+'" data-mx="'+esc(it['Maximum Value'])+'">'+
-         '<div class="q">'+(i+1)+'. '+esc(it['Question'])+(it['Unit']?(' ('+esc(it['Unit'])+')'):'')+'</div>'+
-         responseInput(it,i)+
-         '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
-         '</div>';
+  // First pull the full asset detail, then the checklist, then render both together.
+  run('api_assetDetail',[task.assetId],function(d){
+    run('api_checklistFor',[task.assetType,task.frequency],function(items){
+      renderChecklistModal(task,d,items);
     });
-    h+='</div><label class="f"><input type="checkbox" id="autoIssue" checked> Auto-raise issue for abnormal answers</label>'+
-       '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete</button>'+
-       '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>';
-    openModal(h);
   });
 }
+
+function renderChecklistModal(task,d,items){
+  var o=(d&&d.overview)||{}, rel=(d&&d.reliability)||{};
+  // ---- asset detail panel ----
+  var panel='<div class="section" style="margin-bottom:14px"><div class="kv">'+
+    kv('Machine',(o['Asset Name']||task.assetId)+' ('+esc(o['Asset Type']||task.assetType||'')+')')+
+    kv('Location',o['Current Location']||o['Location']||task.location||'-')+
+    kv('Status',o['Current Status']||'-')+
+    kv('Warranty',(o['Warranty Status']||'-')+(o['Warranty End']?(' till '+o['Warranty End']):''))+
+    kv('Guarantee',(o['Guarantee Status']||'-')+(o['Guarantee End']?(' till '+o['Guarantee End']):''))+
+    kv('Breakdowns',(rel.breakdownCount||0)+(rel.lastBreakdownDate?(' (last '+rel.lastBreakdownDate+')'):''))+
+    kv('Open issues',(d&&d.issues?d.issues.filter(function(x){return String(x['Status']).toLowerCase()!=='closed';}).length:0))+
+    kv('Total spend',money((d&&d.totalCost)||0))+
+    '</div></div>';
+
+  if(!items.length){
+    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+esc(task.task)+'</h3>'+panel+
+      '<p style="color:var(--muted);margin:8px 0 14px">No checklist questions for type "'+esc(task.assetType||'?')+'". Mark done, ya Manage me questions add kar.</p>'+
+      '<button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+',true)\'>Mark task done</button>');
+    return;
+  }
+
+  var h='<span class="close" onclick="closeModal()">&times;</span>'+
+    '<h3>'+esc(task.task)+'</h3>'+panel+
+    '<p style="color:var(--muted);margin-bottom:8px">Har point check kar. Gadbad ho to us point pe form khulega (kya gadbad + photo + escalate).</p>'+
+    '<div id="chkList">';
+  items.forEach(function(it,i){
+    h+='<div class="chkitem" data-item="'+esc(it['Item ID'])+'" data-rt="'+esc(it['Response Type'])+'" data-mn="'+esc(it['Minimum Value'])+'" data-mx="'+esc(it['Maximum Value'])+'" data-q="'+esc(it['Question'])+'">'+
+       '<div class="q">'+(i+1)+'. '+esc(it['Question'])+(it['Unit']?(' ('+esc(it['Unit'])+')'):'')+'</div>'+
+       responseInput(it,i)+
+       // hidden problem block - revealed when answer is "gadbad"
+       '<div class="probBlock" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--red);border-radius:8px;background:var(--redbg)">'+
+         '<label class="f" style="margin-top:0;color:var(--red)">Kya gadbad hai?</label>'+
+         '<textarea class="f prob" placeholder="Problem describe kar"></textarea>'+
+         '<label class="f">Photo (proof)</label><input class="f photo" type="file" accept="image/*">'+
+         '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Issue escalate karu? (Breakdown + bill pending)</label>'+
+       '</div>'+
+       '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional, sab theek ho to bhi)">'+
+       '</div>';
+  });
+  h+='</div>'+
+     '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete</button>'+
+     '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>';
+  openModal(h);
+  // wire abnormal reveal on every response input
+  Array.prototype.forEach.call(document.querySelectorAll('#chkList .resp'),function(el){
+    el.addEventListener('change',function(){abnCheck(el.closest('.chkitem'));});
+    el.addEventListener('keyup',function(){abnCheck(el.closest('.chkitem'));});
+  });
+}
+
 function responseInput(it){
   var rt=String(it['Response Type']||'').trim();
   if(rt==='Numeric Reading') return '<input class="f resp" type="number" step="any" placeholder="reading">';
@@ -273,27 +309,62 @@ function responseInput(it){
   return '<input class="f resp" placeholder="answer">';
   function sel(opts){return '<select class="f resp"><option value="">-- select --</option>'+opts.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>';}
 }
-function finishChecklist(task,forceEmpty){
-  var answers=[];
-  if(!forceEmpty){
-    Array.prototype.forEach.call(document.querySelectorAll('#chkList .chkitem'),function(el){
-      var resp=el.querySelector('.resp'); var rem=el.querySelector('.rem');
-      var rt=el.dataset.rt; var val=resp?resp.value:'';
-      if(val===''&&(!rem||rem.value==='')) return; // skip blank
-      var a={itemId:el.dataset.item,remarks:rem?rem.value:''};
-      if(rt==='Numeric Reading'){a.numeric=val;} else {a.response=val;}
-      answers.push(a);
-    });
+
+/* decide if an answer is "gadbad" and show/hide its problem block */
+function abnCheck(el){
+  if(!el)return;
+  var rt=el.dataset.rt, resp=el.querySelector('.resp'), val=resp?String(resp.value):'';
+  var bad=false;
+  if(rt==='OK / NOT OK') bad=(val==='NOT OK');
+  else if(rt==='Yes / No') bad=(val==='No');
+  else if(rt==='Done / Not Done') bad=(val==='Not Done');
+  else if(rt==='Numeric Reading'){
+    var v=parseFloat(val); if(!isNaN(v)){var mn=parseFloat(el.dataset.mn),mx=parseFloat(el.dataset.mx);
+      if(!isNaN(mn)&&v<mn)bad=true; if(!isNaN(mx)&&v>mx)bad=true;}
   }
-  var payload={assetId:task.assetId,taskId:task.taskId,plannedDate:task.plannedDate,doer:task.doer,
-    answers:answers,autoIssue:$('autoIssue')?$('autoIssue').checked:false,markDone:true};
+  var pb=el.querySelector('.probBlock');
+  if(pb){pb.style.display=bad?'block':'none'; el.classList.toggle('abn',bad);}
+}
+
+function finishChecklist(task,forceEmpty){
+  var items=forceEmpty?[]:Array.prototype.slice.call(document.querySelectorAll('#chkList .chkitem'));
+  // Build answers + collect photo files to read (async).
+  var answers=[], photoJobs=[];
+  items.forEach(function(el){
+    var resp=el.querySelector('.resp'); var rem=el.querySelector('.rem');
+    var rt=el.dataset.rt; var val=resp?resp.value:'';
+    var pb=el.querySelector('.probBlock'); var isBad=pb&&pb.style.display!=='none';
+    if(val===''&&(!rem||rem.value==='')&&!isBad) return; // skip fully blank
+    var a={itemId:el.dataset.item,remarks:rem?rem.value:''};
+    if(rt==='Numeric Reading'){a.numeric=val;} else {a.response=val;}
+    if(isBad){
+      a.problem=el.querySelector('.prob')?el.querySelector('.prob').value:'';
+      a.escalate=el.querySelector('.esc')?el.querySelector('.esc').checked:false;
+      a.raiseIssue=true;
+      var pf=el.querySelector('.photo');
+      if(pf&&pf.files&&pf.files[0]){
+        (function(ans,file){ photoJobs.push(new Promise(function(res){
+          var r=new FileReader();
+          r.onload=function(){ans.photoBase64=r.result.split(',')[1];ans.photoMime=file.type;ans.photoName=file.name;res();};
+          r.onerror=function(){res();}; r.readAsDataURL(file);
+        })); })(a,pf.files[0]);
+      }
+    }
+    answers.push(a);
+  });
+
   toast('Saving...');
-  run('api_saveChecklist',[payload],function(res){
-    closeModal();
-    var msg='Saved '+res.saved+' answer(s).';
-    if(res.issues&&res.issues.length)msg+=' Raised '+res.issues.length+' issue(s): '+res.issues.join(', ');
-    toast(msg);
-    if(CURRENT==='today')loadToday(); else if(CURRENT==='dashboard')loadDashboard();
+  Promise.all(photoJobs).then(function(){
+    var payload={assetId:task.assetId,taskId:task.taskId,plannedDate:task.plannedDate,doer:task.doer,
+      answers:answers,markDone:true};
+    run('api_saveChecklist',[payload],function(res){
+      closeModal();
+      var msg='Saved '+res.saved+' answer(s).';
+      if(res.issues&&res.issues.length)msg+=' '+res.issues.length+' issue raised.';
+      if(res.escalated&&res.escalated.length)msg+=' '+res.escalated.length+' escalated (breakdown).';
+      toast(msg);
+      if(CURRENT==='today')loadToday(); else if(CURRENT==='dashboard')loadDashboard();
+    });
   });
 }
 
@@ -438,15 +509,44 @@ function issueTable(rows,actions){
 }
 function openEscalate(r){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Escalate '+esc(r['Issue ID'])+'</h3>'+
-    '<p style="color:var(--muted);margin-bottom:10px">Raises severity, marks urgent, flags "needs bill". Current level: '+esc(r['Escalation Level']||'0')+'</p>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Severity badhega, Breakdown + bill pending. Current level: '+esc(r['Escalation Level']||'0')+'</p>'+
     '<label class="f">Escalate to</label><input class="f" id="escTo" placeholder="e.g. Maintenance Head" value="'+esc(r['Escalated To']||'')+'">'+
+    '<label class="f">Kitne din me sahi hoga? (optional)</label><input class="f" id="escEta" type="number" min="0" placeholder="days">'+
     '<label class="f">Note</label><textarea class="f" id="escNote" placeholder="why escalating"></textarea>'+
+    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escMail"> Follow-up mail bhejo (assigned doer ko)</label>'+
+    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escBill" checked> Draft bill auto-generate (photo baad me)</label>'+
     '<div style="margin-top:14px"><button class="btn" onclick="saveEscalate(\''+esc(r['Issue ID'])+'\')">Escalate</button></div>');
 }
 function saveEscalate(id){
-  var o={escalatedTo:$('escTo').value,remarks:$('escNote').value};
-  run('api_escalateIssue',[id,o],function(){closeModal();toast('Issue escalated -> Breakdown, bill pending');
-    if(CURRENT==='dashboard')loadDashboard(); else loadIssues();});
+  var o={escalatedTo:$('escTo').value,remarks:$('escNote').value,etaDays:$('escEta').value,
+    notify:$('escMail')?$('escMail').checked:false,autoBill:$('escBill')?$('escBill').checked:false};
+  run('api_escalateIssue',[id,o],function(res){
+    closeModal();
+    var draft=(res&&res.draftBill)?res.draftBill:'';
+    toast('Escalated -> Breakdown, bill pending'+(draft?(' ('+draft+')'):''));
+    if(draft){ setTimeout(function(){ openBillProof(draft); },400); }
+    else if(CURRENT==='dashboard')loadDashboard(); else loadIssues();
+  });
+}
+/* upload proof photo for an (auto-draft) bill */
+function openBillProof(billId){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Bill photo upload &middot; '+esc(billId)+'</h3>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Bill ban gaya. Ab uski photo/PDF upload kar (proof).</p>'+
+    '<input class="f" id="bpFile" type="file" accept="application/pdf,image/*">'+
+    '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" id="bpBtn" onclick="saveBillProof(\''+esc(billId)+'\')">Upload</button>'+
+    '<button class="btn ghost" onclick="closeModal();if(CURRENT===\'dashboard\')loadDashboard();else loadIssues();">Baad me</button></div>');
+}
+function saveBillProof(billId){
+  var f=$('bpFile');
+  if(!f||!f.files||!f.files[0]){toast('File select kar');return;}
+  var file=f.files[0],reader=new FileReader();
+  $('bpBtn').disabled=true;$('bpBtn').textContent='Uploading...';
+  reader.onload=function(){
+    var payload={base64:reader.result.split(',')[1],mimeType:file.type,filename:file.name};
+    run('api_addBillProof',[billId,payload],function(){closeModal();toast('Proof uploaded');
+      if(CURRENT==='dashboard')loadDashboard();else if(CURRENT==='bills')loadBills();else loadIssues();});
+  };
+  reader.readAsDataURL(file);
 }
 function editIssue(r){
   var h='<span class="close" onclick="closeModal()">&times;</span><h3>Update '+esc(r['Issue ID'])+'</h3>'+
@@ -488,9 +588,10 @@ function loadBills(){
       else{
         h+='<table><tr><th>ID</th><th>Asset</th><th>Issue</th><th>Vendor</th><th>Total</th><th>Status</th><th>Proof</th></tr>';
         rows.forEach(function(r){
+          var hasFile=!!r['Drive File URL'];
           h+='<tr><td>'+esc(r['Bill ID'])+'</td><td>'+esc(r['Asset ID'])+'</td><td>'+esc(r['Issue ID']||'-')+'</td><td>'+esc(r['Vendor'])+'</td>'+
             '<td>'+money(r['Total Amount'])+'</td><td>'+statusPill(r['Payment Status'])+'</td>'+
-            '<td>'+(r['Drive File URL']?'<a class="link" href="'+esc(r['Drive File URL'])+'" target="_blank">view</a>':'-')+'</td></tr>';
+            '<td>'+(hasFile?'<a class="link" href="'+esc(r['Drive File URL'])+'" target="_blank">view</a>':'<button class="btn sm" onclick="openBillProof(\''+esc(r['Bill ID'])+'\')">Add proof</button>')+'</td></tr>';
         });
         h+='</table>';
       }
