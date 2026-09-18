@@ -24,6 +24,10 @@
   header.top h1{font-weight:700;font-size:20px;letter-spacing:.5px}
   .search{flex:1;min-width:220px;max-width:420px;display:flex;gap:8px}
   .search input{flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+  .synclbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
+  .syncDot{width:8px;height:8px;border-radius:50%;background:var(--grey);display:inline-block}
+  .syncDot.on{background:var(--green);animation:pulseDot 2s infinite}
+  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
   nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
   nav.tabs button{padding:8px 14px;border:1px solid var(--line);background:var(--white);border-radius:20px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted)}
   nav.tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -84,6 +88,8 @@
     <div class="search">
       <input id="q" placeholder="Search asset / issue / bill / task / vendor..." onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn" onclick="doSearch()">Search</button>
+      <button class="btn ghost" id="refreshBtn" onclick="manualRefresh()" title="Refresh from sheet">&#8635;</button>
+      <label class="synclbl" title="Auto-sync from sheet every 20s"><input type="checkbox" id="autoSync" checked onchange="toggleSync()"> <span id="syncDot" class="syncDot on"></span>Live</label>
     </div>
   </header>
 
@@ -108,6 +114,7 @@
 <script>
 /* ------- tiny helpers ------- */
 var LOOKUPS = null, CURRENT = 'dashboard';
+var _silent = false;
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
@@ -146,9 +153,10 @@ function loadOff(){_busy=Math.max(0,_busy-1);if(_busy===0){var g=$('gload');if(g
 
 function run(fn,args,cb){
   args=args||[];
-  loadOn();
-  var done=function(r){loadOff();cb(r);};
-  var onErr=function(msg){loadOff();$('view').innerHTML='<div class="empty">Error: '+esc(msg)+'</div>';toast('Error: '+msg);};
+  var quiet=_silent;
+  if(!quiet)loadOn();
+  var done=function(r){if(!quiet)loadOff();cb(r);};
+  var onErr=function(msg){if(!quiet)loadOff();if(!quiet){$('view').innerHTML='<div class="empty">Error: '+esc(msg)+'</div>';toast('Error: '+msg);}};
 
   // Mode 1: served by Apps Script
   if(hasGSR() && !API_URL){
@@ -257,7 +265,7 @@ function loadToday(){
 function loadDone(){
   run('api_recentDone',[100],function(res){
     var clean=(res&&res.clean)||[], wi=(res&&res.withIssue)||[];
-    if(!clean.length&&!wi.length){$('view').innerHTML='<div class="empty">Abhi tak koi task done nahi.</div>';return;}
+    if(!clean.length&&!wi.length){$('view').innerHTML='<div class="empty">No completed tasks yet.</div>';return;}
     var h='';
     // With issue / breakdown first (needs attention)
     h+='<div class="section"><h2>Done with issue / breakdown ('+wi.length+')</h2>';
@@ -314,21 +322,21 @@ function renderChecklistModal(task,d,items){
   // problem block html (re-used)
   function probBlock(){
     return '<div class="probBlock" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--red);border-radius:8px;background:var(--redbg)">'+
-      '<label class="f" style="margin-top:0;color:var(--red)">Kya gadbad hai? / Kya ho raha hai?</label>'+
-      '<textarea class="f prob" placeholder="Problem describe kar"></textarea>'+
+      '<label class="f" style="margin-top:0;color:var(--red)">What is wrong? / What is happening?</label>'+
+      '<textarea class="f prob" placeholder="Describe the problem"></textarea>'+
       '<label class="f">Photo (proof)</label><input class="f photo" type="file" accept="image/*">'+
-      '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Issue escalate karu? (Breakdown + bill pending)</label>'+
+      '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Escalate this issue? (Breakdown + bill pending)</label>'+
       '</div>';
   }
 
   var h='<span class="close" onclick="closeModal()">&times;</span>'+
     '<h3>'+esc(task.task)+'</h3>'+panel+
-    '<p style="color:var(--muted);margin-bottom:8px">Machine check kar. Gadbad ho to us point pe form khulega (kya gadbad + photo + escalate).</p>'+
+    '<p style="color:var(--muted);margin-bottom:8px">Check the machine. If something is wrong, a form opens at that point (what is wrong + photo + escalate).</p>'+
     '<div id="chkList">';
 
   // ---- ALWAYS: overall Machine OK? gate (works even when no checklist items exist) ----
-  h+='<div class="chkitem overall" data-item="OVERALL" data-rt="Yes / No" data-mn="" data-mx="" data-q="Overall — machine theek hai?">'+
-     '<div class="q"><b>Overall — machine theek hai?</b></div>'+
+  h+='<div class="chkitem overall" data-item="OVERALL" data-rt="Yes / No" data-mn="" data-mx="" data-q="Overall — is the machine OK?">'+
+     '<div class="q"><b>Overall — is the machine OK?</b></div>'+
      '<select class="f resp"><option value="">-- select --</option><option>Yes</option><option>No</option></select>'+
      probBlock()+
      '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
@@ -364,7 +372,7 @@ function responseInput(it){
   function sel(opts){return '<select class="f resp"><option value="">-- select --</option>'+opts.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>';}
 }
 
-/* decide if an answer is "gadbad" and show/hide its problem block */
+/* decide if an answer is a problem and show/hide its problem block */
 function abnCheck(el){
   if(!el)return;
   var rt=el.dataset.rt, resp=el.querySelector('.resp'), val=resp?String(resp.value):'';
@@ -568,10 +576,10 @@ function openEscalate(r){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Escalate '+esc(r['Issue ID'])+'</h3>'+
     '<p style="color:var(--muted);margin-bottom:10px">Severity badhega, Breakdown + bill pending. Current level: '+esc(r['Escalation Level']||'0')+'</p>'+
     '<label class="f">Escalate to</label><input class="f" id="escTo" placeholder="e.g. Maintenance Head" value="'+esc(r['Escalated To']||'')+'">'+
-    '<label class="f">Kitne din me sahi hoga? (optional)</label><input class="f" id="escEta" type="number" min="0" placeholder="days">'+
+    '<label class="f">Expected fix time in days? (optional)</label><input class="f" id="escEta" type="number" min="0" placeholder="days">'+
     '<label class="f">Note</label><textarea class="f" id="escNote" placeholder="why escalating"></textarea>'+
-    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escMail"> Follow-up mail bhejo (assigned doer ko)</label>'+
-    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escBill" checked> Draft bill auto-generate (photo baad me)</label>'+
+    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escMail"> Send follow-up mail (to assigned doer)</label>'+
+    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escBill" checked> Auto-generate draft bill (add photo later)</label>'+
     '<div style="margin-top:14px"><button class="btn" onclick="saveEscalate(\''+esc(r['Issue ID'])+'\')">Escalate</button></div>');
 }
 function saveEscalate(id){
@@ -580,7 +588,7 @@ function saveEscalate(id){
   run('api_escalateIssue',[id,o],function(res){
     closeModal();
     var draft=(res&&res.draftBill)?res.draftBill:'';
-    toast('Escalated -> Breakdown, bill pending'+(draft?(' ('+draft+')'):''));
+    toast('Escalated to Breakdown, bill pending'+(draft?(' ('+draft+')'):''));
     if(draft){ setTimeout(function(){ openBillProof(draft); },400); }
     else if(CURRENT==='dashboard')loadDashboard(); else loadIssues();
   });
@@ -588,14 +596,14 @@ function saveEscalate(id){
 /* upload proof photo for an (auto-draft) bill */
 function openBillProof(billId){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Bill photo upload &middot; '+esc(billId)+'</h3>'+
-    '<p style="color:var(--muted);margin-bottom:10px">Bill ban gaya. Ab uski photo/PDF upload kar (proof).</p>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Bill created. Now upload its photo/PDF (proof).</p>'+
     '<input class="f" id="bpFile" type="file" accept="application/pdf,image/*">'+
     '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" id="bpBtn" onclick="saveBillProof(\''+esc(billId)+'\')">Upload</button>'+
-    '<button class="btn ghost" onclick="closeModal();if(CURRENT===\'dashboard\')loadDashboard();else loadIssues();">Baad me</button></div>');
+    '<button class="btn ghost" onclick="closeModal();if(CURRENT===\'dashboard\')loadDashboard();else loadIssues();">Later</button></div>');
 }
 function saveBillProof(billId){
   var f=$('bpFile');
-  if(!f||!f.files||!f.files[0]){toast('File select kar');return;}
+  if(!f||!f.files||!f.files[0]){toast('Please select a file');return;}
   var file=f.files[0],reader=new FileReader();
   $('bpBtn').disabled=true;$('bpBtn').textContent='Uploading...';
   reader.onload=function(){
@@ -817,7 +825,7 @@ function saveEditMachine(id){
 }
 function deactivateMachine(id){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Deactivate '+esc(id)+'?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">Machine ko Inactive kar dega - scheduler ise skip karega. Data delete nahi hoga.</p>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">This marks the machine Inactive - the scheduler will skip it. No data is deleted.</p>'+
     '<div style="display:flex;gap:8px"><button class="btn" onclick="confirmDeactivate(\''+esc(id)+'\')">Yes, deactivate</button>'+
     '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
 }
@@ -832,7 +840,7 @@ function reactivateMachine(id){
 /* generic delete with confirm */
 function askDelete(kind,id,after){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Delete '+esc(id)+'?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">Row permanently delete ho jayegi. Undo nahi.</p>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">This row will be permanently deleted. Cannot be undone.</p>'+
     '<div style="display:flex;gap:8px"><button class="btn" onclick="doDelete(\''+kind+'\',\''+esc(id)+'\')">Yes, delete</button>'+
     '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
   window.__afterDelete=after;
@@ -1135,8 +1143,36 @@ function commitBulk(){
   });
 }
 
+/* ================= LIVE SYNC (sheet -> webapp) =================
+ * A standalone page can't be pushed to from Google Sheets, so we POLL: every SYNC_MS we silently
+ * re-run the current view. Webapp -> sheet is already instant (every action writes to the sheet).
+ * onEdit on the sheet already auto-rebuilds For PC, so both sides stay in step. */
+var SYNC_MS=20000, _syncTimer=null;
+function refreshCurrent(){
+  if($('modalBg')&&$('modalBg').classList.contains('show')) return; // don't disturb an open form
+  _silent=true;
+  try{
+    if(CURRENT==='dashboard')loadDashboard();
+    else if(CURRENT==='today')loadToday();
+    else if(CURRENT==='done')loadDone();
+    else if(CURRENT==='assets')loadAssets();
+    else if(CURRENT==='issues')loadIssues();
+    else if(CURRENT==='bills')loadBills();
+    else if(CURRENT==='manage')loadManage();
+  }catch(e){}
+  setTimeout(function(){_silent=false;},50);
+}
+function startSync(){ stopSync(); _syncTimer=setInterval(refreshCurrent,SYNC_MS); }
+function stopSync(){ if(_syncTimer){clearInterval(_syncTimer);_syncTimer=null;} }
+function toggleSync(){
+  var on=$('autoSync')&&$('autoSync').checked;
+  $('syncDot').classList.toggle('on',on);
+  if(on)startSync(); else stopSync();
+}
+function manualRefresh(){ var b=$('refreshBtn'); if(b){b.style.transform='rotate(360deg)';b.style.transition='transform .5s';setTimeout(function(){b.style.transform='';},500);} refreshCurrent(); toast('Synced from sheet'); }
+
 /* ---------------- BOOT ---------------- */
-run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');});
+run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');startSync();});
 </script>
 </body>
 </html>
