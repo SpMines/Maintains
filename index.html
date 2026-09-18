@@ -136,7 +136,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbwh3_rvO2lS6tbhYytiK5WJR7UQBPtUFNEOKdExPzCxEvbb_FC5BzIMCHFTGvWN5dAEYA/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbxRlyOgrXKBPNp0EHlM0L515lumuQ1xgqT14E2O2Muhw85QwHEEdfPcfaHrx0hlpuQHxw/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -255,27 +255,46 @@ function loadToday(){
 
 /* ---------------- RECENT DONE ---------------- */
 function loadDone(){
-  run('api_recentDone',[100],function(rows){
-    if(!rows.length){$('view').innerHTML='<div class="empty">Abhi tak koi task done nahi.</div>';return;}
-    var h='<div class="section"><h2>Recent done ('+rows.length+')</h2><table><tr><th>Asset</th><th>Type</th><th>Task</th><th>Freq</th><th>Planned</th><th>Done on</th><th>Doer</th></tr>';
-    rows.forEach(function(r){
-      h+='<tr>'+
-        '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
-        '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td><td>'+esc(r.frequency)+'</td>'+
-        '<td>'+esc(r.plannedDate)+'</td><td><span class="pill green">'+esc(r.actualDate||'-')+'</span></td><td>'+esc(r.doer)+'</td></tr>';
-    });
-    h+='</table></div>';
+  run('api_recentDone',[100],function(res){
+    var clean=(res&&res.clean)||[], wi=(res&&res.withIssue)||[];
+    if(!clean.length&&!wi.length){$('view').innerHTML='<div class="empty">Abhi tak koi task done nahi.</div>';return;}
+    var h='';
+    // With issue / breakdown first (needs attention)
+    h+='<div class="section"><h2>Done with issue / breakdown ('+wi.length+')</h2>';
+    if(!wi.length){h+='<div class="empty">None.</div>';}
+    else{
+      h+='<table><tr><th>Done on</th><th>Asset</th><th>Type</th><th>Task</th><th>Issue</th><th>Doer</th></tr>';
+      wi.forEach(function(r){
+        h+='<tr><td><span class="pill amber">'+esc(r.actualDate||'-')+'</span></td>'+
+          '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
+          '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td>'+
+          '<td><span class="pill red">'+esc(r.issueSummary||'issue')+'</span></td><td>'+esc(r.doer)+'</td></tr>';
+      });
+      h+='</table>';
+    }
+    h+='</div>';
+    // Clean done
+    h+='<div class="section"><h2>Recent done &mdash; no issue ('+clean.length+')</h2>';
+    if(!clean.length){h+='<div class="empty">None.</div>';}
+    else{
+      h+='<table><tr><th>Done on</th><th>Asset</th><th>Type</th><th>Task</th><th>Freq</th><th>Doer</th></tr>';
+      clean.forEach(function(r){
+        h+='<tr><td><span class="pill green">'+esc(r.actualDate||'-')+'</span></td>'+
+          '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
+          '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td><td>'+esc(r.frequency)+'</td><td>'+esc(r.doer)+'</td></tr>';
+      });
+      h+='</table>';
+    }
+    h+='</div>';
     $('view').innerHTML=h;
   });
 }
 
 /* ---------------- CHECKLIST EXECUTION ---------------- */
 function startChecklist(task){
-  // First pull the full asset detail, then the checklist, then render both together.
-  run('api_assetDetail',[task.assetId],function(d){
-    run('api_checklistFor',[task.assetType,task.frequency],function(items){
-      renderChecklistModal(task,d,items);
-    });
+  // One round-trip: asset detail + checklist together (faster).
+  run('api_startTask',[task.assetId,task.assetType,task.frequency],function(res){
+    renderChecklistModal(task,(res&&res.detail)||null,(res&&res.checklist)||[]);
   });
 }
 
