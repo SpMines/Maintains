@@ -84,6 +84,7 @@
   <nav class="tabs" id="tabs">
     <button data-t="dashboard" class="active" onclick="go('dashboard')">Dashboard</button>
     <button data-t="today" onclick="go('today')">Today's work</button>
+    <button data-t="done" onclick="go('done')">Recent done</button>
     <button data-t="assets" onclick="go('assets')">Assets</button>
     <button data-t="issues" onclick="go('issues')">Issues / breakdowns</button>
     <button data-t="bills" onclick="go('bills')">Bills</button>
@@ -128,7 +129,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbw500OAfkuJMjGBjQs9o-Z1jYJreMdkS25BuHyGHGV9m_7DbfQyfQYKG4OUyj7ow4IPlQ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbwh3_rvO2lS6tbhYytiK5WJR7UQBPtUFNEOKdExPzCxEvbb_FC5BzIMCHFTGvWN5dAEYA/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -155,6 +156,7 @@ function go(tab){
   $('view').innerHTML='<div class="loader">Loading</div>';
   if(tab==='dashboard')loadDashboard();
   else if(tab==='today')loadToday();
+  else if(tab==='done')loadDone();
   else if(tab==='assets')loadAssets();
   else if(tab==='issues')loadIssues();
   else if(tab==='bills')loadBills();
@@ -238,6 +240,22 @@ function loadToday(){
   });
 }
 
+/* ---------------- RECENT DONE ---------------- */
+function loadDone(){
+  run('api_recentDone',[100],function(rows){
+    if(!rows.length){$('view').innerHTML='<div class="empty">Abhi tak koi task done nahi.</div>';return;}
+    var h='<div class="section"><h2>Recent done ('+rows.length+')</h2><table><tr><th>Asset</th><th>Type</th><th>Task</th><th>Freq</th><th>Planned</th><th>Done on</th><th>Doer</th></tr>';
+    rows.forEach(function(r){
+      h+='<tr>'+
+        '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
+        '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td><td>'+esc(r.frequency)+'</td>'+
+        '<td>'+esc(r.plannedDate)+'</td><td><span class="pill green">'+esc(r.actualDate||'-')+'</span></td><td>'+esc(r.doer)+'</td></tr>';
+    });
+    h+='</table></div>';
+    $('view').innerHTML=h;
+  });
+}
+
 /* ---------------- CHECKLIST EXECUTION ---------------- */
 function startChecklist(task){
   // First pull the full asset detail, then the checklist, then render both together.
@@ -250,7 +268,6 @@ function startChecklist(task){
 
 function renderChecklistModal(task,d,items){
   var o=(d&&d.overview)||{}, rel=(d&&d.reliability)||{};
-  // ---- asset detail panel ----
   var panel='<div class="section" style="margin-bottom:14px"><div class="kv">'+
     kv('Machine',(o['Asset Name']||task.assetId)+' ('+esc(o['Asset Type']||task.assetType||'')+')')+
     kv('Location',o['Current Location']||o['Location']||task.location||'-')+
@@ -262,36 +279,41 @@ function renderChecklistModal(task,d,items){
     kv('Total spend',money((d&&d.totalCost)||0))+
     '</div></div>';
 
-  if(!items.length){
-    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+esc(task.task)+'</h3>'+panel+
-      '<p style="color:var(--muted);margin:8px 0 14px">No checklist questions for type "'+esc(task.assetType||'?')+'". Mark done, ya Manage me questions add kar.</p>'+
-      '<button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+',true)\'>Mark task done</button>');
-    return;
+  // problem block html (re-used)
+  function probBlock(){
+    return '<div class="probBlock" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--red);border-radius:8px;background:var(--redbg)">'+
+      '<label class="f" style="margin-top:0;color:var(--red)">Kya gadbad hai? / Kya ho raha hai?</label>'+
+      '<textarea class="f prob" placeholder="Problem describe kar"></textarea>'+
+      '<label class="f">Photo (proof)</label><input class="f photo" type="file" accept="image/*">'+
+      '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Issue escalate karu? (Breakdown + bill pending)</label>'+
+      '</div>';
   }
 
   var h='<span class="close" onclick="closeModal()">&times;</span>'+
     '<h3>'+esc(task.task)+'</h3>'+panel+
-    '<p style="color:var(--muted);margin-bottom:8px">Har point check kar. Gadbad ho to us point pe form khulega (kya gadbad + photo + escalate).</p>'+
+    '<p style="color:var(--muted);margin-bottom:8px">Machine check kar. Gadbad ho to us point pe form khulega (kya gadbad + photo + escalate).</p>'+
     '<div id="chkList">';
+
+  // ---- ALWAYS: overall Machine OK? gate (works even when no checklist items exist) ----
+  h+='<div class="chkitem overall" data-item="OVERALL" data-rt="Yes / No" data-mn="" data-mx="" data-q="Overall — machine theek hai?">'+
+     '<div class="q"><b>Overall — machine theek hai?</b></div>'+
+     '<select class="f resp"><option value="">-- select --</option><option>Yes</option><option>No</option></select>'+
+     probBlock()+
+     '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
+     '</div>';
+
+  // ---- per-item checklist questions (if any for this asset type) ----
   items.forEach(function(it,i){
     h+='<div class="chkitem" data-item="'+esc(it['Item ID'])+'" data-rt="'+esc(it['Response Type'])+'" data-mn="'+esc(it['Minimum Value'])+'" data-mx="'+esc(it['Maximum Value'])+'" data-q="'+esc(it['Question'])+'">'+
        '<div class="q">'+(i+1)+'. '+esc(it['Question'])+(it['Unit']?(' ('+esc(it['Unit'])+')'):'')+'</div>'+
-       responseInput(it,i)+
-       // hidden problem block - revealed when answer is "gadbad"
-       '<div class="probBlock" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--red);border-radius:8px;background:var(--redbg)">'+
-         '<label class="f" style="margin-top:0;color:var(--red)">Kya gadbad hai?</label>'+
-         '<textarea class="f prob" placeholder="Problem describe kar"></textarea>'+
-         '<label class="f">Photo (proof)</label><input class="f photo" type="file" accept="image/*">'+
-         '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Issue escalate karu? (Breakdown + bill pending)</label>'+
-       '</div>'+
-       '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional, sab theek ho to bhi)">'+
+       responseInput(it,i)+ probBlock()+
+       '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
        '</div>';
   });
   h+='</div>'+
-     '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete</button>'+
+     '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete (mark done)</button>'+
      '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>';
   openModal(h);
-  // wire abnormal reveal on every response input
   Array.prototype.forEach.call(document.querySelectorAll('#chkList .resp'),function(el){
     el.addEventListener('change',function(){abnCheck(el.closest('.chkitem'));});
     el.addEventListener('keyup',function(){abnCheck(el.closest('.chkitem'));});
@@ -328,15 +350,16 @@ function abnCheck(el){
 
 function finishChecklist(task,forceEmpty){
   var items=forceEmpty?[]:Array.prototype.slice.call(document.querySelectorAll('#chkList .chkitem'));
-  // Build answers + collect photo files to read (async).
   var answers=[], photoJobs=[];
   items.forEach(function(el){
     var resp=el.querySelector('.resp'); var rem=el.querySelector('.rem');
     var rt=el.dataset.rt; var val=resp?resp.value:'';
     var pb=el.querySelector('.probBlock'); var isBad=pb&&pb.style.display!=='none';
+    var isOverall=el.classList.contains('overall');
     if(val===''&&(!rem||rem.value==='')&&!isBad) return; // skip fully blank
-    var a={itemId:el.dataset.item,remarks:rem?rem.value:''};
+    var a={itemId:el.dataset.item,question:el.dataset.q||'',remarks:rem?rem.value:''};
     if(rt==='Numeric Reading'){a.numeric=val;} else {a.response=val;}
+    if(isOverall) a.overall=true;
     if(isBad){
       a.problem=el.querySelector('.prob')?el.querySelector('.prob').value:'';
       a.escalate=el.querySelector('.esc')?el.querySelector('.esc').checked:false;
@@ -359,10 +382,12 @@ function finishChecklist(task,forceEmpty){
       answers:answers,markDone:true};
     run('api_saveChecklist',[payload],function(res){
       closeModal();
-      var msg='Saved '+res.saved+' answer(s).';
+      var msg='Task done.';
       if(res.issues&&res.issues.length)msg+=' '+res.issues.length+' issue raised.';
-      if(res.escalated&&res.escalated.length)msg+=' '+res.escalated.length+' escalated (breakdown).';
+      if(res.escalated&&res.escalated.length)msg+=' Escalated (breakdown).';
       toast(msg);
+      // If an escalation auto-created a draft bill, ask for its photo now.
+      if(res.draftBills&&res.draftBills.length){ setTimeout(function(){openBillProof(res.draftBills[0]);},400); return; }
       if(CURRENT==='today')loadToday(); else if(CURRENT==='dashboard')loadDashboard();
     });
   });
