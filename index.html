@@ -1,1437 +1,984 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+<base target="_top">
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Motor Maintenance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#F4F1EC;
-  --surface:#FFFDF9;
-  --surface2:#FAF7F1;
-  --ink:#2B2620;
-  --dim:#7A7168;
-  --line:#E8E2D9;
-  --line2:#DCD5CB;
-  --ok:#2F7D4F;
-  --okbg:#E4F1E8;
-  --bad:#C4483F;
-  --badbg:#FBE7E4;
-  --warn:#B07A18;
-  --warnbg:#FBF0DE;
-  --mute:#EFEBE4;
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
-body{
-  font-family:'Lexend',system-ui,-apple-system,'Segoe UI',Arial,sans-serif;
-  background:var(--bg);
-  color:var(--ink);
-  font-size:15px;
-  line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
-button,input,select,textarea{font-family:inherit;color:inherit}
-.hidden{display:none !important}
-
-/* ---------- header ---------- */
-.top{position:sticky;top:0;z-index:60;background:var(--bg);border-bottom:1px solid var(--line)}
-.top-in{max-width:960px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
-.logo{width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--surface);
-      display:flex;align-items:center;justify-content:center;font-size:16px;flex:0 0 auto}
-.co{font-size:11px;font-weight:700;letter-spacing:1.3px;color:var(--dim);line-height:1.2}
-.app{font-size:14.5px;font-weight:600;line-height:1.25}
-.tabs{margin-left:auto;display:flex;gap:4px;background:var(--mute);padding:3px;border-radius:10px}
-.tabs button{border:0;background:transparent;font-size:13px;font-weight:500;color:var(--dim);
-             padding:7px 13px;border-radius:8px;cursor:pointer}
-.tabs button.on{background:var(--surface);color:var(--ink);font-weight:600}
-#msg{display:none;font-size:12.5px;text-align:center;padding:8px 16px;font-weight:500}
-#msg.good{display:block;background:var(--okbg);color:var(--ok)}
-#msg.bad{display:block;background:var(--badbg);color:var(--bad)}
-#msg a{color:inherit;font-weight:600}
-
-/* ---------- layout ---------- */
-.page{max-width:960px;margin:0 auto;padding:0 16px 140px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:14px}
-.pad{padding:20px}
-.eyebrow{font-size:10.5px;font-weight:700;letter-spacing:1.2px;color:var(--dim);text-transform:uppercase}
-.h2{margin:5px 0 3px;font-size:17px;font-weight:600}
-.sub{margin:0;font-size:13px;color:var(--dim)}
-label{display:block;font-size:11px;font-weight:600;letter-spacing:.7px;text-transform:uppercase;
-      color:var(--dim);margin:16px 0 6px}
-input,select,textarea{width:100%;font-size:16px;padding:11px 13px;border:1px solid var(--line2);
-      border-radius:12px;background:var(--surface);outline:none}
-input:focus,select:focus,textarea:focus{border-color:var(--ink)}
-input::placeholder,textarea::placeholder{color:#B3A99C}
-textarea{min-height:76px;resize:vertical;font-size:15px}
-.two{display:flex;flex-wrap:wrap;gap:0 14px}
-.two > div{flex:1 1 210px;min-width:0}
-.btn{font-size:15px;font-weight:600;border-radius:12px;padding:13px 20px;border:1px solid var(--ink);
-     background:var(--ink);color:var(--surface);cursor:pointer;width:100%}
-.btn.alt{background:var(--surface);color:var(--ink);border-color:var(--line2);font-weight:500}
-.btn:disabled{opacity:.45}
-
-/* ---------- mode switch ---------- */
-.seg{display:flex;gap:4px;background:var(--mute);padding:4px;border-radius:12px;margin-top:14px}
-.seg button{flex:1;border:0;background:transparent;padding:11px 8px;border-radius:9px;
-            font-size:14px;font-weight:500;color:var(--dim);cursor:pointer}
-.seg button.on{background:var(--surface);color:var(--ink);font-weight:600}
-.seg small{display:block;font-size:10.5px;font-weight:400;color:var(--dim);margin-top:2px}
-
-/* ---------- machine summary ---------- */
-.mtag{font-size:10px;font-weight:700;letter-spacing:1.2px;color:var(--dim)}
-.mid{font-size:20px;font-weight:700;margin-top:2px}
-.mloc{font-size:14px;font-weight:500;margin-top:6px}
-.mspec{font-size:12.5px;color:var(--dim);margin-top:2px}
-.more{margin-top:10px;font-size:12.5px;font-weight:500;background:none;border:0;padding:0;
-      cursor:pointer;text-decoration:underline;text-underline-offset:3px;width:auto}
-.det{display:none;flex-wrap:wrap;margin-top:12px;border-top:1px solid var(--line);padding-top:12px}
-.det.on{display:flex}
-.det > div{flex:1 1 33%;min-width:96px;padding:5px 0}
-.det span{display:block;font-size:9.5px;letter-spacing:.6px;color:var(--dim);text-transform:uppercase}
-.det b{font-size:13px;font-weight:500}
-
-/* ---------- progress ---------- */
-.ptop{display:flex;align-items:baseline;justify-content:space-between}
-.ptop .a{font-size:13px;font-weight:600}
-.ptop .b{font-size:12.5px;color:var(--dim)}
-.track{height:5px;background:var(--mute);border-radius:3px;margin-top:10px;overflow:hidden}
-.bar{height:100%;width:0;background:var(--ink);border-radius:3px}
-.bar.full{background:var(--ok)}
-
-/* ---------- sections ---------- */
-.sec{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:12px;overflow:hidden}
-.sec-h{display:flex;align-items:center;gap:10px;padding:15px 18px;cursor:pointer}
-.sec-h .name{font-size:12px;font-weight:700;letter-spacing:1.1px}
-.sec-h .cnt{margin-left:auto;font-size:12px;font-weight:500;color:var(--dim)}
-.sec-h .cnt.due{color:var(--warn);font-weight:600}
-.sec-h .cnt.done{color:var(--ok);font-weight:600}
-.arrow{width:10px;height:10px;border-right:1.8px solid var(--dim);border-bottom:1.8px solid var(--dim);
-       transform:rotate(45deg);margin-top:-4px;flex:0 0 auto}
-.sec.open .arrow{transform:rotate(-135deg);margin-top:3px}
-.sec-b{display:none;border-top:1px solid var(--line)}
-.sec.open .sec-b{display:block}
-
-/* ---------- one check row ---------- */
-.item{padding:14px 18px;border-bottom:1px solid var(--line)}
-.item:nth-child(even){background:var(--surface2)}
-.item:last-child{border-bottom:0}
-.item.bad{background:var(--badbg)}
-.q{font-size:14.5px;font-weight:500}
-.bn{font-size:13px;color:#5C544B;margin-top:2px}
-.tool{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.6px;color:var(--warn);
-      background:var(--warnbg);padding:3px 8px;border-radius:5px;margin-top:6px}
-.addread{margin-top:10px;background:none;border:0;padding:0;width:auto;cursor:pointer;
-         font-size:12.5px;font-weight:500;color:var(--dim);text-decoration:underline;text-underline-offset:3px}
-.reading{display:none;margin-top:10px}
-.reading.on{display:flex}
-.reading .wrap2{position:relative;flex:1 1 150px;max-width:230px}
-.reading input{padding-right:48px}
-.reading .unit{position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:12px;
-               font-weight:600;color:var(--dim)}
-.pick{display:flex;gap:7px;margin-top:11px}
-.pick button{flex:1;min-height:44px;border:1px solid var(--line2);background:var(--surface);
-             border-radius:11px;font-size:13.5px;font-weight:500;cursor:pointer}
-.pick button.p-ok{background:var(--okbg);border-color:#B5D8C2;color:var(--ok);font-weight:600}
-.pick button.p-bad{background:var(--badbg);border-color:#EFC2BC;color:var(--bad);font-weight:600}
-.pick button.p-na{background:var(--mute);border-color:var(--line2);color:var(--dim);font-weight:600}
-.more-box{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line2)}
-.more-box.on{display:block}
-.more-box label{margin-top:0}
-.sev{display:flex;gap:7px;margin-top:6px}
-.sev button{flex:1;min-height:40px;border:1px solid var(--line2);background:var(--surface);
-            border-radius:10px;font-size:13px;font-weight:500;color:var(--dim);cursor:pointer}
-.sev button.s-low{background:var(--mute);border-color:var(--line2);color:var(--ink);font-weight:600}
-.sev button.s-med{background:var(--warnbg);border-color:#EBD5AD;color:var(--warn);font-weight:600}
-.sev button.s-crit{background:var(--badbg);border-color:#EFC2BC;color:var(--bad);font-weight:600}
-.photo{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
-.photo .take{min-height:42px;padding:0 15px;border:1px dashed var(--line2);background:var(--surface);
-             border-radius:11px;font-size:13px;font-weight:500;color:var(--dim);cursor:pointer;width:auto}
-.photo .take.has{border-style:solid;border-color:#B5D8C2;background:var(--okbg);color:var(--ok);font-weight:600}
-.photo img{width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid var(--line)}
-.photo .drop{border:0;background:none;color:var(--bad);font-size:13px;font-weight:500;cursor:pointer;width:auto}
-
-/* ---------- records ---------- */
-.rec{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer}
-.rec:last-child{border-bottom:0}
-.rec .rid{font-size:14.5px;font-weight:600}
-.rec .rsub{font-size:12.5px;color:var(--dim);margin-top:2px}
-.rec .right{margin-left:auto;text-align:right;flex:0 0 auto}
-.rec .date{font-size:12px;color:var(--dim)}
-.tagpill{display:inline-block;margin-top:4px;font-size:10.5px;font-weight:700;letter-spacing:.5px;
-         padding:3px 9px;border-radius:6px}
-.tagpill.good{background:var(--okbg);color:var(--ok)}
-.tagpill.att{background:var(--badbg);color:var(--bad)}
-.blank{padding:30px 18px;text-align:center;color:var(--dim);font-size:13.5px}
-
-/* ---------- done screen ---------- */
-.done{text-align:center;padding:34px 22px}
-.circle{width:54px;height:54px;border-radius:50%;background:var(--okbg);margin:0 auto 16px;
-        display:flex;align-items:center;justify-content:center}
-.done h3{margin:0;font-size:20px;font-weight:600}
-.done .who{font-size:13px;color:var(--dim);margin-top:6px}
-.nums{display:flex;gap:10px;margin:22px 0 0;text-align:center}
-.nums > div{flex:1;padding:14px 6px;border:1px solid var(--line);border-radius:12px}
-.nums b{display:block;font-size:22px;font-weight:700}
-.nums span{font-size:10.5px;font-weight:600;letter-spacing:.7px;color:var(--dim);text-transform:uppercase}
-.verdict{margin-top:16px;padding:11px;border-radius:12px;font-size:12.5px;font-weight:700;letter-spacing:.8px}
-.verdict.good{background:var(--okbg);color:var(--ok)}
-.verdict.att{background:var(--badbg);color:var(--bad)}
-.acts{display:flex;flex-direction:column;gap:9px;margin-top:22px}
-
-/* ---------- dock ---------- */
-.dock{position:fixed;left:0;right:0;bottom:0;z-index:55;background:var(--surface);
-      border-top:1px solid var(--line);padding:11px 0 calc(11px + env(safe-area-inset-bottom))}
-.dock-in{max-width:960px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px}
-.dock .info{font-size:12px;color:var(--dim);flex:0 0 auto}
-.dock .info b{display:block;color:var(--ink);font-size:13.5px;font-weight:600}
-.dock .btn{margin-left:auto;width:auto;flex:0 1 280px}
-
-/* ---------- popup + toast ---------- */
-.mask{position:fixed;inset:0;background:rgba(43,38,32,.42);display:none;align-items:center;
-      justify-content:center;padding:20px;z-index:90}
-.mask.on{display:flex}
-.pop{background:var(--surface);border-radius:16px;width:100%;max-width:440px;padding:22px}
-.pop h3{margin:0 0 6px;font-size:17px;font-weight:600}
-.pop p{margin:0;font-size:13.5px;color:var(--dim)}
-.pop .row{display:flex;gap:10px;margin-top:20px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:var(--ink);
-       color:var(--surface);font-size:13.5px;font-weight:500;padding:11px 18px;border-radius:11px;
-       z-index:95;opacity:0;transition:opacity .2s;pointer-events:none;max-width:88vw;text-align:center}
-#toast.on{opacity:1}
-#toast.bad{background:var(--bad)}
-.loading{padding:26px;text-align:center;color:var(--dim);font-size:13.5px}
-.note{background:var(--warnbg);color:var(--warn);border:1px solid #EBD5AD;border-radius:12px;
-      padding:13px 16px;font-size:13px;margin-top:14px}
-.foot{text-align:center;font-size:11px;color:#A69C90;margin:24px 0 6px}
-.how{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px}
-.how b{font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--dim);text-transform:uppercase}
-.how ol{margin:9px 0 0;padding-left:20px}
-.how li{font-size:13.5px;margin-bottom:5px}
-.how li:last-child{margin-bottom:0}
-.help{width:30px;height:30px;border-radius:50%;border:1px solid var(--line2);background:var(--surface);
-      color:var(--dim);font-size:14px;font-weight:600;cursor:pointer;flex:0 0 auto;margin-left:8px}
-
-@media (max-width:520px){
-  .two > div{flex:1 1 100%}
-  .dock .btn{flex:1 1 auto;padding:13px 14px}
-  .tabs button{padding:7px 11px;font-size:12.5px}
-  .nums b{font-size:19px}
-}
+  :root{
+    --white:#ffffff; --ink:#1a1a1f; --muted:#6b6b76; --line:#e2e2e8; --band:#f6f6f9;
+    --green:#2e7d32; --greenbg:#e6f4ea;
+    --amber:#8a6d00; --amberbg:#fff4d6;
+    --red:#b3261e;   --redbg:#fde8e6;
+    --blue:#1a5fb4;  --bluebg:#e8f0fe;
+    --grey:#5f6368;  --greybg:#eef0f2;
+    --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;font-family:'Jost',sans-serif;margin:0;padding:0}
+  body{background:var(--white);color:var(--ink);font-size:14px;line-height:1.5}
+  .wrap{width:90vw;max-width:1400px;margin:0 auto;padding:18px 0 60px}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:2px solid var(--ink);margin-bottom:16px;flex-wrap:wrap}
+  header.top h1{font-weight:700;font-size:20px;letter-spacing:.5px}
+  .search{flex:1;min-width:220px;max-width:420px;display:flex;gap:8px}
+  .search input{flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
+  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+  nav.tabs button{padding:8px 14px;border:1px solid var(--line);background:var(--white);border-radius:20px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted)}
+  nav.tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn{padding:8px 14px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;cursor:pointer;font-weight:500;font-size:13px}
+  .btn.ghost{background:#fff;color:var(--ink)}
+  .btn.sm{padding:5px 10px;font-size:12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:22px}
+  .card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);background:#fff}
+  .card .k{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.2px}
+  .card .v{font-size:26px;font-weight:700;margin-top:4px}
+  .card.warn .v{color:var(--amber)} .card.bad .v{color:var(--red)} .card.ok .v{color:var(--green)} .card.info .v{color:var(--blue)}
+  .section{margin-bottom:26px}
+  .section h2{font-size:15px;font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--band);font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.2px}
+  tr:hover td{background:#fafafd}
+  .pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+  .pill.green{background:var(--greenbg);color:var(--green)} .pill.amber{background:var(--amberbg);color:var(--amber)}
+  .pill.red{background:var(--redbg);color:var(--red)} .pill.grey{background:var(--greybg);color:var(--grey)} .pill.blue{background:var(--bluebg);color:var(--blue)}
+  .link{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500}
+  .link:hover{text-decoration:underline}
+  .empty{color:var(--muted);padding:18px;text-align:center;font-style:italic}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .col{flex:1;min-width:260px}
+  label.f{display:block;font-size:12px;color:var(--muted);font-weight:500;margin:10px 0 3px}
+  input.f,select.f,textarea.f{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+  textarea.f{min-height:64px;resize:vertical}
+  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:50}
+  .modal-bg.show{display:flex}
+  .modal{background:#fff;border-radius:14px;width:100%;max-width:640px;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+  .modal h3{font-size:17px;font-weight:600;margin-bottom:4px}
+  .modal .close{float:right;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
+  .chkitem{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+  .chkitem .q{font-weight:500;margin-bottom:8px}
+  .chkitem.abn{border-color:var(--red);background:var(--redbg)}
+  .kv{display:grid;grid-template-columns:180px 1fr;gap:6px 14px;font-size:13px}
+  .kv .kk{color:var(--muted);font-weight:500}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;z-index:99}
+  .toast.show{opacity:1}
+  .loader{text-align:center;padding:60px;color:var(--muted);font-weight:600;letter-spacing:2px;animation:pulse 1.2s infinite}
+  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
+  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .subtabs button{padding:5px 11px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;font-size:12px;color:var(--muted)}
+  .subtabs button.active{background:var(--band);color:var(--ink);font-weight:600}
 </style>
 </head>
 <body>
+<div class="wrap">
+  <header class="top">
+    <h1>Asset control center</h1>
+    <div class="search">
+      <input id="q" placeholder="Search asset / issue / bill / task / vendor..." onkeydown="if(event.key==='Enter')doSearch()">
+      <button class="btn" onclick="doSearch()">Search</button>
+    </div>
+  </header>
 
-<div class="top">
-  <div class="top-in">
-    <div class="logo">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="3"></circle>
-        <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"></path>
-      </svg>
-    </div>
-    <div>
-      <div class="co" id="coName">S.P. GROUP</div>
-      <div class="app">Motor Maintenance</div>
-    </div>
-    <div class="tabs">
-      <button class="on" id="tabCheck" onclick="openTab('check')">Checklist</button>
-      <button id="tabRec" onclick="openTab('records')">Records</button>
-    </div>
-    <button class="help" onclick="showHelp()" title="Kaise use karein">?</button>
-  </div>
-  <div id="msg"></div>
+  <nav class="tabs" id="tabs">
+    <button data-t="dashboard" class="active" onclick="go('dashboard')">Dashboard</button>
+    <button data-t="today" onclick="go('today')">Today's work</button>
+    <button data-t="assets" onclick="go('assets')">Assets</button>
+    <button data-t="issues" onclick="go('issues')">Issues / breakdowns</button>
+    <button data-t="bills" onclick="go('bills')">Bills</button>
+    <button data-t="manage" onclick="go('manage')">Manage</button>
+  </nav>
+
+  <div id="view"><div class="loader">Loading</div></div>
 </div>
 
-<div class="page">
-
-  <!-- ============ CHECKLIST PAGE ============ -->
-  <div id="pageCheck">
-
-    <div class="card pad">
-      <div class="eyebrow">Step 1</div>
-      <div class="h2">Who are you?</div>
-      <p class="sub">আপনার নাম বেছে নিন</p>
-      <label>Name</label>
-      <select id="empSel" onchange="chooseName()">
-        <option value="">Select your name</option>
-      </select>
-      <div id="setupNote"></div>
-      <div class="how">
-        <b>Three steps and you are done</b>
-        <ol>
-          <li>Pick your name</li>
-          <li>Pick the machine — its checklist opens by itself</li>
-          <li>Tap <b>OK</b> or <b>Issue</b> on every line, then <b>Submit</b> at the bottom</li>
-        </ol>
-      </div>
-    </div>
-
-    <div class="card pad hidden" id="cardMode">
-      <div class="eyebrow">Step 2</div>
-      <div class="h2">What are you doing?</div>
-      <div class="seg">
-        <button class="on" id="modeCheck" onclick="chooseWork('Checklist')">
-          Checklist<small>Daily / Weekly / Monthly</small>
-        </button>
-        <button id="modeBreak" onclick="chooseWork('Breakdown')">
-          Breakdown<small>Repair &amp; problem log</small>
-        </button>
-      </div>
-    </div>
-
-    <div class="card pad hidden" id="cardMachine">
-      <div class="eyebrow">Step 3</div>
-      <div class="h2">Which machine?</div>
-      <p class="sub">তালিকায় না থাকলে Other বেছে নিন</p>
-      <label>Machine</label>
-      <select id="macSel" onchange="chooseMachine()">
-        <option value="">Select machine</option>
-      </select>
-      <div id="otherWrap" class="hidden">
-        <div class="two">
-          <div>
-            <label>Tag / model number</label>
-            <input id="macOther" placeholder="K-2216200" oninput="typeMachineId()">
-          </div>
-          <div>
-            <label>Machine type</label>
-            <select id="macOtherType" onchange="showChecklist()">
-              <option value="MOTOR">Motor</option>
-              <option value="PUMP">Pump</option>
-              <option value="FILTER">Filter</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card pad hidden" id="cardSummary">
-      <div class="mtag">MACHINE ID</div>
-      <div class="mid" id="sumId"></div>
-      <div class="mloc" id="sumLoc"></div>
-      <div class="mspec" id="sumSpec"></div>
-      <button class="more hidden" id="sumMore" onclick="toggleMachineDetails()">View details</button>
-      <div class="det" id="sumDet"></div>
-    </div>
-
-    <div class="card pad hidden" id="cardProgress">
-      <div class="ptop">
-        <span class="a">Inspection progress</span>
-        <span class="b" id="progText">0 of 0 checks done</span>
-      </div>
-      <div class="track"><div class="bar" id="progBar"></div></div>
-    </div>
-
-    <div id="listArea"></div>
-
-    <!-- breakdown form -->
-    <div id="breakArea" class="hidden">
-      <div class="card pad">
-        <div class="eyebrow">Breakdown</div>
-        <div class="h2">Problem details</div>
-        <p class="sub">কী সমস্যা, কে সারিয়েছে, কত খরচ</p>
-        <label>Problem type</label>
-        <select id="bProblem">
-          <option value="">Select</option>
-          <option>Breakdown — machine not running</option>
-          <option>Abnormal noise / vibration</option>
-          <option>Overheating</option>
-          <option>Water / oil leakage</option>
-          <option>Electrical fault</option>
-          <option>Bearing failure</option>
-          <option>Belt / coupling problem</option>
-          <option>Routine servicing</option>
-          <option>Other</option>
-        </select>
-        <label>What happened</label>
-        <textarea id="bDesc" placeholder="Describe the problem in simple words"></textarea>
-        <label>Action taken</label>
-        <textarea id="bAction" placeholder="What was done to fix it"></textarea>
-        <label>Parts changed</label>
-        <input id="bParts" placeholder="bearing 6205, capacitor">
-        <div class="two">
-          <div><label>Cost (₹)</label><input id="bCost" inputmode="numeric" placeholder="10000"></div>
-          <div><label>Vendor / technician</label><input id="bVendor" placeholder="Chandan"></div>
-        </div>
-        <div class="two">
-          <div><label>Down from</label><input id="bFrom" type="datetime-local"></div>
-          <div><label>Down to</label><input id="bTo" type="datetime-local"></div>
-        </div>
-        <label>Status</label>
-        <select id="bStatus"><option>Closed</option><option>Open</option></select>
-      </div>
-    </div>
-
-    <div class="card pad hidden" id="cardExtra">
-      <div class="eyebrow">Optional</div>
-      <div class="h2">Additional notes</div>
-      <div class="two">
-        <div><label>Running hours / meter</label><input id="runHrs" inputmode="numeric" placeholder="1240"></div>
-      </div>
-      <label>Remarks</label>
-      <textarea id="remarks" placeholder="Anything the supervisor should know"></textarea>
-    </div>
-
-    <div class="foot" id="footNote"></div>
-  </div>
-
-  <!-- ============ DONE PAGE ============ -->
-  <div id="pageDone" class="hidden">
-    <div class="card">
-      <div class="done">
-        <div class="circle">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2F7D4F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 6L9 17l-5-5"></path>
-          </svg>
-        </div>
-        <h3>Checklist submitted</h3>
-        <div class="who" id="doneWho"></div>
-        <div class="nums">
-          <div><b id="doneOk">0</b><span>OK</span></div>
-          <div><b id="doneBad">0</b><span>Issues</span></div>
-          <div><b id="doneNa">0</b><span>N/A</span></div>
-        </div>
-        <div class="verdict good" id="doneVerdict">NORMAL</div>
-        <div class="acts">
-          <button class="btn" id="btnReport">View report</button>
-          <button class="btn alt" id="btnPdf">Download PDF</button>
-          <button class="btn alt" onclick="startNew()">Check another machine</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============ RECORDS PAGE ============ -->
-  <div id="pageRecords" class="hidden">
-    <div class="card pad">
-      <div class="eyebrow">Filter</div>
-      <div class="h2">Records</div>
-      <div class="two">
-        <div><label>From</label><input id="fFrom" type="date" onchange="loadOldRecords()"></div>
-        <div><label>To</label><input id="fTo" type="date" onchange="loadOldRecords()"></div>
-      </div>
-      <div class="two">
-        <div>
-          <label>Employee</label>
-          <select id="fEmp" onchange="showOldRecords()"><option value="">All employees</option></select>
-        </div>
-        <div>
-          <label>Machine</label>
-          <select id="fMac" onchange="showOldRecords()"><option value="">All machines</option></select>
-        </div>
-        <div>
-          <label>Status</label>
-          <select id="fStatus" onchange="showOldRecords()">
-            <option value="">All</option>
-            <option value="ok">Normal</option>
-            <option value="att">Attention</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="card"><div id="recList" class="loading">Loading</div></div>
-  </div>
-
-</div>
-
-<div class="dock hidden" id="dock">
-  <div class="dock-in">
-    <div class="info" id="dockInfo"><b>0 of 0</b>done</div>
-    <button class="btn" id="btnSubmit" onclick="checkThenSave()">Submit checklist →</button>
-  </div>
-</div>
-
-<div class="mask" id="mask">
-  <div class="pop">
-    <h3 id="popTitle"></h3>
-    <p id="popBody"></p>
-    <div class="row">
-      <button class="btn alt" id="popNo" onclick="closePopup()">Cancel</button>
-      <button class="btn" id="popYes">OK</button>
-    </div>
-  </div>
-</div>
-
-<div id="toast"></div>
+<!-- generic modal -->
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* =====================================================================
-   ==  1. SETTINGS  ====================================================
-   Change things ONLY inside this box. Leave the rest alone.
-   ===================================================================== */
-var SETTINGS = {
+/* ------- tiny helpers ------- */
+var LOOKUPS = null, CURRENT = 'dashboard';
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
+function openModal(html){$('modalBox').innerHTML=html;$('modalBg').classList.add('show');}
+function closeModal(){$('modalBg').classList.remove('show');}
+$('modalBg').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function money(n){n=Number(n)||0;return '\u20B9'+n.toLocaleString('en-IN');}
 
-  // Google Apps Script web app URL — you get it after deploying.
-  // Looks like: https://script.google.com/macros/s/AKfy....../exec
-  GAS_URL: 'https://script.google.com/macros/s/AKfycbxp1E75584fxTFi8Js7sQ2v3AVq_F-jyM3puJwDmcymCDQWEVet7_siKKDnlzO1Jjlw/exec',
-
-  // Name shown in the header
-  COMPANY: 'S.P. GROUP',
-  APP_NAME: 'Motor Maintenance',
-
-  // On-screen words. Want to change the wording? Change it here only.
-  WORDS: {
-    ok:     '✓ OK',
-    issue:  '✕ Issue',
-    na:     '— N/A',
-    submit: 'Submit checklist →'
-  }
-};
-
-var API = localStorage.getItem('mmc_api') || SETTINGS.GAS_URL;
-
-var DATA = {
-  employees: [],
-  machines: [],
-  items: [],
-  last: {},
-  records: [],
-  weeklyDays: 7,
-  monthlyDays: 30
-};
-
-var PICK = {
-  mode: 'Checklist',
-  emp: '',
-  machine: null,
-  otherId: '',
-  answers: {}
-};
-
-/* =====================================================================
-   ==  2. HELPERS  — toast, popup, server call
-   ===================================================================== */
-function find(id){ return document.getElementById(id); }
-
-function clean(v){
-  return String(v === undefined || v === null ? '' : v)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+function statusPill(s){
+  s=String(s||'').trim();var c='grey';
+  if(/done|active|normal|paid/i.test(s))c='green';
+  else if(/pending|expiring|maintenance|repair|progress|partial/i.test(s))c='amber';
+  else if(/overdue|breakdown|expired|open|abnormal|unpaid|not ok/i.test(s))c='red';
+  else if(/hold|recorded|inactive/i.test(s))c='grey';
+  return '<span class="pill '+c+'">'+esc(s||'-')+'</span>';
 }
 
-function showMessage(text, isBad){
-  var t = find('toast');
-  t.textContent = text;
-  t.className = 'on' + (isBad ? ' bad' : '');
-  setTimeout(function(){ t.className = ''; }, 2600);
-}
+/* run wrapper */
+/* ========================================================================================
+ * BACKEND CONNECTION
+ * Two ways this HTML talks to the Apps Script backend:
+ *   1. Served BY Apps Script (doGet)  -> google.script.run is available -> use it.
+ *   2. Hosted STANDALONE (GitHub Pages, any host) -> set API_URL to your GAS web app /exec URL
+ *      and it POSTs (CORS-safe text/plain) to the doPost router.
+ * To go standalone: paste your deployment URL below, e.g.
+ *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
+ * Leave it "" when the file is served by Apps Script.
+ * ====================================================================================== */
+var API_URL = "https://script.google.com/macros/s/AKfycbxX4mthQ9NpvKQRnasU_OthSUPWkuFDToaK8kf3ChhSe8w3rBiyoH9l98OoSmWPgwXVtA/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
-function showPopup(title, body, yesText, onYes){
-  find('popTitle').textContent = title;
-  find('popBody').innerHTML = body;
-  find('popYes').textContent = yesText || 'OK';
-  find('popNo').style.display = onYes ? '' : 'none';
-  find('popYes').onclick = function(){
-    closePopup();
-    if(onYes) onYes();
-  };
-  find('mask').classList.add('on');
-}
-function closePopup(){ find('mask').classList.remove('on'); }
+function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
-function showBanner(kind, html){
-  var m = find('msg');
-  m.className = kind;
-  m.innerHTML = html;
-}
+function run(fn,args,cb){
+  args=args||[];
+  var onErr=function(msg){ $('view').innerHTML='<div class="empty">Error: '+esc(msg)+'</div>'; toast('Error: '+msg); };
 
-function askServer(payload){
-  return fetch(API, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  })
-  .then(function(res){ return res.text(); })
-  .then(function(text){
-    try {
-      return JSON.parse(text);
-    } catch(err){
-      throw new Error('Bad reply from the server. Check that deployment access is set to Anyone.');
-    }
-  });
-}
-
-function todayDate(){
-  var d = new Date();
-  return d.getFullYear() + '-' +
-         ('0' + (d.getMonth() + 1)).slice(-2) + '-' +
-         ('0' + d.getDate()).slice(-2);
-}
-
-function daysBetween(from, to){
-  if(!from) return 9999;
-  return Math.round((new Date(to + 'T00:00:00') - new Date(from + 'T00:00:00')) / 86400000);
-}
-
-/* =====================================================================
-   ==  3. ON OPEN  — loads names, machines and check items from the sheet
-   ===================================================================== */
-function startApp(){
-  if(!API || API.indexOf('macros') < 0){
-    showBanner('bad', 'GAS URL not set. <a href="#" onclick="askForUrl();return false">Set URL</a>');
+  // Mode 1: served by Apps Script
+  if(hasGSR() && !API_URL){
+    google.script.run.withSuccessHandler(cb).withFailureHandler(function(e){onErr(e.message);})[fn].apply(google.script.run,args);
     return;
   }
-  askServer({ action: 'boot' })
-    .then(function(r){
-      if(!r.ok) throw new Error(r.error || 'Boot failed');
-      DATA.employees = r.employees || [];
-      DATA.machines = r.machines || [];
-      DATA.items = r.items || [];
-      DATA.last = r.last || {};
-      DATA.weeklyDays = r.weekly_days || 7;
-      DATA.monthlyDays = r.monthly_days || 30;
-
-      find('coName').textContent = String(r.company || SETTINGS.COMPANY).toUpperCase();
-      find('footNote').textContent = (r.company || '') + ' · ' + (r.app || '') + ' · v' + r.version;
-
-      loadNameList();
-      loadMachineList();
-
-      if(!DATA.employees.length){
-        find('setupNote').innerHTML =
-          '<div class="note">No employees found. In the sheet open menu → 🔧 Maintenance → ➕ ADD and add names.</div>';
-      }
-
-      showBanner('good', 'Connected');
-      setTimeout(function(){ showBanner('', ''); }, 1600);
-    })
-    .catch(function(err){
-      showBanner('bad', clean(err.message) + ' <a href="#" onclick="askForUrl();return false">Set URL</a>');
-    });
+  // Mode 2: standalone -> fetch POST (CORS-safe text/plain) to the doPost router
+  if(!API_URL){ onErr('API_URL not set. Paste your GAS /exec URL at the top of the file, or open the app from the Apps Script web app.'); return; }
+  fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:fn,args:args})})
+    .then(function(r){return r.json();})
+    .then(function(d){ if(d && d.ok){ cb(d.result); } else { onErr((d&&d.error)||'Unknown error'); } })
+    .catch(function(e){ onErr(e.message); });
 }
 
-function askForUrl(){
-  var v = prompt('Paste the GAS web app /exec URL', API);
-  if(!v) return;
-  v = v.trim();
-  if(v.indexOf('/exec') < 0){
-    showMessage('The URL must end with /exec', true);
-    return;
-  }
-  localStorage.setItem('mmc_api', v);
-  location.reload();
+function go(tab){
+  CURRENT=tab;
+  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('active',b.dataset.t===tab);});
+  $('view').innerHTML='<div class="loader">Loading</div>';
+  if(tab==='dashboard')loadDashboard();
+  else if(tab==='today')loadToday();
+  else if(tab==='assets')loadAssets();
+  else if(tab==='issues')loadIssues();
+  else if(tab==='bills')loadBills();
+  else if(tab==='manage')loadManage();
 }
 
-function loadNameList(){
-  var sel = find('empSel');
-  var filter = find('fEmp');
-  sel.innerHTML = '<option value="">Select your name</option>';
-  filter.innerHTML = '<option value="">All employees</option>';
+/* ---------------- DASHBOARD ---------------- */
+function loadDashboard(){
+  run('api_dashboard',[],function(d){
+    var cards=[
+      ['Total Assets',d.totalAssets,''],['Active',d.activeAssets,'ok'],
+      ['Tasks Today',d.tasksToday,'info'],['Pending',d.pending,'warn'],['Overdue',d.overdue,'bad'],
+      ['Open issues',d.openIssues,'warn'],['Open Breakdowns',d.openBreakdowns,'bad'],
+      ['Under Maintenance',d.underMaintenance,'warn'],
+      ['Warranty Expiring',d.warrantyExpiring,'warn'],['Warranty Expired',d.warrantyExpired,'bad'],
+      ['Pending bills',d.pendingBills,'warn'],['Unpaid Amount',money(d.unpaidAmount),'bad'],
+      ['This Month Expense',money(d.monthExpense),'info']
+    ];
+    var h='<div class="cards">'+cards.map(function(c){
+      return '<div class="card '+(c[2]||'')+'"><div class="k">'+c[0]+'</div><div class="v">'+esc(c[1])+'</div></div>';
+    }).join('')+'</div>';
 
-  DATA.employees.forEach(function(e){
-    var a = document.createElement('option');
-    a.value = e.name;
-    a.textContent = e.name + (e.role ? ' · ' + e.role : '');
-    sel.appendChild(a);
-
-    var b = document.createElement('option');
-    b.value = e.name;
-    b.textContent = e.name;
-    filter.appendChild(b);
-  });
-
-  var saved = localStorage.getItem('mmc_emp');
-  if(saved){
-    sel.value = saved;
-    if(sel.value) chooseName();
-  }
-}
-
-function loadMachineList(){
-  var main = '<option value="">Select machine</option>';
-  var filter = '<option value="">All machines</option>';
-
-  DATA.machines.forEach(function(m){
-    var label = clean(m.name) + (m.location ? ' — ' + clean(m.location) : '');
-    main += '<option value="' + clean(m.machine_id) + '">' + label + '</option>';
-    filter += '<option value="' + clean(m.machine_id) + '">' + clean(m.name) + '</option>';
-  });
-  main += '<option value="__OTHER__">Other / not in list</option>';
-
-  find('macSel').innerHTML = main;
-  find('fMac').innerHTML = filter;
-}
-
-/* =====================================================================
-   ==  4. THREE STEPS  — name -> what to do -> which machine
-   ===================================================================== */
-function chooseName(){
-  PICK.emp = find('empSel').value;
-  if(!PICK.emp) return;
-  localStorage.setItem('mmc_emp', PICK.emp);
-  find('cardMode').classList.remove('hidden');
-  find('cardMachine').classList.remove('hidden');
-}
-
-function chooseWork(mode){
-  PICK.mode = mode;
-  find('modeCheck').classList.toggle('on', mode === 'Checklist');
-  find('modeBreak').classList.toggle('on', mode === 'Breakdown');
-  PICK.answers = {};
-  showChecklist();
-}
-
-function chooseMachine(){
-  var v = find('macSel').value;
-  if(v === '__OTHER__'){
-    PICK.machine = null;
-    find('otherWrap').classList.remove('hidden');
-  } else {
-    find('otherWrap').classList.add('hidden');
-    PICK.otherId = '';
-    PICK.machine = null;
-    DATA.machines.forEach(function(m){
-      if(m.machine_id === v) PICK.machine = m;
-    });
-  }
-  PICK.answers = {};
-  showChecklist();
-}
-
-function typeMachineId(){
-  PICK.otherId = find('macOther').value.trim();
-  showChecklist();
-}
-
-function machineKind(){
-  if(PICK.machine) return PICK.machine.type || 'MOTOR';
-  return find('macOtherType').value || 'MOTOR';
-}
-
-function machineChosen(){
-  return !!(PICK.machine || PICK.otherId);
-}
-
-function lastCheckedOn(freq){
-  var id = PICK.machine ? PICK.machine.machine_id : '';
-  if(!id || !DATA.last[id]) return '';
-  return DATA.last[id][freq] || '';
-}
-
-function isDueNow(freq){
-  if(freq === 'Daily') return { due: true, last: lastCheckedOn('Daily') };
-  var limit = (freq === 'Weekly') ? DATA.weeklyDays : DATA.monthlyDays;
-  var last = lastCheckedOn(freq);
-  return { due: daysBetween(last, todayDate()) >= limit, last: last };
-}
-
-/* =====================================================================
-   ==  5. MACHINE CARD  — shows machine details on top
-   ===================================================================== */
-function showMachineCard(){
-  var card = find('cardSummary');
-  if(!machineChosen()){
-    card.classList.add('hidden');
-    return;
-  }
-  card.classList.remove('hidden');
-
-  var m = PICK.machine;
-  if(!m){
-    find('sumId').textContent = PICK.otherId;
-    find('sumLoc').textContent = '';
-    find('sumSpec').textContent = 'Not in list · ' + machineKind();
-    find('sumMore').classList.add('hidden');
-    find('sumDet').className = 'det';
-    find('sumDet').innerHTML = '';
-    return;
-  }
-
-  find('sumId').textContent = m.machine_id;
-  find('sumLoc').textContent = m.location || '';
-
-  var spec = [];
-  if(m.make) spec.push(m.make);
-  if(m.hp) spec.push(m.hp);
-  if(m.voltage) spec.push(m.voltage + 'V');
-  if(m.rpm) spec.push(m.rpm + ' RPM');
-  find('sumSpec').textContent = spec.join(' • ');
-
-  var rows = [
-    ['Model', m.model], ['Frame', m.frame], ['FLA', m.fla],
-    ['Installed', m.install_date], ['Type', m.type]
-  ].filter(function(r){ return r[1]; });
-
-  if(rows.length){
-    find('sumMore').classList.remove('hidden');
-    find('sumDet').innerHTML = rows.map(function(r){
-      return '<div><span>' + clean(r[0]) + '</span><b>' + clean(r[1]) + '</b></div>';
-    }).join('');
-  } else {
-    find('sumMore').classList.add('hidden');
-    find('sumDet').innerHTML = '';
-  }
-  find('sumDet').className = 'det';
-  find('sumMore').textContent = 'View details';
-}
-
-function toggleMachineDetails(){
-  var box = find('sumDet');
-  box.classList.toggle('on');
-  find('sumMore').textContent = box.classList.contains('on') ? 'Hide details' : 'View details';
-}
-
-/* =====================================================================
-   ==  6. CHECKLIST  — builds the Daily / Weekly / Monthly rows
-   ===================================================================== */
-function getItems(freq){
-  var type = machineKind();
-  return DATA.items.filter(function(i){
-    return i.type === type && i.freq === freq;
-  });
-}
-
-function showChecklist(){
-  var ready = machineChosen();
-  var isCheck = (PICK.mode === 'Checklist');
-
-  showMachineCard();
-  find('breakArea').classList.toggle('hidden', !(ready && !isCheck));
-  find('cardExtra').classList.toggle('hidden', !ready);
-  find('dock').classList.toggle('hidden', !ready);
-
-  if(!ready || !isCheck){
-    find('listArea').innerHTML = '';
-    find('cardProgress').classList.add('hidden');
-    updateCounts();
-    return;
-  }
-
-  var html = '';
-  var openedOne = false;
-
-  ['Daily', 'Weekly', 'Monthly'].forEach(function(freq){
-    var list = getItems(freq);
-    if(!list.length) return;
-
-    var info = isDueNow(freq);
-    var open = false;
-    if(freq === 'Daily'){
-      open = true;
-      openedOne = true;
-    } else if(info.due && !openedOne){
-      open = true;
-      openedOne = true;
+    // Bill Generate Pending (escalated / breakdown issues awaiting a bill+proof)
+    if(d.billPending&&d.billPending.length){
+      h+='<div class="section"><h2>Bill generate pending &mdash; breakdowns ('+d.billPending.length+')</h2>'+
+        '<table><tr><th>Issue</th><th>Asset</th><th>Problem</th><th>Severity</th><th></th></tr>';
+      d.billPending.forEach(function(r){
+        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
+          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
+          '<td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
+          '<td><button class="btn sm" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Generate bill + proof</button></td></tr>';
+      });
+      h+='</table></div>';
     }
 
-    var label, cls;
-    if(freq === 'Daily'){
-      label = '0 / ' + list.length;
-      cls = '';
-    } else if(info.due){
-      label = 'Due now';
-      cls = 'due';
-    } else {
-      label = 'Done ' + (info.last || '—');
-      cls = 'done';
+    // Recent issues - actionable (escalate / generate bill) right here
+    h+='<div class="section"><h2>Recent issues</h2>';
+    if(!d.recentIssues||!d.recentIssues.length){h+='<div class="empty">No open issues.</div>';}
+    else{
+      h+='<table><tr><th>ID</th><th>Asset</th><th>Type</th><th>Problem</th><th>Severity</th><th>Status</th><th></th></tr>';
+      d.recentIssues.forEach(function(r){
+        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
+          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
+          '<td>'+esc(r['Issue Type'])+'</td><td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
+          '<td>'+statusPill(r['Status'])+(String(r['Needs Bill']).toLowerCase()==='yes'?' <span class="pill amber">bill pending</span>':'')+'</td>'+
+          '<td style="white-space:nowrap"><button class="btn sm" onclick=\'openEscalate('+JSON.stringify(r)+')\'>Escalate</button> '+
+          (String(r['Needs Bill']).toLowerCase()==='yes'?'<button class="btn sm ghost" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Bill</button>':'')+'</td></tr>';
+      });
+      h+='</table>';
     }
+    h+='</div>';
 
-    html += '<div class="sec' + (open ? ' open' : '') + '" id="sec' + freq + '">' +
-              '<div class="sec-h" onclick="openCloseSection(\'' + freq + '\')">' +
-                '<span class="name">' + freq.toUpperCase() + ' INSPECTION</span>' +
-                '<span class="cnt ' + cls + '" id="cnt' + freq + '" data-idle="' + clean(label) + '">' + clean(label) + '</span>' +
-                '<span class="arrow"></span>' +
-              '</div>' +
-              '<div class="sec-b">';
-
-    list.forEach(function(item){
-      html += buildOneRow(item);
-    });
-
-    html += '</div></div>';
+    if(d.repeatBreakdowns&&d.repeatBreakdowns.length){
+      h+='<div class="section"><h2>Repeated breakdowns</h2><table><tr><th>Asset</th><th>Breakdowns</th></tr>'+
+        d.repeatBreakdowns.map(function(r){return '<tr><td><a class="link" onclick="assetDetail(\''+r.assetId+'\')">'+esc(r.assetId)+'</a></td><td>'+r.breakdowns+'</td></tr>';}).join('')+'</table></div>';
+    }
+    if(d.expenseTrend&&d.expenseTrend.length){
+      h+='<div class="section"><h2>Expense trend (6 mo)</h2><table><tr>'+
+        d.expenseTrend.map(function(t){return '<th>'+esc(t.month)+'</th>';}).join('')+'</tr><tr>'+
+        d.expenseTrend.map(function(t){return '<td>'+money(t.total)+'</td>';}).join('')+'</tr></table></div>';
+    }
+    $('view').innerHTML=h;
   });
-
-  if(!html){
-    find('listArea').innerHTML = '<div class="card"><div class="blank">No check items for this machine type.</div></div>';
-    find('cardProgress').classList.add('hidden');
-    return;
-  }
-
-  find('listArea').innerHTML = html;
-  find('cardProgress').classList.remove('hidden');
-  updateCounts();
 }
 
-function buildOneRow(item){
-  var id = item.item_id;
-  var tag = '';
-  if(item.needs_tool){
-    tag = '<div class="tool">NEEDS INSTRUMENT · ' + clean(item.tier).toUpperCase() + '</div>';
-  } else if(item.tier === 'Technician'){
-    tag = '<div class="tool">TECHNICIAN</div>';
-  }
+/* ---------------- TODAY'S WORK ---------------- */
+function loadToday(){
+  run('api_todaysWork',[],function(rows){
+    if(!rows.length){$('view').innerHTML='<div class="empty">No pending or overdue tasks. All clear.</div>';return;}
+    var h='<div class="section"><h2>Today &amp; overdue ('+rows.length+')</h2><table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
+    rows.forEach(function(r){
+      h+='<tr>'+
+        '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
+        '<td>'+esc(r.assetType)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.task)+'</td>'+
+        '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
+        '<td>'+esc(r.doer)+'</td><td>'+statusPill(r.status)+'</td>'+
+        '<td><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button></td></tr>';
+    });
+    h+='</table></div>';
+    $('view').innerHTML=h;
+  });
+}
 
-  // Reading stays hidden. A technician can open it if he wants to note a value.
-  var unit = item.unit ? clean(item.unit) : '';
-  var reading = '<button class="addread" id="link_' + clean(id) + '" onclick="openReading(\'' + id + '\')">' +
-                  '+ Add reading' + (unit ? ' (' + unit + ')' : '') +
-                '</button>' +
-                '<div class="reading" id="read_' + clean(id) + '"><div class="wrap2">' +
-                  '<input inputmode="decimal" placeholder="Value" oninput="typeReading(\'' + id + '\', this.value)">' +
-                  (unit ? '<span class="unit">' + unit + '</span>' : '') +
-                '</div></div>';
-
-  return '<div class="item" id="item_' + clean(id) + '">' +
-           '<div class="q">' + clean(item.item_en) + '</div>' +
-           (item.item_bn ? '<div class="bn">' + clean(item.item_bn) + '</div>' : '') +
-           tag +
-           reading +
-           '<div class="pick">' +
-             '<button data-val="OK" onclick="tapResult(\'' + id + '\', \'OK\')">' + SETTINGS.WORDS.ok + '</button>' +
-             '<button data-val="Issue" onclick="tapResult(\'' + id + '\', \'Issue\')">' + SETTINGS.WORDS.issue + '</button>' +
-             '<button data-val="N/A" onclick="tapResult(\'' + id + '\', \'N/A\')">' + SETTINGS.WORDS.na + '</button>' +
-           '</div>' +
-           '<div class="more-box" id="extra_' + clean(id) + '">' +
-             '<label>Issue remark</label>' +
-             '<textarea placeholder="What is the problem?" oninput="typeRemark(\'' + id + '\', this.value)"></textarea>' +
-             '<label>Severity</label>' +
-             '<div class="sev" id="sev_' + clean(id) + '">' +
-               '<button data-sev="Low" onclick="tapSeverity(\'' + id + '\', \'Low\')">Low</button>' +
-               '<button data-sev="Medium" onclick="tapSeverity(\'' + id + '\', \'Medium\')">Medium</button>' +
-               '<button data-sev="Critical" onclick="tapSeverity(\'' + id + '\', \'Critical\')">Critical</button>' +
-             '</div>' +
-             '<div class="photo" id="photo_' + clean(id) + '">' +
-               '<input type="file" accept="image/*" capture="environment" class="hidden" id="file_' + clean(id) + '" onchange="sendPhoto(\'' + id + '\', this)">' +
-               '<button class="take" id="take_' + clean(id) + '" onclick="openCamera(\'' + id + '\')">Add photo</button>' +
-             '</div>' +
-           '</div>' +
+/* ---------------- CHECKLIST EXECUTION ---------------- */
+function startChecklist(task){
+  run('api_checklistFor',[task.assetType,task.frequency],function(items){
+    if(!items.length){
+      openModal('<span class="close" onclick="closeModal()">&times;</span><h3>No checklist</h3>'+
+        '<p style="color:var(--muted);margin:8px 0 14px">No checklist items defined for type "'+esc(task.assetType||'?')+'". You can still mark the task done.</p>'+
+        '<button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+',[])\'>Mark task done</button>');
+      return;
+    }
+    var h='<span class="close" onclick="closeModal()">&times;</span>'+
+      '<h3>'+esc(task.task)+'</h3><p style="color:var(--muted);margin-bottom:14px">'+esc(task.assetId)+' &middot; '+esc(task.assetType)+' &middot; '+esc(task.location||'')+'</p><div id="chkList">';
+    items.forEach(function(it,i){
+      h+='<div class="chkitem" data-item="'+esc(it['Item ID'])+'" data-rt="'+esc(it['Response Type'])+'" data-mn="'+esc(it['Minimum Value'])+'" data-mx="'+esc(it['Maximum Value'])+'">'+
+         '<div class="q">'+(i+1)+'. '+esc(it['Question'])+(it['Unit']?(' ('+esc(it['Unit'])+')'):'')+'</div>'+
+         responseInput(it,i)+
+         '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
          '</div>';
-}
-
-function openCloseSection(freq){
-  find('sec' + freq).classList.toggle('open');
-}
-
-function getOneItem(id){
-  var found = null;
-  DATA.items.forEach(function(i){
-    if(i.item_id === id) found = i;
+    });
+    h+='</div><label class="f"><input type="checkbox" id="autoIssue" checked> Auto-raise issue for abnormal answers</label>'+
+       '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete</button>'+
+       '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>';
+    openModal(h);
   });
-  return found;
 }
-
-function startAnswer(id){
-  if(!PICK.answers[id]){
-    var item = getOneItem(id);
-    if(!item) return null;
-    PICK.answers[id] = {
-      item_id: id,
-      freq: item.freq,
-      item_en: item.item_en,
-      result: '',
-      severity: '',
-      reading: '',
-      remark: '',
-      photo: ''
-    };
+function responseInput(it){
+  var rt=String(it['Response Type']||'').trim();
+  if(rt==='Numeric Reading') return '<input class="f resp" type="number" step="any" placeholder="reading">';
+  if(rt==='OK / NOT OK') return sel(['OK','NOT OK']);
+  if(rt==='Yes / No') return sel(['Yes','No']);
+  if(rt==='Done / Not Done') return sel(['Done','Not Done']);
+  if(rt==='Date') return '<input class="f resp" type="date">';
+  if(rt==='Time') return '<input class="f resp" type="time">';
+  return '<input class="f resp" placeholder="answer">';
+  function sel(opts){return '<select class="f resp"><option value="">-- select --</option>'+opts.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>';}
+}
+function finishChecklist(task,forceEmpty){
+  var answers=[];
+  if(!forceEmpty){
+    Array.prototype.forEach.call(document.querySelectorAll('#chkList .chkitem'),function(el){
+      var resp=el.querySelector('.resp'); var rem=el.querySelector('.rem');
+      var rt=el.dataset.rt; var val=resp?resp.value:'';
+      if(val===''&&(!rem||rem.value==='')) return; // skip blank
+      var a={itemId:el.dataset.item,remarks:rem?rem.value:''};
+      if(rt==='Numeric Reading'){a.numeric=val;} else {a.response=val;}
+      answers.push(a);
+    });
   }
-  return PICK.answers[id];
+  var payload={assetId:task.assetId,taskId:task.taskId,plannedDate:task.plannedDate,doer:task.doer,
+    answers:answers,autoIssue:$('autoIssue')?$('autoIssue').checked:false,markDone:true};
+  toast('Saving...');
+  run('api_saveChecklist',[payload],function(res){
+    closeModal();
+    var msg='Saved '+res.saved+' answer(s).';
+    if(res.issues&&res.issues.length)msg+=' Raised '+res.issues.length+' issue(s): '+res.issues.join(', ');
+    toast(msg);
+    if(CURRENT==='today')loadToday(); else if(CURRENT==='dashboard')loadDashboard();
+  });
 }
 
-function tapResult(id, value){
-  var ans = startAnswer(id);
-  if(!ans) return;
+/* ---------------- ASSETS ---------------- */
+function loadAssets(){
+  run('api_assetList',[],function(rows){
+    var head='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Assets ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
+    if(!rows.length){$('view').innerHTML=head+'<div class="empty">No machines yet. Click "+ Add machine" to add one.</div></div>';return;}
+    var h=head+'<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Warranty</th><th>Guarantee</th><th>Criticality</th></tr>';
+    rows.forEach(function(r){
+      h+='<tr><td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
+        '<td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td>'+
+        '<td>'+statusPill(r.status)+'</td><td>'+statusPill(r.warranty)+'</td><td>'+statusPill(r.guarantee||'-')+'</td><td>'+esc(r.criticality||'-')+'</td></tr>';
+    });
+    $('view').innerHTML=h+'</table></div>';
+  });
+}
 
-  var clearing = (ans.result === value);
-  ans.result = clearing ? '' : value;
-  var now = ans.result;
+/* ---- Add / Edit Machine ---- */
+function openAddMachine(){
+  var types=(LOOKUPS.assetTypes||[]).map(function(o){return '<option>'+esc(o)+'</option>';}).join('');
+  var crit=(LOOKUPS.criticality||[]).map(function(o){return '<option'+(o==='Medium'?' selected':'')+'>'+esc(o)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add machine</h3>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Asset ID auto-generates (AST-xxx).</p>'+
+    '<div class="row"><div class="col"><label class="f">Machine name</label><input class="f" id="mName"></div>'+
+    '<div class="col"><label class="f">Type</label><select class="f" id="mType">'+types+'</select></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Location</label><input class="f" id="mLoc"></div>'+
+    '<div class="col"><label class="f">Criticality</label><select class="f" id="mCrit">'+crit+'</select></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Make</label><input class="f" id="mMake"></div>'+
+    '<div class="col"><label class="f">Model</label><input class="f" id="mModel"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Serial / tag</label><input class="f" id="mSerial"></div>'+
+    '<div class="col"><label class="f">Vendor</label><input class="f" id="mVendor"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Install date</label><input class="f" id="mInstall" type="date"></div>'+
+    '<div class="col"><label class="f">Purchase cost</label><input class="f" id="mCost" type="number" step="any"></div></div>'+
+    '<hr style="margin:12px 0;border:none;border-top:1px solid var(--line)"><b style="font-size:13px">Warranty</b>'+
+    '<div class="row"><div class="col"><label class="f">Warranty start</label><input class="f" id="mWStart" type="date"></div>'+
+    '<div class="col"><label class="f">Warranty end</label><input class="f" id="mWEnd" type="date"></div></div>'+
+    '<label class="f">Warranty provider</label><input class="f" id="mWProv">'+
+    '<b style="font-size:13px">Guarantee</b>'+
+    '<div class="row"><div class="col"><label class="f">Guarantee start</label><input class="f" id="mGStart" type="date"></div>'+
+    '<div class="col"><label class="f">Guarantee end</label><input class="f" id="mGEnd" type="date"></div></div>'+
+    '<label class="f">Guarantee provider</label><input class="f" id="mGProv">'+
+    '<div style="margin-top:14px"><button class="btn" id="mBtn" onclick="saveMachine()">Save machine</button></div>');
+}
+function saveMachine(){
+  var o={name:$('mName').value,type:$('mType').value,location:$('mLoc').value,criticality:$('mCrit').value,
+    make:$('mMake').value,model:$('mModel').value,serial:$('mSerial').value,vendor:$('mVendor').value,
+    installDate:$('mInstall').value,purchaseCost:$('mCost').value,
+    warrantyStart:$('mWStart').value,warrantyEnd:$('mWEnd').value,warrantyProvider:$('mWProv').value,
+    guaranteeStart:$('mGStart').value,guaranteeEnd:$('mGEnd').value,guaranteeProvider:$('mGProv').value};
+  if(!o.name){toast('Machine name required');return;}
+  $('mBtn').disabled=true;$('mBtn').textContent='Saving...';
+  run('api_addAsset',[o],function(id){closeModal();toast('Machine '+id+' added');loadAssets();});
+}
+function openEditWarranty(id,o){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Edit warranty / guarantee &middot; '+esc(id)+'</h3>'+
+    '<b style="font-size:13px">Warranty</b>'+
+    '<div class="row"><div class="col"><label class="f">Start</label><input class="f" id="eWS" type="date" value="'+esc(o['Warranty Start']||'')+'"></div>'+
+    '<div class="col"><label class="f">End</label><input class="f" id="eWE" type="date" value="'+esc(o['Warranty End']||'')+'"></div></div>'+
+    '<label class="f">Provider</label><input class="f" id="eWP" value="'+esc(o['Warranty Provider']||'')+'">'+
+    '<b style="font-size:13px">Guarantee</b>'+
+    '<div class="row"><div class="col"><label class="f">Start</label><input class="f" id="eGS" type="date" value="'+esc(o['Guarantee Start']||'')+'"></div>'+
+    '<div class="col"><label class="f">End</label><input class="f" id="eGE" type="date" value="'+esc(o['Guarantee End']||'')+'"></div></div>'+
+    '<label class="f">Provider</label><input class="f" id="eGP" value="'+esc(o['Guarantee Provider']||'')+'">'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveWarranty(\''+esc(id)+'\')">Save</button></div>');
+}
+function saveWarranty(id){
+  var patch={'Warranty Start':$('eWS').value,'Warranty End':$('eWE').value,'Warranty Provider':$('eWP').value,
+    'Guarantee Start':$('eGS').value,'Guarantee End':$('eGE').value,'Guarantee Provider':$('eGP').value};
+  run('api_updateAsset',[id,patch],function(){closeModal();toast('Warranty/Guarantee updated');assetDetail(id);});
+}
 
-  var box = find('item_' + id);
-  var buttons = box.querySelectorAll('.pick button');
-  for(var i = 0; i < buttons.length; i++){
-    var val = buttons[i].getAttribute('data-val');
-    var cls = '';
-    if(now && val === now){
-      cls = (val === 'OK') ? 'p-ok' : (val === 'Issue' ? 'p-bad' : 'p-na');
+function assetDetail(id){
+  $('view').innerHTML='<div class="loader">Loading</div>';
+  run('api_assetDetail',[id],function(d){
+    if(!d){$('view').innerHTML='<div class="empty">Asset not found.</div>';return;}
+    var o=d.overview,rel=d.reliability;
+    var h='<button class="btn ghost sm" onclick="go(\'assets\')">&larr; Back</button>'+
+      '<div class="section" style="margin-top:12px"><h2>'+esc(o['Asset ID'])+' &middot; '+esc(o['Asset Name']||'')+'</h2>'+
+      '<div class="row"><div class="col"><div class="kv">'+
+      kv('Type',o['Asset Type'])+kv('Category',o['Category'])+kv('Location',o['Current Location']||o['Location'])+
+      kv('Status',o['Current Status'])+kv('Criticality',o['Criticality'])+kv('Vendor',o['Vendor'])+
+      '</div></div><div class="col"><div class="kv">'+
+      kv('Warranty',(o['Warranty Status']||'')+(o['Warranty End']?(' (till '+o['Warranty End']+')'):''))+
+      kv('Guarantee',(o['Guarantee Status']||'')+(o['Guarantee End']?(' (till '+o['Guarantee End']+')'):''))+
+      kv('Installed',rel.installDate)+kv('Days since install',rel.daysSinceInstall)+
+      kv('Breakdowns',rel.breakdownCount)+kv('Last breakdown',rel.lastBreakdownDate||'-')+
+      kv('Days since last BD',rel.daysSinceLastBreakdown)+kv('Avg days between BD',rel.avgDaysBetweenBreakdowns||'-')+
+      kv('Total spend',money(d.totalCost))+
+      '</div></div></div></div>';
+
+    h+='<div class="row" style="margin-bottom:14px">'+
+       '<button class="btn sm" onclick=\'openMaint("'+esc(id)+'")\'>+ Maintenance</button>'+
+       '<button class="btn sm" onclick=\'openMove("'+esc(id)+'")\'>+ Movement</button>'+
+       '<button class="btn sm" onclick=\'openBill("'+esc(id)+'")\'>+ Bill</button>'+
+       '<button class="btn sm ghost" onclick=\'openIssue("'+esc(id)+'")\'>+ Issue</button>'+
+       '<button class="btn sm ghost" onclick=\'openEditWarranty("'+esc(id)+'",'+JSON.stringify(o)+')\'>Edit Warranty/Guarantee</button></div>';
+
+    h+=histSection('Checklist history',d.checklist,['Actual DateTime','Question','Response','Numeric Reading','Result','Issue ID']);
+    h+=histSection('Issues',d.issues,['Issue ID','Detected DateTime','Issue Type','Problem','Severity','Status']);
+    h+=histSection('Maintenance',d.maintenance,['History ID','Event Date','Event Type','Description','Cost','Bill ID']);
+    h+=histSection('Movement',d.movement,['Movement ID','Movement Date','From Location','To Location','Reason']);
+    h+=histSection('Bills',d.bills,['Bill ID','Invoice Date','Vendor','Total Amount','Payment Status','Drive File URL']);
+    $('view').innerHTML=h;
+  });
+}
+function kv(k,v){return '<div class="kk">'+esc(k)+'</div><div>'+esc(v||'-')+'</div>';}
+function histSection(title,rows,cols){
+  var h='<div class="section"><h2>'+esc(title)+' ('+(rows?rows.length:0)+')</h2>';
+  if(!rows||!rows.length){return h+'<div class="empty">None.</div></div>';}
+  h+='<table><tr>'+cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr>';
+  rows.forEach(function(r){
+    h+='<tr>'+cols.map(function(c){
+      var v=r[c]||'';
+      if(c==='Result'||c==='Status'||c==='Payment Status')return '<td>'+statusPill(v)+'</td>';
+      if(c==='Drive File URL'&&v)return '<td><a class="link" href="'+esc(v)+'" target="_blank">view</a></td>';
+      if((c==='Cost'||c==='Total Amount')&&v!=='')return '<td>'+money(v)+'</td>';
+      return '<td>'+esc(v)+'</td>';
+    }).join('')+'</tr>';
+  });
+  return h+'</table></div>';
+}
+
+/* ---------------- ISSUES ---------------- */
+function loadIssues(){
+  run('api_openIssues',[],function(rows){
+    var h='<div class="section"><h2>Open issues ('+rows.length+')</h2>'+issueTable(rows,true)+'</div>';
+    $('view').innerHTML=h;
+  });
+}
+function issueTable(rows,actions){
+  if(!rows||!rows.length)return '<div class="empty">No open issues.</div>';
+  var h='<table><tr><th>ID</th><th>Asset</th><th>Type</th><th>Problem</th><th>Severity</th><th>Lvl</th><th>Status</th><th>Assigned</th>'+(actions?'<th></th>':'')+'</tr>';
+  rows.forEach(function(r){
+    h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
+      '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
+      '<td>'+esc(r['Issue Type'])+'</td><td>'+esc(r['Problem'])+'</td>'+
+      '<td>'+esc(r['Severity'])+'</td><td>'+esc(r['Escalation Level']||'0')+'</td><td>'+statusPill(r['Status'])+(String(r['Needs Bill']).toLowerCase()==='yes'?' <span class="pill amber">needs bill</span>':'')+'</td><td>'+esc(r['Assigned Doer']||'-')+'</td>'+
+      (actions?('<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editIssue('+JSON.stringify(r)+')\'>Update</button> <button class="btn sm" onclick=\'openEscalate('+JSON.stringify(r)+')\'>Escalate</button></td>'):'')+'</tr>';
+  });
+  return h+'</table>';
+}
+function openEscalate(r){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Escalate '+esc(r['Issue ID'])+'</h3>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Raises severity, marks urgent, flags "needs bill". Current level: '+esc(r['Escalation Level']||'0')+'</p>'+
+    '<label class="f">Escalate to</label><input class="f" id="escTo" placeholder="e.g. Maintenance Head" value="'+esc(r['Escalated To']||'')+'">'+
+    '<label class="f">Note</label><textarea class="f" id="escNote" placeholder="why escalating"></textarea>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveEscalate(\''+esc(r['Issue ID'])+'\')">Escalate</button></div>');
+}
+function saveEscalate(id){
+  var o={escalatedTo:$('escTo').value,remarks:$('escNote').value};
+  run('api_escalateIssue',[id,o],function(){closeModal();toast('Issue escalated -> Breakdown, bill pending');
+    if(CURRENT==='dashboard')loadDashboard(); else loadIssues();});
+}
+function editIssue(r){
+  var h='<span class="close" onclick="closeModal()">&times;</span><h3>Update '+esc(r['Issue ID'])+'</h3>'+
+    '<label class="f">Status</label>'+selEl('st',LOOKUPS.issueStatus,r['Status'])+
+    '<label class="f">Assigned doer</label>'+selEl('as',['',].concat(LOOKUPS.doers),r['Assigned Doer'])+
+    '<label class="f">Root cause</label><input class="f" id="rc" value="'+esc(r['Root Cause']||'')+'">'+
+    '<label class="f">Action taken</label><textarea class="f" id="at">'+esc(r['Action Taken']||'')+'</textarea>'+
+    '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick="saveIssue(\''+esc(r['Issue ID'])+'\')">Save</button>'+
+    '<button class="btn ghost" onclick="askDelete(\'issue\',\''+esc(r['Issue ID'])+'\',loadIssues)">Delete</button></div>';
+  openModal(h);
+}
+function saveIssue(id){
+  var patch={'Status':$('st').value,'Assigned Doer':$('as').value,'Root Cause':$('rc').value,'Action Taken':$('at').value};
+  run('api_updateIssue',[id,patch],function(){closeModal();toast('Issue updated');loadIssues();});
+}
+
+/* ---------------- BILLS ---------------- */
+function loadBills(){
+  run('api_issuesNeedingBill',[],function(need){
+    var h='';
+    // Section 1: issues awaiting a bill + proof
+    h+='<div class="section"><h2>Awaiting bill &amp; proof ('+need.length+')</h2>';
+    if(!need.length){h+='<div class="empty">Nothing awaiting proof.</div>';}
+    else{
+      h+='<table><tr><th>Issue</th><th>Asset</th><th>Problem</th><th>Severity</th><th></th></tr>';
+      need.forEach(function(r){
+        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
+          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
+          '<td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
+          '<td><button class="btn sm" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Submit bill + proof</button></td></tr>';
+      });
+      h+='</table>';
     }
-    buttons[i].className = cls;
-  }
-
-  box.classList.toggle('bad', now === 'Issue');
-  find('extra_' + id).classList.toggle('on', now === 'Issue');
-
-  if(now !== 'Issue'){
-    ans.severity = '';
-    ans.photo = '';
-    ans.remark = '';
-    var sevButtons = find('sev_' + id).querySelectorAll('button');
-    for(var s = 0; s < sevButtons.length; s++) sevButtons[s].className = '';
-    var area = find('extra_' + id).querySelector('textarea');
-    if(area) area.value = '';
-    removePhoto(id);
-  }
-
-  if(!now){
-    ans.reading = '';
-    var readBox = box.querySelector('.reading input');
-    if(readBox) readBox.value = '';
-    find('read_' + id).classList.remove('on');
-    find('link_' + id).textContent = '+ Add reading';
-    delete PICK.answers[id];
-  }
-
-  updateCounts();
-}
-
-function tapSeverity(id, level){
-  var ans = startAnswer(id);
-  if(!ans) return;
-  ans.severity = level;
-
-  var buttons = find('sev_' + id).querySelectorAll('button');
-  for(var i = 0; i < buttons.length; i++){
-    var val = buttons[i].getAttribute('data-sev');
-    if(val !== level){
-      buttons[i].className = '';
-    } else {
-      buttons[i].className = (val === 'Low') ? 's-low' : (val === 'Medium' ? 's-med' : 's-crit');
-    }
-  }
-}
-
-function typeRemark(id, text){
-  var ans = startAnswer(id);
-  if(ans) ans.remark = text;
-}
-
-function openReading(id){
-  var box = find('read_' + id);
-  var link = find('link_' + id);
-  var open = box.classList.toggle('on');
-  link.textContent = open ? 'Hide reading' : '+ Add reading';
-  if(open){
-    var input = box.querySelector('input');
-    if(input) input.focus();
-  }
-}
-
-function typeReading(id, text){
-  var ans = startAnswer(id);
-  if(ans) ans.reading = text;
-}
-
-/* =====================================================================
-   ==  7. PHOTO  — takes a photo and sends it to Drive
-   ===================================================================== */
-function openCamera(id){
-  find('file_' + id).click();
-}
-
-function removePhoto(id){
-  var box = find('photo_' + id);
-  if(!box) return;
-  var img = box.querySelector('img');
-  if(img) img.remove();
-  var drop = box.querySelector('.drop');
-  if(drop) drop.remove();
-  var btn = find('take_' + id);
-  if(btn){
-    btn.className = 'take';
-    btn.textContent = 'Add photo';
-  }
-  var file = find('file_' + id);
-  if(file) file.value = '';
-}
-
-function sendPhoto(id, input){
-  var file = input.files && input.files[0];
-  if(!file) return;
-  var ans = startAnswer(id);
-  if(!ans) return;
-
-  var btn = find('take_' + id);
-  btn.textContent = 'Compressing…';
-
-  var reader = new FileReader();
-  reader.onload = function(ev){
-    var img = new Image();
-    img.onload = function(){
-      var max = 1280;
-      var w = img.width;
-      var h = img.height;
-      if(w > max || h > max){
-        if(w > h){ h = Math.round(h * max / w); w = max; }
-        else { w = Math.round(w * max / h); h = max; }
-      }
-      var canvas = document.createElement('canvas');
-      canvas.width = w;
-      canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      var dataUrl = canvas.toDataURL('image/jpeg', 0.68);
-
-      btn.textContent = 'Uploading…';
-      askServer({ action: 'uploadPhoto', b64: dataUrl.split(',')[1], mime: 'image/jpeg', name: id })
-        .then(function(r){
-          if(!r.ok){
-            btn.textContent = 'Add photo';
-            showMessage(r.error || 'Upload failed', true);
-            return;
-          }
-          ans.photo = r.url;
-
-          var box = find('photo_' + id);
-          var thumb = document.createElement('img');
-          thumb.src = dataUrl;
-          box.appendChild(thumb);
-
-          var drop = document.createElement('button');
-          drop.className = 'drop';
-          drop.textContent = 'Remove';
-          drop.onclick = function(){
-            ans.photo = '';
-            removePhoto(id);
-          };
-          box.appendChild(drop);
-
-          btn.className = 'take has';
-          btn.textContent = 'Photo attached';
-          showMessage('Photo uploaded');
-        })
-        .catch(function(err){
-          btn.textContent = 'Add photo';
-          showMessage(err.message, true);
+    h+='</div>';
+    // Section 2: pending bills
+    run('api_pendingBills',[],function(rows){
+      h+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Pending bills ('+rows.length+')</h2><button class="btn sm" onclick="openBill(\'\')">+ New bill</button></div>';
+      if(!rows.length){h+='<div class="empty">No pending bills.</div>';}
+      else{
+        h+='<table><tr><th>ID</th><th>Asset</th><th>Issue</th><th>Vendor</th><th>Total</th><th>Status</th><th>Proof</th></tr>';
+        rows.forEach(function(r){
+          h+='<tr><td>'+esc(r['Bill ID'])+'</td><td>'+esc(r['Asset ID'])+'</td><td>'+esc(r['Issue ID']||'-')+'</td><td>'+esc(r['Vendor'])+'</td>'+
+            '<td>'+money(r['Total Amount'])+'</td><td>'+statusPill(r['Payment Status'])+'</td>'+
+            '<td>'+(r['Drive File URL']?'<a class="link" href="'+esc(r['Drive File URL'])+'" target="_blank">view</a>':'-')+'</td></tr>';
         });
-    };
-    img.onerror = function(){
-      btn.textContent = 'Add photo';
-      showMessage('Could not read the image', true);
-    };
-    img.src = ev.target.result;
-  };
-  reader.onerror = function(){
-    btn.textContent = 'Add photo';
-    showMessage('Could not read the file', true);
-  };
-  reader.readAsDataURL(file);
-}
-
-/* =====================================================================
-   ==  8. COUNTS  — how many done, how many left
-   ===================================================================== */
-function countDone(freq){
-  return getItems(freq).filter(function(i){
-    return PICK.answers[i.item_id] && PICK.answers[i.item_id].result;
-  }).length;
-}
-
-function updateCounts(){
-  if(PICK.mode === 'Breakdown'){
-    find('dockInfo').innerHTML = '<b>Breakdown</b>problem log';
-    find('btnSubmit').textContent = 'Save breakdown →';
-    return;
-  }
-  find('btnSubmit').textContent = SETTINGS.WORDS.submit;
-
-  var total = 0;
-  var done = 0;
-
-  ['Daily', 'Weekly', 'Monthly'].forEach(function(freq){
-    var list = getItems(freq);
-    if(!list.length) return;
-
-    var count = countDone(freq);
-    var box = find('cnt' + freq);
-    if(box){
-      if(freq === 'Daily' || count > 0){
-        box.textContent = count + ' / ' + list.length;
-        box.className = 'cnt' + (count === list.length ? ' done' : '');
-      } else {
-        box.textContent = box.getAttribute('data-idle');
+        h+='</table>';
       }
-      if(count === list.length && count > 0 && freq !== 'Daily'){
-        find('sec' + freq).classList.remove('open');
-      }
-    }
-    total += list.length;
-    done += count;
+      h+='</div>';
+      $('view').innerHTML=h;
+    });
   });
-
-  var issues = 0;
-  Object.keys(PICK.answers).forEach(function(k){
-    if(PICK.answers[k].result === 'Issue') issues++;
-  });
-
-  if(find('progText')){
-    find('progText').textContent = done + ' of ' + total + ' checks done';
-    var bar = find('progBar');
-    bar.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
-    bar.className = 'bar' + (total && done === total ? ' full' : '');
-  }
-
-  find('dockInfo').innerHTML = '<b>' + done + ' of ' + total + '</b>' +
-    (issues ? issues + ' issue' + (issues > 1 ? 's' : '') : 'done');
 }
 
-/* =====================================================================
-   ==  9. SUBMIT  — writes the rows into the sheet
-   ===================================================================== */
-function checkThenSave(){
-  if(!PICK.emp){ showMessage('Pick your name first', true); return; }
-  if(!machineChosen()){ showMessage('Pick a machine first', true); return; }
+/* ---------------- ADD FORMS (maintenance / movement / bill / issue) ---------------- */
+function selEl(id,opts,val){return '<select class="f" id="'+id+'">'+opts.map(function(o){return '<option'+(String(o)===String(val||'')?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>';}
 
-  if(PICK.mode === 'Breakdown'){
-    if(!find('bProblem').value){ showMessage('Choose a problem type', true); return; }
-    if(!find('bDesc').value.trim()){ showMessage('Describe the problem', true); return; }
-    saveToSheet();
-    return;
-  }
-
-  var daily = getItems('Daily');
-  var missing = daily.filter(function(i){
-    return !(PICK.answers[i.item_id] && PICK.answers[i.item_id].result);
-  });
-
-  if(missing.length){
-    showMessage(missing.length + ' daily check(s) left', true);
-    find('secDaily').classList.add('open');
-    var first = find('item_' + missing[0].item_id);
-    if(first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    return;
-  }
-
-  var pending = [];
-  ['Weekly', 'Monthly'].forEach(function(freq){
-    var list = getItems(freq);
-    if(!list.length) return;
-    var count = countDone(freq);
-    if(isDueNow(freq).due && count < list.length){
-      pending.push(freq + ' (' + count + '/' + list.length + ')');
-    }
-  });
-
-  if(pending.length){
-    showPopup('Some checks pending',
-          'These are due but not finished: <b>' + clean(pending.join(', ')) + '</b><br><br>Submit anyway?',
-          'Submit anyway', saveToSheet);
-    return;
-  }
-
-  saveToSheet();
+function openMaint(assetId){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add maintenance &middot; '+esc(assetId)+'</h3>'+
+    '<label class="f">Event type</label>'+selEl('mt',LOOKUPS.maintTypes)+
+    '<label class="f">Event date</label><input class="f" id="md" type="date">'+
+    '<label class="f">Doer</label>'+selEl('mdo',[''].concat(LOOKUPS.doers))+
+    '<label class="f">Description</label><input class="f" id="mds">'+
+    '<label class="f">Action taken</label><textarea class="f" id="mat"></textarea>'+
+    '<label class="f">Parts used</label><input class="f" id="mpu">'+
+    '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="mv"></div>'+
+    '<div class="col"><label class="f">Cost</label><input class="f" id="mc" type="number" step="any"></div></div>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveMaint(\''+esc(assetId)+'\')">Save</button></div>');
+}
+function saveMaint(assetId){
+  var o={assetId:assetId,eventType:$('mt').value,eventDate:$('md').value,doer:$('mdo').value,
+    description:$('mds').value,actionTaken:$('mat').value,partsUsed:$('mpu').value,vendor:$('mv').value,cost:$('mc').value};
+  run('api_addMaintenance',[o],function(id){closeModal();toast('Maintenance '+id+' added');assetDetail(assetId);});
 }
 
-function saveToSheet(){
-  var btn = find('btnSubmit');
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
+function openMove(assetId){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add movement &middot; '+esc(assetId)+'</h3>'+
+    '<label class="f">To location</label><input class="f" id="vto">'+
+    '<label class="f">Movement date</label><input class="f" id="vd" type="date">'+
+    '<label class="f">Moved by</label>'+selEl('vby',[''].concat(LOOKUPS.doers))+
+    '<label class="f">Reason</label><input class="f" id="vr">'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveMove(\''+esc(assetId)+'\')">Save</button></div>');
+}
+function saveMove(assetId){
+  var o={assetId:assetId,toLocation:$('vto').value,movementDate:$('vd').value,movedBy:$('vby').value,reason:$('vr').value};
+  run('api_addMovement',[o],function(id){closeModal();toast('Movement '+id+' added');assetDetail(assetId);});
+}
 
-  var body = {
-    action: 'submit',
-    mode: PICK.mode,
-    emp_name: PICK.emp,
-    machine_id: PICK.machine ? PICK.machine.machine_id : '',
-    machine_other: PICK.machine ? '' : PICK.otherId,
-    running_hrs: find('runHrs').value.trim(),
-    remarks: find('remarks').value.trim(),
-    answers: Object.keys(PICK.answers).map(function(k){ return PICK.answers[k]; })
-             .filter(function(a){ return a.result; })
+function openIssue(assetId){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Raise issue &middot; '+esc(assetId)+'</h3>'+
+    '<label class="f">Issue type</label>'+selEl('it',LOOKUPS.issueTypes)+
+    '<label class="f">Problem</label><input class="f" id="ip">'+
+    '<div class="row"><div class="col"><label class="f">Severity</label>'+selEl('is',LOOKUPS.issueSeverity)+'</div>'+
+    '<div class="col"><label class="f">Priority</label>'+selEl('ipr',LOOKUPS.issuePriority)+'</div></div>'+
+    '<label class="f">Assign doer</label>'+selEl('ido',[''].concat(LOOKUPS.doers))+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveNewIssue(\''+esc(assetId)+'\')">Raise</button></div>');
+}
+function saveNewIssue(assetId){
+  var o={assetId:assetId,issueType:$('it').value,problem:$('ip').value,severity:$('is').value,priority:$('ipr').value,assignedDoer:$('ido').value};
+  run('api_createIssue',[o],function(id){closeModal();toast('Issue '+id+' raised');assetDetail(assetId);});
+}
+
+function openBill(assetId, issueId){
+  var proofReq = !!issueId;
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add bill'+(assetId?(' &middot; '+esc(assetId)):'')+'</h3>'+
+    (issueId?('<p style="color:var(--red);margin-bottom:8px">Against issue '+esc(issueId)+' - proof file is REQUIRED.</p>'):'')+
+    '<input type="hidden" id="bIssue" value="'+esc(issueId||'')+'">'+
+    '<label class="f">Asset ID</label><input class="f" id="ba" value="'+esc(assetId)+'">'+
+    '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="bv"></div>'+
+    '<div class="col"><label class="f">Invoice no.</label><input class="f" id="bin"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Invoice date</label><input class="f" id="bid" type="date"></div>'+
+    '<div class="col"><label class="f">Bill type</label>'+selEl('bt',LOOKUPS.billTypes)+'</div></div>'+
+    '<div class="row"><div class="col"><label class="f">Subtotal</label><input class="f" id="bs" type="number" step="any"></div>'+
+    '<div class="col"><label class="f">GST</label><input class="f" id="bg" type="number" step="any"></div></div>'+
+    '<label class="f">Payment status</label>'+selEl('bps',LOOKUPS.paymentStatus)+
+    '<label class="f">Attach bill / proof (PDF/image)'+(proofReq?' <span style="color:var(--red)">*required</span>':'')+'</label><input class="f" id="bf" type="file" accept="application/pdf,image/*">'+
+    '<div style="margin-top:14px"><button class="btn" id="bbtn" onclick="saveBill()">Save bill</button></div>');
+}
+function saveBill(){
+  var issueId=$('bIssue')?$('bIssue').value:'';
+  var o={assetId:$('ba').value,issueId:issueId,vendor:$('bv').value,invoiceNumber:$('bin').value,invoiceDate:$('bid').value,
+    billType:$('bt').value,subtotal:$('bs').value,gst:$('bg').value,paymentStatus:$('bps').value};
+  var fileInput=$('bf');
+  var hasFile=fileInput&&fileInput.files&&fileInput.files[0];
+  if(issueId&&!hasFile){toast('Proof file required for issue bills');return;}
+  var send=function(){
+    $('bbtn').disabled=true;$('bbtn').textContent='Saving...';
+    run('api_createBill',[o],function(res){closeModal();toast('Bill '+res.billId+' saved');
+      if(CURRENT==='bills')loadBills(); else if(CURRENT==='dashboard')loadDashboard(); else if(o.assetId)assetDetail(o.assetId);});
   };
-
-  if(PICK.mode === 'Breakdown'){
-    body.breakdown = {
-      problem: find('bProblem').value,
-      description: find('bDesc').value.trim(),
-      action: find('bAction').value.trim(),
-      parts: find('bParts').value.trim(),
-      cost: find('bCost').value.trim(),
-      vendor: find('bVendor').value.trim(),
-      down_from: find('bFrom').value,
-      down_to: find('bTo').value,
-      status: find('bStatus').value
-    };
-  }
-
-  askServer(body)
-    .then(function(r){
-      btn.disabled = false;
-      updateCounts();
-      if(!r.ok){ showMessage(r.error || 'Save failed', true); return; }
-      showThankYou(r);
-    })
-    .catch(function(err){
-      btn.disabled = false;
-      updateCounts();
-      showMessage(err.message, true);
-    });
+  if(hasFile){
+    var f=fileInput.files[0],reader=new FileReader();
+    reader.onload=function(){o.file={base64:reader.result.split(',')[1],mimeType:f.type,filename:f.name};send();};
+    reader.readAsDataURL(f);
+  } else { send(); }
 }
 
-function showThankYou(r){
-  var issues = Number(r.issue) || 0;
-  var machineName = PICK.machine ? PICK.machine.machine_id : PICK.otherId;
-
-  find('doneWho').textContent = PICK.emp + ' · ' + machineName + ' · ' + r.entry_id;
-  find('doneOk').textContent = r.ok_count || 0;
-  find('doneBad').textContent = issues;
-  find('doneNa').textContent = r.na || 0;
-
-  var verdict = find('doneVerdict');
-  verdict.className = 'verdict ' + (issues ? 'att' : 'good');
-  verdict.textContent = issues ? 'ATTENTION REQUIRED' : 'NORMAL';
-
-  find('btnReport').onclick = function(){ openReport(r.entry_id); };
-  find('btnPdf').onclick = function(){ downloadPdf(r.entry_id, find('btnPdf')); };
-
-  find('pageCheck').classList.add('hidden');
-  find('pageRecords').classList.add('hidden');
-  find('pageDone').classList.remove('hidden');
-  find('dock').classList.add('hidden');
-  window.scrollTo({ top: 0 });
-}
-
-function startNew(){
-  PICK.answers = {};
-  PICK.machine = null;
-  PICK.otherId = '';
-
-  find('macSel').value = '';
-  find('macOther').value = '';
-  find('otherWrap').classList.add('hidden');
-  find('runHrs').value = '';
-  find('remarks').value = '';
-  ['bProblem','bDesc','bAction','bParts','bCost','bVendor','bFrom','bTo'].forEach(function(id){
-    find(id).value = '';
+/* ---------------- SEARCH ---------------- */
+function doSearch(){
+  var q=$('q').value.trim();if(!q)return;
+  CURRENT='search';$('view').innerHTML='<div class="loader">Searching</div>';
+  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.remove('active');});
+  run('api_search',[q],function(r){
+    var h='';
+    h+=searchBlock('Assets',r.assets,function(a){return '<a class="link" onclick="assetDetail(\''+esc(a['Asset ID'])+'\')">'+esc(a['Asset ID'])+'</a> &middot; '+esc(a['Asset Name']||a['Asset Name / Type']||'')+' ('+esc(a['Asset Type']||'')+')';});
+    h+=searchBlock('Issues',r.issues,function(a){return esc(a['Issue ID'])+' &middot; '+esc(a['Asset ID'])+' &middot; '+esc(a['Problem']);});
+    h+=searchBlock('Bills',r.bills,function(a){return esc(a['Bill ID'])+' &middot; '+esc(a['Vendor'])+' &middot; '+money(a['Total Amount']);});
+    h+=searchBlock('Tasks',r.tasks,function(a){return esc(a['Task ID'])+' &middot; '+esc(a['Task']);});
+    $('view').innerHTML=h||'<div class="empty">No results.</div>';
   });
-
-  find('listArea').innerHTML = '';
-  find('cardProgress').classList.add('hidden');
-  find('cardSummary').classList.add('hidden');
-  find('pageDone').classList.add('hidden');
-  find('pageCheck').classList.remove('hidden');
-
-  showChecklist();
-  askServer({ action: 'boot' })
-    .then(function(r){ if(r.ok) DATA.last = r.last || {}; })
-    .catch(function(){});
-  window.scrollTo({ top: 0 });
+}
+function searchBlock(title,rows,fmt){
+  if(!rows||!rows.length)return '';
+  return '<div class="section"><h2>'+title+' ('+rows.length+')</h2>'+rows.map(function(r){return '<div style="padding:6px 0;border-bottom:1px solid var(--line)">'+fmt(r)+'</div>';}).join('')+'</div>';
 }
 
-/* =====================================================================
-   == 10. REPORT  — A4 page and PDF
-   ===================================================================== */
-function openReport(id){
-  window.open(API + '?report=' + encodeURIComponent(id), '_blank');
+/* ---------------- MANAGE (sheet management from webapp) ---------------- */
+var MANAGE_SUB='machines';
+function loadManage(){
+  var subs=[['machines','Machines'],['checklist','Checklist'],['tasks','Tasks'],['doers','Doers'],
+    ['holidays','Holidays'],['leave','Leave'],['money','Money'],['config','Config'],['upload','Bulk Upload'],['scheduler','Run Scheduler']];
+  var h='<div class="subtabs">'+subs.map(function(s){
+    return '<button id="sm_'+s[0]+'" class="'+(MANAGE_SUB===s[0]?'active':'')+'" onclick="manageSub(\''+s[0]+'\')">'+s[1]+'</button>';
+  }).join('')+'</div><div id="mgBody"><div class="loader">Loading</div></div>';
+  $('view').innerHTML=h;
+  var f={machines:manageMachines,checklist:manageChecklist,tasks:manageTasks,doers:manageDoers,
+    holidays:manageHolidays,leave:manageLeave,money:manageMoney,config:manageConfig,upload:manageUpload,scheduler:manageScheduler};
+  (f[MANAGE_SUB]||manageMachines)();
 }
+function manageSub(s){MANAGE_SUB=s;loadManage();}
 
-function downloadPdf(id, btn){
-  var original = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'Building PDF…';
-
-  askServer({ action: 'makePdf', entry_id: id })
-    .then(function(r){
-      btn.disabled = false;
-      btn.textContent = original;
-      if(!r.ok){ showMessage(r.error || 'PDF failed', true); return; }
-
-      var raw = atob(r.b64);
-      var bytes = new Uint8Array(raw.length);
-      for(var i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
-
-      var url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
-      var link = document.createElement('a');
-      link.href = url;
-      link.download = r.name;
-      link.click();
-      setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-    })
-    .catch(function(err){
-      btn.disabled = false;
-      btn.textContent = original;
-      showMessage(err.message, true);
+/* --- Manage: Machines (edit / deactivate) --- */
+function manageMachines(){
+  run('api_assetList',[],function(rows){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Machines ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
+    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No machines.</div></div>';return;}
+    h+='<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th></th></tr>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(r.assetId)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td>'+
+        '<td>'+statusPill(r.status)+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick="editMachine(\''+esc(r.assetId)+'\')">Edit</button> '+
+        (String(r.status).toLowerCase()!=='inactive'?'<button class="btn sm ghost" onclick="deactivateMachine(\''+esc(r.assetId)+'\')">Deactivate</button>':'<button class="btn sm ghost" onclick="reactivateMachine(\''+esc(r.assetId)+'\')">Reactivate</button>')+'</td></tr>';
     });
-}
-
-/* =====================================================================
-   == 11. OLD RECORDS  — list and filters
-   ===================================================================== */
-function openTab(name){
-  find('pageCheck').classList.toggle('hidden', name !== 'check');
-  find('pageRecords').classList.toggle('hidden', name !== 'records');
-  find('pageDone').classList.add('hidden');
-  find('tabCheck').classList.toggle('on', name === 'check');
-  find('tabRec').classList.toggle('on', name === 'records');
-  find('dock').classList.toggle('hidden', name !== 'check' || !machineChosen());
-  if(name === 'records') loadOldRecords();
-  window.scrollTo({ top: 0 });
-}
-
-function loadOldRecords(){
-  var box = find('recList');
-  box.className = 'loading';
-  box.textContent = 'Loading';
-
-  askServer({ action: 'listEntries', from: find('fFrom').value, to: find('fTo').value, limit: 100 })
-    .then(function(r){
-      if(!r.ok){ box.textContent = r.error || 'Failed'; return; }
-      DATA.records = r.entries || [];
-      showOldRecords();
-    })
-    .catch(function(err){ box.textContent = err.message; });
-}
-
-function showOldRecords(){
-  var emp = find('fEmp').value;
-  var mac = find('fMac').value;
-  var status = find('fStatus').value;
-
-  var rows = DATA.records.filter(function(e){
-    if(emp && e.employee !== emp) return false;
-    if(mac && e.machine_id !== mac) return false;
-    var bad = Number(e.issue) > 0;
-    if(status === 'ok' && bad) return false;
-    if(status === 'att' && !bad) return false;
-    return true;
+    $('mgBody').innerHTML=h+'</table></div>';
   });
+}
+function editMachine(id){
+  run('api_assetDetail',[id],function(d){
+    if(!d){toast('Not found');return;}
+    var o=d.overview;
+    var types=(LOOKUPS.assetTypes||[]).map(function(t){return '<option'+(t===o['Asset Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
+    var crit=(LOOKUPS.criticality||[]).map(function(t){return '<option'+(t===o['Criticality']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
+    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Edit '+esc(id)+'</h3>'+
+      '<div class="row"><div class="col"><label class="f">Name</label><input class="f" id="emName" value="'+esc(o['Asset Name']||'')+'"></div>'+
+      '<div class="col"><label class="f">Type</label><select class="f" id="emType">'+types+'</select></div></div>'+
+      '<div class="row"><div class="col"><label class="f">Location</label><input class="f" id="emLoc" value="'+esc(o['Current Location']||o['Location']||'')+'"></div>'+
+      '<div class="col"><label class="f">Criticality</label><select class="f" id="emCrit">'+crit+'</select></div></div>'+
+      '<div class="row"><div class="col"><label class="f">Make</label><input class="f" id="emMake" value="'+esc(o['Make']||'')+'"></div>'+
+      '<div class="col"><label class="f">Model</label><input class="f" id="emModel" value="'+esc(o['Model']||'')+'"></div></div>'+
+      '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="emVendor" value="'+esc(o['Vendor']||'')+'"></div>'+
+      '<div class="col"><label class="f">Serial</label><input class="f" id="emSerial" value="'+esc(o['Serial Number']||'')+'"></div></div>'+
+      '<label class="f">Remarks</label><input class="f" id="emRem" value="'+esc(o['Remarks']||'')+'">'+
+      '<div style="margin-top:14px"><button class="btn" onclick="saveEditMachine(\''+esc(id)+'\')">Save</button></div>');
+  });
+}
+function saveEditMachine(id){
+  var patch={'Asset Name':$('emName').value,'Asset Type':$('emType').value,'Location':$('emLoc').value,
+    'Current Location':$('emLoc').value,'Criticality':$('emCrit').value,'Make':$('emMake').value,
+    'Model':$('emModel').value,'Vendor':$('emVendor').value,'Serial Number':$('emSerial').value,'Remarks':$('emRem').value};
+  run('api_updateAsset',[id,patch],function(){closeModal();toast('Machine updated');manageMachines();});
+}
+function deactivateMachine(id){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Deactivate '+esc(id)+'?</h3>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">Machine ko Inactive kar dega - scheduler ise skip karega. Data delete nahi hoga.</p>'+
+    '<div style="display:flex;gap:8px"><button class="btn" onclick="confirmDeactivate(\''+esc(id)+'\')">Yes, deactivate</button>'+
+    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
+}
+function confirmDeactivate(id){
+  run('api_deactivateAsset',[id],function(){closeModal();toast(id+' deactivated');manageMachines();});
+}
 
-  var box = find('recList');
-  if(!rows.length){
-    box.className = 'blank';
-    box.textContent = 'No records found.';
-    return;
+function reactivateMachine(id){
+  run('api_reactivateAsset',[id],function(){toast(id+' reactivated');manageMachines();});
+}
+
+/* generic delete with confirm */
+function askDelete(kind,id,after){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Delete '+esc(id)+'?</h3>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">Row permanently delete ho jayegi. Undo nahi.</p>'+
+    '<div style="display:flex;gap:8px"><button class="btn" onclick="doDelete(\''+kind+'\',\''+esc(id)+'\')">Yes, delete</button>'+
+    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
+  window.__afterDelete=after;
+}
+function doDelete(kind,id){
+  run('api_deleteRow',[kind,id],function(){closeModal();toast('Deleted');if(window.__afterDelete)window.__afterDelete();});
+}
+
+/* --- Manage: TASKS (scheduler defs) --- */
+function manageTasks(){
+  run('api_listTasks',[],function(rows){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Recurring tasks ('+rows.length+')</h2><button class="btn sm" onclick="editTask(null)">+ Add task</button></div>';
+    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No tasks. Add one - it feeds the scheduler.</div></div>';return;}
+    h+='<table><tr><th>ID</th><th>Task</th><th>Doer</th><th>Freq</th><th>Anchor</th><th>Scope</th><th>Active</th><th></th></tr>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(r['Task ID'])+'</td><td>'+esc(r['Task'])+'</td><td>'+esc(r['Doer Name'])+'</td>'+
+        '<td>'+esc(r['Frequency'])+'</td><td>'+esc(r['Anchor (Day/Date)'])+'</td><td>'+esc(r['Asset Scope'])+'</td>'+
+        '<td>'+statusPill(r['Active'])+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editTask('+JSON.stringify(r)+')\'>Edit</button> '+
+        '<button class="btn sm ghost" onclick="toggleTask(\''+esc(r['Task ID'])+'\','+(String(r['Active']).toLowerCase()==='active'?'false':'true')+')">'+
+        (String(r['Active']).toLowerCase()==='active'?'Off':'On')+'</button></td></tr>';
+    });
+    $('mgBody').innerHTML=h+'</table><p style="color:var(--muted);margin-top:8px">After adding/editing tasks, open <b>Run Scheduler</b> to generate the dated checklist.</p></div>';
+  });
+}
+function editTask(r){
+  r=r||{};
+  var doers=[''].concat(LOOKUPS.doers||[]).map(function(d){return '<option'+(d===r['Doer Name']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
+  var freq=(LOOKUPS.frequencies||[]).map(function(d){return '<option'+(d===r['Frequency']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
+  var scope=(LOOKUPS.assetScopes||[]).map(function(d){return '<option'+(d===r['Asset Scope']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
+  var dept=(LOOKUPS.departments||[]).map(function(d){return '<option'+(d===r['Department']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(r['Task ID']?'Edit':'Add')+' Task</h3>'+
+    '<input type="hidden" id="tkId" value="'+esc(r['Task ID']||'')+'">'+
+    '<label class="f">Task</label><input class="f" id="tkTask" value="'+esc(r['Task']||'')+'">'+
+    '<div class="row"><div class="col"><label class="f">Doer</label><select class="f" id="tkDoer">'+doers+'</select></div>'+
+    '<div class="col"><label class="f">Department</label><select class="f" id="tkDept">'+dept+'</select></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Frequency</label><select class="f" id="tkFreq">'+freq+'</select></div>'+
+    '<div class="col"><label class="f">Anchor (day/date)</label><input class="f" id="tkAnchor" value="'+esc(r['Anchor (Day/Date)']||'')+'" placeholder="Monday / 1 / 1-Apr"></div></div>'+
+    '<label class="f">Asset Scope</label><select class="f" id="tkScope">'+scope+'</select>'+
+    '<p style="color:var(--muted);font-size:12px;margin-top:6px">Scope "All Active Assets" = task runs on every machine. "General" = one-off.</p>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveTask()">Save</button></div>');
+}
+function saveTask(){
+  var o={taskId:$('tkId').value,task:$('tkTask').value,doer:$('tkDoer').value,department:$('tkDept').value,
+    frequency:$('tkFreq').value,anchor:$('tkAnchor').value,scope:$('tkScope').value,active:'Active'};
+  if(!o.task){toast('Task name required');return;}
+  run('api_saveTask',[o],function(){closeModal();toast('Task saved');manageTasks();});
+}
+function toggleTask(id,on){run('api_toggleTask',[id,on],function(){toast('Updated');manageTasks();});}
+
+/* --- Manage: DOERS --- */
+function manageDoers(){
+  run('api_listDoers',[],function(rows){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Doers / staff ('+rows.length+')</h2><button class="btn sm" onclick="editDoer(null)">+ Add doer</button></div>';
+    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No doers.</div></div>';return;}
+    h+='<table><tr><th>Name</th><th>Dept</th><th>Email</th><th>Phone</th><th>Buddy</th><th>Active</th><th></th></tr>';
+    rows.forEach(function(r){
+      h+='<tr><td>'+esc(r['Doer Name'])+'</td><td>'+esc(r['Department'])+'</td><td>'+esc(r['Email'])+'</td>'+
+        '<td>'+esc(r['Phone Number'])+'</td><td>'+esc(r['Buddy'])+'</td><td>'+statusPill(r['Active'])+'</td>'+
+        '<td><button class="btn sm ghost" onclick=\'editDoer('+JSON.stringify(r)+')\'>Edit</button></td></tr>';
+    });
+    $('mgBody').innerHTML=h+'</table></div>';
+  });
+}
+function editDoer(r){
+  r=r||{};
+  var dept=(LOOKUPS.departments||[]).map(function(d){return '<option'+(d===r['Department']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(r['Doer Name']?'Edit':'Add')+' Doer</h3>'+
+    '<input type="hidden" id="drOld" value="'+esc(r['Doer Name']||'')+'">'+
+    '<div class="row"><div class="col"><label class="f">Name</label><input class="f" id="drName" value="'+esc(r['Doer Name']||'')+'"></div>'+
+    '<div class="col"><label class="f">Department</label><select class="f" id="drDept">'+dept+'</select></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Email</label><input class="f" id="drEmail" value="'+esc(r['Email']||'')+'"></div>'+
+    '<div class="col"><label class="f">Phone</label><input class="f" id="drPhone" value="'+esc(r['Phone Number']||'')+'"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Reminder hour (0-23)</label><input class="f" id="drHour" type="number" min="0" max="23" value="'+esc(r['Email Reminder Hour']||'')+'"></div>'+
+    '<div class="col"><label class="f">Buddy</label><input class="f" id="drBuddy" value="'+esc(r['Buddy']||'')+'"></div></div>'+
+    '<label class="f">Active</label><select class="f" id="drActive"><option'+(String(r['Active']).toLowerCase()!=='inactive'?' selected':'')+'>Active</option><option'+(String(r['Active']).toLowerCase()==='inactive'?' selected':'')+'>Inactive</option></select>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveDoer()">Save</button></div>');
+}
+function saveDoer(){
+  var o={oldName:$('drOld').value,name:$('drName').value,department:$('drDept').value,email:$('drEmail').value,
+    phone:$('drPhone').value,reminderHour:$('drHour').value,buddy:$('drBuddy').value,active:$('drActive').value};
+  if(!o.name){toast('Name required');return;}
+  run('api_saveDoer',[o],function(){closeModal();toast('Doer saved');manageDoers();});
+}
+
+/* --- Manage: HOLIDAYS --- */
+function manageHolidays(){
+  run('api_listHolidays',[],function(rows){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Holidays ('+rows.length+')</h2><button class="btn sm" onclick="addHolidayModal()">+ Add holiday</button></div>';
+    if(!rows.length){h+='<div class="empty">No holidays.</div>';}
+    else{h+='<table><tr><th>Date</th><th>Day</th><th>Type</th><th>Name</th></tr>';
+      rows.forEach(function(r){h+='<tr><td>'+esc(r['Holiday Date'])+'</td><td>'+esc(r['Day Name'])+'</td><td>'+esc(r['Holiday Type'])+'</td><td>'+esc(r['Holiday Name'])+'</td></tr>';});
+      h+='</table>';}
+    $('mgBody').innerHTML=h+'</div>';
+  });
+}
+function addHolidayModal(){
+  var types=(LOOKUPS.holidayTypes||['GH','RH']).map(function(t){return '<option>'+esc(t)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add holiday</h3>'+
+    '<label class="f">Date</label><input class="f" id="hlDate" type="date">'+
+    '<div class="row"><div class="col"><label class="f">Type</label><select class="f" id="hlType">'+types+'</select></div>'+
+    '<div class="col"><label class="f">Name</label><input class="f" id="hlName"></div></div>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveHoliday()">Save</button></div>');
+}
+function saveHoliday(){
+  var o={date:$('hlDate').value,type:$('hlType').value,name:$('hlName').value};
+  if(!o.date){toast('Date required');return;}
+  run('api_addHoliday',[o],function(){closeModal();toast('Holiday added');manageHolidays();});
+}
+
+/* --- Manage: LEAVE --- */
+function manageLeave(){
+  run('api_listLeave',[],function(rows){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Leave ('+rows.length+')</h2><button class="btn sm" onclick="addLeaveModal()">+ Add leave</button></div>';
+    if(!rows.length){h+='<div class="empty">No leave records.</div>';}
+    else{h+='<table><tr><th>Doer</th><th>From</th><th>To</th><th>Reason</th><th>Buddy</th></tr>';
+      rows.forEach(function(r){h+='<tr><td>'+esc(r['Doer Name'])+'</td><td>'+esc(r['From Date'])+'</td><td>'+esc(r['To Date'])+'</td><td>'+esc(r['Reason'])+'</td><td>'+esc(r['Buddy'])+'</td></tr>';});
+      h+='</table>';}
+    $('mgBody').innerHTML=h+'</div>';
+  });
+}
+function addLeaveModal(){
+  var doers=[''].concat(LOOKUPS.doers||[]).map(function(d){return '<option>'+esc(d)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add leave</h3>'+
+    '<label class="f">Doer</label><select class="f" id="lvDoer">'+doers+'</select>'+
+    '<div class="row"><div class="col"><label class="f">From</label><input class="f" id="lvFrom" type="date"></div>'+
+    '<div class="col"><label class="f">To</label><input class="f" id="lvTo" type="date"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Reason</label><input class="f" id="lvReason"></div>'+
+    '<div class="col"><label class="f">Buddy (cover)</label><input class="f" id="lvBuddy"></div></div>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveLeave()">Save</button></div>');
+}
+function saveLeave(){
+  var o={doer:$('lvDoer').value,from:$('lvFrom').value,to:$('lvTo').value,reason:$('lvReason').value,buddy:$('lvBuddy').value};
+  if(!o.doer){toast('Doer required');return;}
+  run('api_addLeave',[o],function(){closeModal();toast('Leave added');manageLeave();});
+}
+
+/* --- Manage: CONFIG --- */
+function manageConfig(){
+  run('api_listConfig',[],function(rows){
+    var h='<div class="section"><h2>Config settings ('+rows.length+')</h2>';
+    if(!rows.length){h+='<div class="empty">No config. Run Setup first.</div>';}
+    else{h+='<table><tr><th>Key</th><th>Value</th><th>Description</th><th></th></tr>';
+      rows.forEach(function(r){
+        h+='<tr><td>'+esc(r.key)+'</td><td><input class="f" id="cfg_'+esc(r.key)+'" value="'+esc(r.value)+'" style="min-width:120px"></td>'+
+          '<td style="color:var(--muted);font-size:12px">'+esc(r.description)+'</td>'+
+          '<td><button class="btn sm" onclick="saveConfig(\''+esc(r.key)+'\')">Save</button></td></tr>';
+      });
+      h+='</table>';}
+    $('mgBody').innerHTML=h+'</div>';
+  });
+}
+function saveConfig(key){
+  var v=$('cfg_'+key).value;
+  run('api_setConfig',[key,v],function(){toast(key+' saved');});
+}
+
+/* --- Manage: MONEY FLOW --- */
+function manageMoney(){
+  run('api_moneyRows',[],function(rows){
+    var total=rows.reduce(function(s,r){return s+(Number(r['Total'])||0);},0);
+    var unpaid=rows.reduce(function(s,r){return s+(String(r['Payment Status']).toLowerCase()!=='paid'?(Number(r['Total'])||0):0);},0);
+    var h='<div class="section"><h2>Money flow ('+rows.length+' txns)</h2>'+
+      '<div class="cards"><div class="card info"><div class="k">Total</div><div class="v">'+money(total)+'</div></div>'+
+      '<div class="card bad"><div class="k">Unpaid</div><div class="v">'+money(unpaid)+'</div></div></div>';
+    if(!rows.length){h+='<div class="empty">No transactions.</div>';}
+    else{h+='<table><tr><th>ID</th><th>Date</th><th>Asset</th><th>Vendor</th><th>Type</th><th>Total</th><th>Status</th><th></th></tr>';
+      rows.forEach(function(r){
+        h+='<tr><td>'+esc(r['Transaction ID'])+'</td><td>'+esc(r['Date'])+'</td><td>'+esc(r['Asset ID'])+'</td>'+
+          '<td>'+esc(r['Vendor'])+'</td><td>'+esc(r['Type'])+'</td><td>'+money(r['Total'])+'</td><td>'+statusPill(r['Payment Status'])+'</td>'+
+          '<td><button class="btn sm ghost" onclick="askDelete(\'money\',\''+esc(r['Transaction ID'])+'\',manageMoney)">Del</button></td></tr>';
+      });
+      h+='</table>';}
+    $('mgBody').innerHTML=h+'</div>';
+  });
+}
+
+/* --- Manage: RUN SCHEDULER --- */
+function manageScheduler(){
+  $('mgBody').innerHTML='<div class="section"><h2>Run scheduler</h2>'+
+    '<p style="color:var(--muted);margin-bottom:12px">Generates dated checklist instances from your Tasks, then refreshes the For PC view. Run after adding/editing tasks or machines.</p>'+
+    '<button class="btn" id="schBtn" onclick="runScheduler()">Generate + refresh now</button>'+
+    '<div id="schOut" style="margin-top:14px"></div></div>';
+}
+function runScheduler(){
+  $('schBtn').disabled=true;$('schBtn').textContent='Running...';
+  run('api_runScheduler',[],function(msg){
+    $('schBtn').disabled=false;$('schBtn').textContent='Generate + refresh now';
+    $('schOut').innerHTML='<div class="pill green">Done</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
+    toast('Scheduler run complete');
+  });
+}
+
+
+/* --- Manage: Checklist questions (CRUD) --- */
+function manageChecklist(){
+  run('api_checklistItems',[],function(items){
+    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Checklist questions ('+items.length+')</h2><button class="btn sm" onclick="editChecklistItem(null)">+ Add question</button></div>';
+    if(!items.length){$('mgBody').innerHTML=h+'<div class="empty">No questions. Add one, or seed templates from the sheet menu.</div></div>';return;}
+    h+='<table><tr><th>Type</th><th>Category</th><th>Question</th><th>Response</th><th>Min/Max</th><th>Active</th><th></th></tr>';
+    items.forEach(function(it){
+      var mm=(it['Minimum Value']||'')+((it['Minimum Value']||it['Maximum Value'])?' / ':'')+(it['Maximum Value']||'');
+      h+='<tr><td>'+esc(it['Asset Type'])+'</td><td>'+esc(it['Category'])+'</td><td>'+esc(it['Question'])+'</td>'+
+        '<td>'+esc(it['Response Type'])+'</td><td>'+esc(mm||'-')+'</td><td>'+statusPill(it['Active'])+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editChecklistItem('+JSON.stringify(it)+')\'>Edit</button> '+
+        '<button class="btn sm ghost" onclick="toggleItem(\''+esc(it['Item ID'])+'\','+(String(it['Active']).toLowerCase()==='active'?'false':'true')+')">'+
+        (String(it['Active']).toLowerCase()==='active'?'Off':'On')+'</button></td></tr>';
+    });
+    $('mgBody').innerHTML=h+'</table></div>';
+  });
+}
+function editChecklistItem(it){
+  it=it||{};
+  var types=(LOOKUPS.assetTypes||[]).map(function(t){return '<option'+(t===it['Asset Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
+  var rtypes=['OK / NOT OK','Yes / No','Done / Not Done','Numeric Reading','Text','Date','Time'].map(function(t){return '<option'+(t===it['Response Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(it['Item ID']?'Edit':'Add')+' Question</h3>'+
+    '<input type="hidden" id="ciId" value="'+esc(it['Item ID']||'')+'">'+
+    '<div class="row"><div class="col"><label class="f">Asset type</label><select class="f" id="ciType">'+types+'</select></div>'+
+    '<div class="col"><label class="f">Category</label><input class="f" id="ciCat" value="'+esc(it['Category']||'')+'"></div></div>'+
+    '<label class="f">Question</label><input class="f" id="ciQ" value="'+esc(it['Question']||'')+'">'+
+    '<div class="row"><div class="col"><label class="f">Response type</label><select class="f" id="ciRT">'+rtypes+'</select></div>'+
+    '<div class="col"><label class="f">Unit</label><input class="f" id="ciUnit" value="'+esc(it['Unit']||'')+'"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Min (numeric)</label><input class="f" id="ciMin" type="number" step="any" value="'+esc(it['Minimum Value']||'')+'"></div>'+
+    '<div class="col"><label class="f">Max (numeric)</label><input class="f" id="ciMax" type="number" step="any" value="'+esc(it['Maximum Value']||'')+'"></div></div>'+
+    '<div class="row"><div class="col"><label class="f">Sequence</label><input class="f" id="ciSeq" type="number" value="'+esc(it['Sequence']||'')+'"></div>'+
+    '<div class="col"><label class="f">Frequency (blank=all)</label><input class="f" id="ciFreq" value="'+esc(it['Frequency']||'')+'"></div></div>'+
+    '<div style="margin-top:14px"><button class="btn" onclick="saveChecklistItem()">Save</button></div>');
+}
+function saveChecklistItem(){
+  var o={itemId:$('ciId').value,assetType:$('ciType').value,category:$('ciCat').value,question:$('ciQ').value,
+    responseType:$('ciRT').value,unit:$('ciUnit').value,min:$('ciMin').value,max:$('ciMax').value,
+    sequence:$('ciSeq').value,frequency:$('ciFreq').value,active:'Active'};
+  if(!o.question){toast('Question required');return;}
+  run('api_saveChecklistItem',[o],function(){closeModal();toast('Question saved');manageChecklist();});
+}
+function toggleItem(id,on){run('api_toggleChecklistItem',[id,on],function(){toast('Updated');manageChecklist();});}
+
+/* --- Manage: Bulk Upload (CSV paste or file) --- */
+var BULK_ROWS=[];
+function manageUpload(){
+  var h='<div class="section"><h2>Bulk upload machines</h2>'+
+    '<p style="color:var(--muted);margin-bottom:10px">Paste CSV or choose a .csv file. Columns (header row required):<br>'+
+    '<code>Name,Type,Location,Make,Model,Serial,Vendor,WarrantyEnd,GuaranteeEnd,Criticality,PurchaseCost</code><br>'+
+    'Only Name + Type needed; rest optional. Dates as YYYY-MM-DD.</p>'+
+    '<div style="margin-bottom:8px"><button class="btn sm ghost" onclick="fillSampleCSV()">Insert sample</button> '+
+    '<input type="file" id="csvFile" accept=".csv,text/csv" style="display:inline-block;margin-left:8px" onchange="readCSVFile()"></div>'+
+    '<textarea class="f" id="csvText" style="min-height:150px;font-family:monospace" placeholder="Name,Type,Location,...&#10;Yard Light,Light,Main Gate,..."></textarea>'+
+    '<div style="margin-top:10px"><button class="btn" onclick="parseBulk()">Preview</button></div>'+
+    '<div id="bulkPreview"></div></div>';
+  $('mgBody').innerHTML=h;
+}
+function fillSampleCSV(){
+  $('csvText').value='Name,Type,Location,Make,Model,Serial,Vendor,WarrantyEnd,GuaranteeEnd,Criticality,PurchaseCost\n'+
+    'Corridor Light,Light,Block A,Philips,LED-100,LGT-201,Bright Elec,2027-06-30,2028-06-30,Low,2500\n'+
+    'Booster Pump,Pump,Pump House 2,Kirloskar,KP-10,PMP-777,Jai Pumps,2027-01-15,,Medium,18000';
+}
+function readCSVFile(){
+  var f=$('csvFile').files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){$('csvText').value=r.result;parseBulk();};r.readAsText(f);
+}
+function parseCSV_(text){
+  var lines=String(text||'').trim().split(/\r?\n/).filter(function(l){return l.trim();});
+  if(lines.length<2)return {header:[],rows:[]};
+  function splitLine(l){
+    var out=[],cur='',q=false;
+    for(var i=0;i<l.length;i++){var c=l[i];
+      if(c==='"'){q=!q;}
+      else if(c===','&&!q){out.push(cur);cur='';}
+      else cur+=c;}
+    out.push(cur);return out.map(function(s){return s.trim();});
   }
-
-  box.className = '';
-  box.innerHTML = rows.map(function(e){
-    var bad = Number(e.issue) > 0;
-    return '<div class="rec" onclick="openReport(\'' + clean(e.entry_id) + '\')">' +
-             '<div>' +
-               '<div class="rid">' + clean(e.machine_id || e.entry_id) + '</div>' +
-               '<div class="rsub">' + clean(e.employee) + (e.freqs ? ' · ' + clean(e.freqs) : '') + '</div>' +
-             '</div>' +
-             '<div class="right">' +
-               '<div class="date">' + clean(e.date) + '</div>' +
-               '<span class="tagpill ' + (bad ? 'att' : 'good') + '">' + (bad ? 'ATTENTION' : 'NORMAL') + '</span>' +
-             '</div>' +
-           '</div>';
-  }).join('');
+  var header=splitLine(lines[0]).map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
+  var rows=[];
+  for(var i=1;i<lines.length;i++){
+    var cells=splitLine(lines[i]);var o={};
+    header.forEach(function(h,idx){o[h]=cells[idx]||'';});
+    rows.push(o);
+  }
+  return {header:header,rows:rows};
+}
+function parseBulk(){
+  var p=parseCSV_($('csvText').value);
+  if(!p.rows.length){$('bulkPreview').innerHTML='<div class="empty">Nothing to parse. Check header row.</div>';return;}
+  BULK_ROWS=p.rows.map(function(r){
+    return {name:r.name||'',type:r.type||'Other',location:r.location||'',make:r.make||'',model:r.model||'',
+      serial:r.serial||'',vendor:r.vendor||'',warrantyEnd:r.warrantyend||'',guaranteeEnd:r.guaranteeend||'',
+      criticality:r.criticality||'Medium',purchaseCost:r.purchasecost||''};
+  }).filter(function(r){return r.name;});
+  var h='<div class="section"><h2>Preview ('+BULK_ROWS.length+' machines)</h2><table><tr><th>Name</th><th>Type</th><th>Location</th><th>Warranty End</th><th>Guarantee End</th></tr>';
+  BULK_ROWS.forEach(function(r){h+='<tr><td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.warrantyEnd||'-')+'</td><td>'+esc(r.guaranteeEnd||'-')+'</td></tr>';});
+  h+='</table><div style="margin-top:12px"><button class="btn" id="bulkBtn" onclick="commitBulk()">Import '+BULK_ROWS.length+' Machines</button></div></div>';
+  $('bulkPreview').innerHTML=h;
+}
+function commitBulk(){
+  if(!BULK_ROWS.length)return;
+  $('bulkBtn').disabled=true;$('bulkBtn').textContent='Importing...';
+  run('api_bulkAddMachines',[BULK_ROWS],function(res){
+    toast('Imported '+res.added+' machines: '+res.ids.slice(0,3).join(', ')+(res.ids.length>3?'...':''));
+    BULK_ROWS=[];MANAGE_SUB='machines';loadManage();
+  });
 }
 
-/* =====================================================================
-   == 12. HELP  — the "?" button popup
-   ===================================================================== */
-function showHelp(){
-  showPopup('How it works',
-    'Tap <b>OK</b> — a green row goes into the sheet. That check is done.<br><br>' +
-    '<b>Issue</b> — a red row, and a box opens below to describe the problem, ' +
-    'set how serious it is, and attach a photo.<br><br>' +
-    '<b>N/A</b> — a grey row. That check was not done.<br><br>' +
-    'Tapped by mistake? Tap the same button again to clear it.<br><br>' +
-    '<b>Submit</b> writes every row into the Google Sheet and opens the report.');
-}
-
-/* =====================================================================
-   == 13. START
-   ===================================================================== */
-find('mask').addEventListener('click', function(e){
-  if(e.target === this) closePopup();
-});
-startApp();
+/* ---------------- BOOT ---------------- */
+run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');});
 </script>
 </body>
 </html>
