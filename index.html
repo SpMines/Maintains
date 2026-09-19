@@ -115,6 +115,7 @@
 /* ------- tiny helpers ------- */
 var LOOKUPS = null, CURRENT = 'dashboard';
 var _silent = false;
+var _viewToken = 0;   // bumped on every tab change; stale renders are ignored
 function $(id){return document.getElementById(id);}
 function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
@@ -173,19 +174,25 @@ function run(fn,args,cb){
 
 function go(tab){
   CURRENT=tab;
+  _viewToken++;                 // invalidate any in-flight loads from the previous tab
+  var myTok=_viewToken;
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('active',b.dataset.t===tab);});
   $('view').innerHTML='<div class="loader">Loading</div>';
-  if(tab==='dashboard')loadDashboard();
-  else if(tab==='today')loadToday();
-  else if(tab==='done')loadDone();
-  else if(tab==='assets')loadAssets();
-  else if(tab==='issues')loadIssues();
-  else if(tab==='bills')loadBills();
-  else if(tab==='manage')loadManage();
+  if(tab==='dashboard')loadDashboard(myTok);
+  else if(tab==='today')loadToday(myTok);
+  else if(tab==='done')loadDone(myTok);
+  else if(tab==='assets')loadAssets(myTok);
+  else if(tab==='issues')loadIssues(myTok);
+  else if(tab==='bills')loadBills(myTok);
+  else if(tab==='manage')loadManage(myTok);
 }
+/* true if this render still belongs to the current view (else a newer tab was opened) */
+function fresh(tok){ return tok===undefined || tok===_viewToken; }
+function setView(html,tok){ if(tok!==undefined && tok!==_viewToken) return; $('view').innerHTML=html; }
+
 
 /* ---------------- DASHBOARD ---------------- */
-function loadDashboard(){
+function loadDashboard(tok){
   run('api_dashboard',[],function(d){
     var cards=[
       ['Total Assets',d.totalAssets,''],['Active',d.activeAssets,'ok'],
@@ -239,14 +246,14 @@ function loadDashboard(){
         d.expenseTrend.map(function(t){return '<th>'+esc(t.month)+'</th>';}).join('')+'</tr><tr>'+
         d.expenseTrend.map(function(t){return '<td>'+money(t.total)+'</td>';}).join('')+'</tr></table></div>';
     }
-    $('view').innerHTML=h;
+    setView(h,tok);
   });
 }
 
 /* ---------------- TODAY'S WORK ---------------- */
-function loadToday(){
+function loadToday(tok){
   run('api_todaysWork',[],function(rows){
-    if(!rows.length){$('view').innerHTML='<div class="empty">No pending or overdue tasks. All clear.</div>';return;}
+    if(!rows.length){setView('<div class="empty">No pending or overdue tasks. All clear.</div>',tok);return;}
     var h='<div class="section"><h2>Today &amp; overdue ('+rows.length+')</h2><table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
     rows.forEach(function(r){
       h+='<tr>'+
@@ -257,15 +264,15 @@ function loadToday(){
         '<td><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button></td></tr>';
     });
     h+='</table></div>';
-    $('view').innerHTML=h;
+    setView(h,tok);
   });
 }
 
 /* ---------------- RECENT DONE ---------------- */
-function loadDone(){
+function loadDone(tok){
   run('api_recentDone',[100],function(res){
     var clean=(res&&res.clean)||[], wi=(res&&res.withIssue)||[];
-    if(!clean.length&&!wi.length){$('view').innerHTML='<div class="empty">No completed tasks yet.</div>';return;}
+    if(!clean.length&&!wi.length){setView('<div class="empty">No completed tasks yet.</div>',tok);return;}
     var h='';
     // With issue / breakdown first (needs attention)
     h+='<div class="section"><h2>Done with issue / breakdown ('+wi.length+')</h2>';
@@ -294,7 +301,7 @@ function loadDone(){
       h+='</table>';
     }
     h+='</div>';
-    $('view').innerHTML=h;
+    setView(h,tok);
   });
 }
 
@@ -434,17 +441,17 @@ function finishChecklist(task,forceEmpty){
 }
 
 /* ---------------- ASSETS ---------------- */
-function loadAssets(){
+function loadAssets(tok){
   run('api_assetList',[],function(rows){
     var head='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Assets ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
-    if(!rows.length){$('view').innerHTML=head+'<div class="empty">No machines yet. Click "+ Add machine" to add one.</div></div>';return;}
+    if(!rows.length){setView(head+'<div class="empty">No machines yet. Click "+ Add machine" to add one.</div></div>',tok);return;}
     var h=head+'<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Warranty</th><th>Guarantee</th><th>Criticality</th></tr>';
     rows.forEach(function(r){
       h+='<tr><td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
         '<td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td>'+
         '<td>'+statusPill(r.status)+'</td><td>'+statusPill(r.warranty)+'</td><td>'+statusPill(r.guarantee||'-')+'</td><td>'+esc(r.criticality||'-')+'</td></tr>';
     });
-    $('view').innerHTML=h+'</table></div>';
+    setView(h+'</table></div>',tok);
   });
 }
 
@@ -554,10 +561,10 @@ function histSection(title,rows,cols){
 }
 
 /* ---------------- ISSUES ---------------- */
-function loadIssues(){
+function loadIssues(tok){
   run('api_openIssues',[],function(rows){
     var h='<div class="section"><h2>Open issues ('+rows.length+')</h2>'+issueTable(rows,true)+'</div>';
-    $('view').innerHTML=h;
+    setView(h,tok);
   });
 }
 function issueTable(rows,actions){
@@ -629,7 +636,7 @@ function saveIssue(id){
 }
 
 /* ---------------- BILLS ---------------- */
-function loadBills(){
+function loadBills(tok){
   run('api_issuesNeedingBill',[],function(need){
     var h='';
     // Section 1: issues awaiting a bill + proof
@@ -661,7 +668,7 @@ function loadBills(){
         h+='</table>';
       }
       h+='</div>';
-      $('view').innerHTML=h;
+      setView(h,tok);
     });
   });
 }
@@ -770,13 +777,13 @@ function searchBlock(title,rows,fmt){
 
 /* ---------------- MANAGE (sheet management from webapp) ---------------- */
 var MANAGE_SUB='machines';
-function loadManage(){
+function loadManage(tok){
   var subs=[['machines','Machines'],['checklist','Checklist'],['tasks','Tasks'],['doers','Doers'],
     ['holidays','Holidays'],['leave','Leave'],['money','Money'],['config','Config'],['import','Import'],['scheduler','Sync / Scheduler'],['reset','Reset']];
   var h='<div class="subtabs">'+subs.map(function(s){
     return '<button id="sm_'+s[0]+'" class="'+(MANAGE_SUB===s[0]?'active':'')+'" onclick="manageSub(\''+s[0]+'\')">'+s[1]+'</button>';
   }).join('')+'</div><div id="mgBody"><div class="loader">Loading</div></div>';
-  $('view').innerHTML=h;
+  setView(h,tok);
   var f={machines:manageMachines,checklist:manageChecklist,tasks:manageTasks,doers:manageDoers,
     holidays:manageHolidays,leave:manageLeave,money:manageMoney,config:manageConfig,import:manageImport,scheduler:manageScheduler,reset:manageReset};
   (f[MANAGE_SUB]||manageMachines)();
