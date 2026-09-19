@@ -144,7 +144,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbwjy2OOSnrMDoCp45Eqw4WFqz4v0BTAt-Y1cU0oHdoDiEaULNkGdO7eQMnr5BDFGJHb6w/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbzMqXpU3mGpjuf0GjTU6umEiKdFdd2qVf0O-LMV0O2pC5dQNxwFl6Z3GWshfW3ycDAnJA/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -1031,6 +1031,7 @@ function manageScheduler(){
   $('mgBody').innerHTML='<div class="section"><h2>Sync / Scheduler</h2>'+
     '<p style="color:var(--muted);margin-bottom:12px"><b>Sync all</b> reconciles every sheet (registry backfill, warranty/guarantee, tasks, generate checklist, refresh For PC). Use it after editing sheets directly or if things look out of step.</p>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="syncBtn" onclick="runSyncAll()">Sync all now</button>'+
+    '<button class="btn ghost" id="fmtBtn" onclick="runFormat()">Format all sheets</button>'+
     '<button class="btn ghost" id="schBtn" onclick="runScheduler()">Generate + refresh only</button></div>'+
     '<div id="schOut" style="margin-top:14px"></div></div>';
 }
@@ -1040,6 +1041,14 @@ function runSyncAll(){
     $('syncBtn').disabled=false;$('syncBtn').textContent='Sync all now';
     $('schOut').innerHTML='<div class="pill green">Synced</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
     toast('All sheets synced');
+  });
+}
+function runFormat(){
+  $('fmtBtn').disabled=true;$('fmtBtn').textContent='Formatting...';
+  run('api_formatSheets',[],function(msg){
+    $('fmtBtn').disabled=false;$('fmtBtn').textContent='Format all sheets';
+    $('schOut').innerHTML='<div class="pill green">Formatted</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
+    toast('All sheets formatted');
   });
 }
 function runScheduler(){
