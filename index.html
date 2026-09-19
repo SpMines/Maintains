@@ -69,9 +69,10 @@
   .kv{display:grid;grid-template-columns:180px 1fr;gap:6px 14px;font-size:13px}
   .kv .kk{color:var(--muted);font-weight:500}
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;z-index:99}
-  .gload{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;z-index:200;display:none;align-items:center;gap:8px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-  .gload.on{display:inline-flex}
-  .gload .sp{width:13px;height:13px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  .gload{position:fixed;inset:0;background:rgba(255,255,255,.45);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center}
+  .gload.on{display:flex}
+  .gload .glbox{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:13px;font-weight:500}
+  .gload .sp{width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .toast.show{opacity:1}
   .loader{text-align:center;padding:60px;color:var(--muted);font-weight:600;letter-spacing:2px;animation:pulse 1.2s infinite}
@@ -88,8 +89,7 @@
     <div class="search">
       <input id="q" placeholder="Search asset / issue / bill / task / vendor..." onkeydown="if(event.key==='Enter')doSearch()">
       <button class="btn" onclick="doSearch()">Search</button>
-      <button class="btn ghost" id="refreshBtn" onclick="manualRefresh()" title="Refresh from sheet">&#8635;</button>
-      <label class="synclbl" title="Auto-sync from sheet every 20s"><input type="checkbox" id="autoSync" checked onchange="toggleSync()"> <span id="syncDot" class="syncDot on"></span>Live</label>
+      <span class="synclbl" title="Auto-syncs from the sheet"><span id="syncDot" class="syncDot on"></span>Live</span>
     </div>
   </header>
 
@@ -108,7 +108,7 @@
 
 <!-- generic modal -->
 <div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
-<div class="gload" id="gload"><span class="sp"></span> Loading...</div>
+<div class="gload" id="gload"><div class="glbox"><span class="sp"></span>Loading...</div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -144,13 +144,14 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbwtEPt344g3C0MtuQ9NicD0LTjoHIt4ldCqPU16RDPpe951gKIagM0xHrcvN2PsJqpVaQ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbz3TV1U9SrwihExk_HUFMe6_7dRUmBSTOeUyanizWb7lyNDE-Kkkuvnzzq_KxHIzK4XWQ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
 var _busy=0;
-function loadOn(){_busy++;var g=$('gload');if(g)g.classList.add('on');}
-function loadOff(){_busy=Math.max(0,_busy-1);if(_busy===0){var g=$('gload');if(g)g.classList.remove('on');}}
+var _loadTimer=null;
+function loadOn(){_busy++;if(!_loadTimer){_loadTimer=setTimeout(function(){var g=$('gload');if(g&&_busy>0)g.classList.add('on');},220);}}
+function loadOff(){_busy=Math.max(0,_busy-1);if(_busy===0){if(_loadTimer){clearTimeout(_loadTimer);_loadTimer=null;}var g=$('gload');if(g)g.classList.remove('on');}}
 
 function run(fn,args,cb){
   args=args||[];
@@ -1205,14 +1206,15 @@ var SYNC_MS=20000, _syncTimer=null;
 function refreshCurrent(){
   if($('modalBg')&&$('modalBg').classList.contains('show')) return; // don't disturb an open form
   _silent=true;
+  var tok=_viewToken;   // if the user switches tab before this returns, the render is dropped
   try{
-    if(CURRENT==='dashboard')loadDashboard();
-    else if(CURRENT==='today')loadToday();
-    else if(CURRENT==='done')loadDone();
-    else if(CURRENT==='assets')loadAssets();
-    else if(CURRENT==='issues')loadIssues();
-    else if(CURRENT==='bills')loadBills();
-    else if(CURRENT==='manage')loadManage();
+    if(CURRENT==='dashboard')loadDashboard(tok);
+    else if(CURRENT==='today')loadToday(tok);
+    else if(CURRENT==='done')loadDone(tok);
+    else if(CURRENT==='assets')loadAssets(tok);
+    else if(CURRENT==='issues')loadIssues(tok);
+    else if(CURRENT==='bills')loadBills(tok);
+    else if(CURRENT==='manage')loadManage(tok);
   }catch(e){}
   setTimeout(function(){_silent=false;},50);
 }
