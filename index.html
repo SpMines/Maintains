@@ -144,7 +144,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbxUbj9j_jx36Di-ImmHB5jmRB0eOf2Cm1vzMVISjcY1d6z1qoAAbJRGAuV4lrnXo3n2WQ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbwQnvAqh9gFdGOMW6kez8wIC8IPNrq1iIk88tk6H_DzbKj71cy-MQK4RGoVwptyS6bf3w/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -277,8 +277,11 @@ function renderToday(tok){
   var h='<div class="section">'+
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
       '<h2 style="border:0">Today &amp; overdue ('+shown.length+')</h2>'+
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
+      '<button class="btn sm" onclick="openAssign()">+ Assign task</button>'+
       '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
-      '<select class="f" style="max-width:260px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
+      '<select class="f" style="max-width:240px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
+      '</div>'+
     '</div>'+
     '<table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
   shown.forEach(function(r){
@@ -327,6 +330,66 @@ function loadDone(tok){
     }
     h+='</div>';
     setView(h,tok);
+  });
+}
+
+/* ---------------- ASSIGN TASK (location-wise, all or partial machines) ---------------- */
+var ASSIGN_ASSETS=[];
+function openAssign(){
+  run('api_assetList',[],function(all){
+    ASSIGN_ASSETS=(all||[]).filter(function(a){return String(a.status).toLowerCase()!=='inactive';});
+    var locs={}; ASSIGN_ASSETS.forEach(function(a){var l=(a.location||'').trim()||'(no location)';locs[l]=true;});
+    var locList=Object.keys(locs).sort();
+    var locOpts='<option value="__all">All locations</option>'+locList.map(function(l){
+      var n=ASSIGN_ASSETS.filter(function(a){return ((a.location||'').trim()||'(no location)')===l;}).length;
+      return '<option value="'+esc(l)+'">'+esc(l)+' ('+n+')</option>';
+    }).join('');
+    var doers=[''].concat(LOOKUPS.doers||[]).map(function(dd){return '<option>'+esc(dd)+'</option>';}).join('');
+    var today=new Date().toISOString().slice(0,10);
+    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Assign task</h3>'+
+      '<div class="row"><div class="col"><label class="f">Location</label>'+
+      '<select class="f" id="asLoc" onchange="renderAssignMachines()">'+locOpts+'</select></div>'+
+      '<div class="col"><label class="f">Date</label><input class="f" id="asDate" type="date" value="'+today+'"></div></div>'+
+      '<div class="row"><div class="col"><label class="f">Task</label><input class="f" id="asTask" placeholder="e.g. Daily check" value="Daily check"></div>'+
+      '<div class="col"><label class="f">Assign to (doer)</label><select class="f" id="asDoer">'+doers+'</select></div></div>'+
+      '<label class="f" style="display:flex;justify-content:space-between;align-items:center">Machines '+
+      '<span><button class="btn sm ghost" onclick="assignAllToggle(true)">All</button> '+
+      '<button class="btn sm ghost" onclick="assignAllToggle(false)">None</button></span></label>'+
+      '<div id="asMachines" style="max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
+      '<div style="margin-top:14px"><button class="btn" id="asBtn" onclick="doAssign()">Assign</button></div>');
+    renderAssignMachines();
+  });
+}
+function assignFiltered(){
+  var loc=$('asLoc').value;
+  return ASSIGN_ASSETS.filter(function(a){
+    if(loc==='__all')return true;
+    return ((a.location||'').trim()||'(no location)')===loc;
+  });
+}
+function renderAssignMachines(){
+  var list=assignFiltered();
+  if(!list.length){$('asMachines').innerHTML='<div class="empty" style="padding:8px">No machines here.</div>';return;}
+  $('asMachines').innerHTML=list.map(function(a){
+    return '<label style="display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:13px">'+
+      '<input type="checkbox" class="asChk" value="'+esc(a.assetId)+'" checked> '+
+      '<b>'+esc(a.assetId)+'</b> &middot; '+esc(a.name||'')+' <span style="color:var(--muted)">('+esc(a.type||'')+')</span></label>';
+  }).join('');
+}
+function assignAllToggle(on){
+  Array.prototype.forEach.call(document.querySelectorAll('#asMachines .asChk'),function(c){c.checked=on;});
+}
+function doAssign(){
+  var ids=[];
+  Array.prototype.forEach.call(document.querySelectorAll('#asMachines .asChk'),function(c){if(c.checked)ids.push(c.value);});
+  if(!ids.length){toast('Select at least one machine');return;}
+  var o={taskName:$('asTask').value||'Assigned check',doer:$('asDoer').value,date:$('asDate').value,
+    location:($('asLoc').value==='__all'?'':$('asLoc').value),assetIds:ids};
+  $('asBtn').disabled=true;$('asBtn').textContent='Assigning...';
+  run('api_assignTasks',[o],function(res){
+    closeModal();
+    toast('Assigned to '+res.added+' machine(s)');
+    if(CURRENT==='today')loadToday(); else go('today');
   });
 }
 
