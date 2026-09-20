@@ -252,21 +252,45 @@ function loadDashboard(tok){
 }
 
 /* ---------------- TODAY'S WORK ---------------- */
+var TODAY_ROWS=[], TODAY_LOC='__all';
 function loadToday(tok){
   run('api_todaysWork',[],function(rows){
-    if(!rows.length){setView('<div class="empty">No pending or overdue tasks. All clear.</div>',tok);return;}
-    var h='<div class="section"><h2>Today &amp; overdue ('+rows.length+')</h2><table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
-    rows.forEach(function(r){
-      h+='<tr>'+
-        '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
-        '<td>'+esc(r.assetType)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.task)+'</td>'+
-        '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
-        '<td>'+esc(r.doer)+'</td><td>'+statusPill(r.status)+'</td>'+
-        '<td><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button></td></tr>';
-    });
-    h+='</table></div>';
-    setView(h,tok);
+    TODAY_ROWS=rows||[];
+    if(!TODAY_ROWS.length){setView('<div class="empty">No pending or overdue tasks. All clear.</div>',tok);return;}
+    renderToday(tok);
   });
+}
+function renderToday(tok){
+  // unique locations from the rows
+  var locs={}; TODAY_ROWS.forEach(function(r){ var l=(r.location||'').trim()||'(no location)'; locs[l]=true; });
+  var locList=Object.keys(locs).sort();
+  var shown=TODAY_ROWS.filter(function(r){
+    if(TODAY_LOC==='__all')return true;
+    var l=(r.location||'').trim()||'(no location)';
+    return l===TODAY_LOC;
+  });
+  var opts='<option value="__all">All locations ('+TODAY_ROWS.length+')</option>'+
+    locList.map(function(l){
+      var n=TODAY_ROWS.filter(function(r){return ((r.location||'').trim()||'(no location)')===l;}).length;
+      return '<option value="'+esc(l)+'"'+(l===TODAY_LOC?' selected':'')+'>'+esc(l)+' ('+n+')</option>';
+    }).join('');
+  var h='<div class="section">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+      '<h2 style="border:0">Today &amp; overdue ('+shown.length+')</h2>'+
+      '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
+      '<select class="f" style="max-width:260px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
+    '</div>'+
+    '<table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
+  shown.forEach(function(r){
+    h+='<tr>'+
+      '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
+      '<td>'+esc(r.assetType)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.task)+'</td>'+
+      '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
+      '<td>'+esc(r.doer)+'</td><td>'+statusPill(r.status)+'</td>'+
+      '<td><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button></td></tr>';
+  });
+  h+='</table></div>';
+  setView(h,tok);
 }
 
 /* ---------------- RECENT DONE ---------------- */
