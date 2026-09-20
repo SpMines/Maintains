@@ -256,8 +256,7 @@ var TODAY_ROWS=[], TODAY_LOC='__all';
 function loadToday(tok){
   run('api_todaysWork',[],function(rows){
     TODAY_ROWS=rows||[];
-    if(!TODAY_ROWS.length){setView('<div class="empty">No pending or overdue tasks. All clear.</div>',tok);return;}
-    renderToday(tok);
+    renderToday(tok);   // always render so header + Assign button show even when empty
   });
 }
 function renderToday(tok){
@@ -282,8 +281,9 @@ function renderToday(tok){
       '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
       '<select class="f" style="max-width:240px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
       '</div>'+
-    '</div>'+
-    '<table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
+    '</div>';
+  if(!shown.length){ h+='<div class="empty">No pending or overdue tasks here. Use "+ Assign task" to add work.</div></div>'; setView(h,tok); return; }
+  h+='<table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
   shown.forEach(function(r){
     h+='<tr>'+
       '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
