@@ -144,7 +144,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbzcWI_4vbYXesL5XtlemGsWpbzFiWrZhVpZyySJDaYOZAYjfsKU7G7Gqb-K7Pc9FF9Uzg/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbzrFFviB8m-cLWFh8ix0803B1mP0B_wYHplS6fPTYBqwBntZFMNUOmLsJLJ4Mdi9LWZ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -291,7 +291,7 @@ function renderToday(tok){
       '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
       '<td>'+esc(r.doer)+'</td><td>'+statusPill(r.status)+'</td>'+
       '<td style="white-space:nowrap"><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button> '+
-      '<button class="btn sm ghost" onclick="removeTask('+JSON.stringify(r).replace(/'/g,"&#39;")+')">Remove</button></td></tr>';
+      '<button class="btn sm ghost" onclick="removeTask(\''+esc(r.taskId)+'\',\''+esc(r.assetId)+'\',\''+esc(r.plannedDate)+'\')">Remove</button></td></tr>';
   });
   h+='</table></div>';
   setView(h,tok);
@@ -335,14 +335,14 @@ function loadDone(tok){
 }
 
 /* remove a task instance from Today's work / For PC (assigned or generated) */
-function removeTask(r){
+function removeTask(taskId,assetId,plannedDate){
   openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Remove task?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">'+esc(r.assetId)+' &middot; '+esc(r.task)+' ('+esc(r.plannedDate)+')<br>Ye task Today\'s work aur For PC se hat jayega. Task List (recurring) safe rahega.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" onclick="doRemoveTask(\''+esc(r.taskId)+'\',\''+esc(r.assetId)+'\',\''+esc(r.plannedDate)+'\')">Yes, remove</button>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">'+esc(assetId)+' ('+esc(plannedDate)+')<br>Ye task Today\'s work aur For PC se hat jayega. Task List (recurring) safe rahega.</p>'+
+    '<div style="display:flex;gap:8px"><button class="btn" onclick="doRemoveTask(\''+esc(taskId)+'\',\''+esc(assetId)+'\',\''+esc(plannedDate)+'\')">Yes, remove</button>'+
     '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
 }
 function doRemoveTask(t,a,p){
-  run('api_deleteTask',[t,a,p],function(res){closeModal();toast('Removed');loadToday();});
+  run('api_deleteTask',[t,a,p],function(res){closeModal();toast(res&&res.deleted?('Removed '+res.deleted):'Removed');loadToday();});
 }
 
 /* ---------------- ASSIGN TASK (location-wise, all or partial machines) ---------------- */
