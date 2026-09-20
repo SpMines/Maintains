@@ -15,27 +15,31 @@
     --red:#b3261e;   --redbg:#fde8e6;
     --blue:#1a5fb4;  --bluebg:#e8f0fe;
     --grey:#5f6368;  --greybg:#eef0f2;
+    --acc1:#6d3bff;  --acc2:#2d6cff;   /* purple -> blue accent */
+    --accgrad:linear-gradient(90deg,#6d3bff,#2d6cff);
     --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   }
   *{box-sizing:border-box;font-family:'Jost',sans-serif;margin:0;padding:0}
+  html,body{-webkit-text-size-adjust:100%}
   body{background:var(--white);color:var(--ink);font-size:14px;line-height:1.5}
-  .wrap{width:90vw;max-width:1400px;margin:0 auto;padding:18px 0 60px}
+  .wrap{width:92vw;max-width:1400px;margin:0 auto;padding:16px 0 70px}
   header.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:2px solid var(--ink);margin-bottom:16px;flex-wrap:wrap}
-  header.top h1{font-weight:700;font-size:20px;letter-spacing:.5px}
-  .search{flex:1;min-width:220px;max-width:420px;display:flex;gap:8px}
-  .search input{flex:1;padding:9px 12px;border:1px solid var(--line);border-radius:8px;font-size:14px}
-  .synclbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap;cursor:pointer}
+  header.top h1{font-weight:800;font-size:20px;letter-spacing:.5px;background:var(--accgrad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .search{flex:1;min-width:220px;max-width:460px;display:flex;gap:8px;align-items:center}
+  .search input{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px}
+  .synclbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap}
   .syncDot{width:8px;height:8px;border-radius:50%;background:var(--grey);display:inline-block}
   .syncDot.on{background:var(--green);animation:pulseDot 2s infinite}
   @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
   nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-  nav.tabs button{padding:8px 14px;border:1px solid var(--line);background:var(--white);border-radius:20px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted)}
-  nav.tabs button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .btn{padding:8px 14px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:8px;cursor:pointer;font-weight:500;font-size:13px}
-  .btn.ghost{background:#fff;color:var(--ink)}
-  .btn.sm{padding:5px 10px;font-size:12px}
+  nav.tabs button{padding:9px 15px;border:1px solid var(--line);background:var(--white);border-radius:22px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted);white-space:nowrap}
+  nav.tabs button.active{background:var(--accgrad);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(109,59,255,.25)}
+  .btn{padding:9px 15px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;cursor:pointer;font-weight:500;font-size:13px}
+  .btn:not(.ghost){background:var(--accgrad);border-color:transparent}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.sm{padding:6px 11px;font-size:12px}
   .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:22px}
-  .card{border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);background:#fff}
+  .card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);background:#fff}
   .card .k{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.2px}
   .card .v{font-size:26px;font-weight:700;margin-top:4px}
   .card.warn .v{color:var(--amber)} .card.bad .v{color:var(--red)} .card.ok .v{color:var(--green)} .card.info .v{color:var(--blue)}
@@ -80,6 +84,39 @@
   .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
   .subtabs button{padding:5px 11px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;font-size:12px;color:var(--muted)}
   .subtabs button.active{background:var(--band);color:var(--ink);font-weight:600}
+
+  /* ===================== MOBILE / RESPONSIVE ===================== */
+  @media (max-width: 760px){
+    .wrap{width:94vw;padding:12px 0 90px}
+    header.top{flex-direction:column;align-items:stretch;gap:10px;padding:10px 0}
+    header.top h1{font-size:22px;text-align:center}
+    .search{max-width:100%;min-width:0}
+    /* tabs scroll horizontally instead of wrapping into many rows */
+    nav.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:14px}
+    nav.tabs::-webkit-scrollbar{height:0}
+    nav.tabs button{flex:0 0 auto}
+    /* stat cards: 2 per row on phone */
+    .cards{grid-template-columns:repeat(2,1fr);gap:10px}
+    .card .v{font-size:22px}
+    /* tables scroll sideways inside their section (no page-wide overflow) */
+    .section{overflow-x:auto;-webkit-overflow-scrolling:touch}
+    table{min-width:600px}
+    .section h2{font-size:14px}
+    /* bigger touch targets */
+    .btn{padding:11px 16px;font-size:14px}
+    .btn.sm{padding:8px 12px;font-size:13px}
+    nav.tabs button{padding:10px 16px;font-size:14px}
+    /* modal fills the screen nicely */
+    .modal-bg{padding:0;align-items:flex-end}
+    .modal{max-width:100%;border-radius:16px 16px 0 0;max-height:92vh;overflow:auto}
+    .row{flex-direction:column;gap:0}
+    .col{min-width:0}
+    .kv{grid-template-columns:130px 1fr}
+  }
+  @media (max-width: 400px){
+    .cards{grid-template-columns:1fr}
+    .kv{grid-template-columns:110px 1fr;font-size:12px}
+  }
 </style>
 </head>
 <body>
