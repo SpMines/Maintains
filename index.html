@@ -137,6 +137,7 @@
     <button data-t="assets" onclick="go('assets')">Assets</button>
     <button data-t="issues" onclick="go('issues')">Issues / breakdowns</button>
     <button data-t="bills" onclick="go('bills')">Bills</button>
+    <button data-t="reports" onclick="go('reports')">Reports</button>
     <button data-t="manage" onclick="go('manage')">Manage</button>
   </nav>
 
@@ -181,7 +182,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbzrFFviB8m-cLWFh8ix0803B1mP0B_wYHplS6fPTYBqwBntZFMNUOmLsJLJ4Mdi9LWZ/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbzLHMFfNt62hyxgAhE4RdITuAnUc7PaZQXdWsNPRcp4A_WPxHadXVbzEC0D8RcC3U5bfg/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -222,6 +223,7 @@ function go(tab){
   else if(tab==='assets')loadAssets(myTok);
   else if(tab==='issues')loadIssues(myTok);
   else if(tab==='bills')loadBills(myTok);
+  else if(tab==='reports')loadReports(myTok);
   else if(tab==='manage')loadManage(myTok);
 }
 /* true if this render still belongs to the current view (else a newer tab was opened) */
@@ -320,9 +322,11 @@ function renderToday(tok){
       '</div>'+
     '</div>';
   if(!shown.length){ h+='<div class="empty">No pending or overdue tasks here. Use "+ Assign task" to add work.</div></div>'; setView(h,tok); return; }
-  h+='<table><tr><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
+  h+='<div style="margin-bottom:8px"><button class="btn sm ghost" onclick="deleteSelectedTasks()">Delete selected</button></div>';
+  h+='<table><tr><th><input type="checkbox" onclick="toggleAllToday(this)"></th><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
   shown.forEach(function(r){
     h+='<tr>'+
+      '<td><input type="checkbox" class="tchk" data-t="'+esc(r.taskId)+'" data-a="'+esc(r.assetId)+'"></td>'+
       '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
       '<td>'+esc(r.assetType)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.task)+'</td>'+
       '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
@@ -332,6 +336,20 @@ function renderToday(tok){
   });
   h+='</table></div>';
   setView(h,tok);
+}
+function toggleAllToday(cb){ Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){c.checked=cb.checked;}); }
+function deleteSelectedTasks(){
+  var list=[];
+  Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){ if(c.checked)list.push({taskId:c.dataset.t,assetId:c.dataset.a}); });
+  if(!list.length){toast('Select tasks first (tick the boxes)');return;}
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Delete '+list.length+' task(s)?</h3>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">Selected tasks Today\'s work aur For PC se hat jayenge (Status = Deleted). Task List safe.</p>'+
+    '<div style="display:flex;gap:8px"><button class="btn" id="dsBtn" onclick=\'doDeleteSelected('+JSON.stringify(list)+')\'>Yes, delete</button>'+
+    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
+}
+function doDeleteSelected(list){
+  $('dsBtn').disabled=true;$('dsBtn').textContent='Deleting...';
+  run('api_deleteTasksBulk',[list],function(res){closeModal();toast('Deleted '+(res&&res.deleted||0));loadToday();});
 }
 
 /* ---------------- RECENT DONE ---------------- */
@@ -394,12 +412,16 @@ function openAssign(){
       return '<option value="'+esc(l)+'">'+esc(l)+' ('+n+')</option>';
     }).join('');
     var doers=[''].concat(LOOKUPS.doers||[]).map(function(dd){return '<option>'+esc(dd)+'</option>';}).join('');
+    var tnames=(LOOKUPS.taskNames||[]);
+    var taskOpts=tnames.length
+      ? tnames.map(function(t){return '<option>'+esc(t)+'</option>';}).join('')
+      : '<option value="">(no tasks defined - add in Manage &rarr; Tasks)</option>';
     var today=new Date().toISOString().slice(0,10);
     openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Assign task</h3>'+
       '<div class="row"><div class="col"><label class="f">Location</label>'+
       '<select class="f" id="asLoc" onchange="renderAssignMachines()">'+locOpts+'</select></div>'+
       '<div class="col"><label class="f">Date</label><input class="f" id="asDate" type="date" value="'+today+'"></div></div>'+
-      '<div class="row"><div class="col"><label class="f">Task</label><input class="f" id="asTask" placeholder="e.g. Daily check" value="Daily check"></div>'+
+      '<div class="row"><div class="col"><label class="f">Task</label><select class="f" id="asTask">'+taskOpts+'</select></div>'+
       '<div class="col"><label class="f">Assign to (doer)</label><select class="f" id="asDoer">'+doers+'</select></div></div>'+
       '<label class="f" style="display:flex;justify-content:space-between;align-items:center">Machines '+
       '<span><button class="btn sm ghost" onclick="assignAllToggle(true)">All</button> '+
@@ -432,7 +454,9 @@ function doAssign(){
   var ids=[];
   Array.prototype.forEach.call(document.querySelectorAll('#asMachines .asChk'),function(c){if(c.checked)ids.push(c.value);});
   if(!ids.length){toast('Select at least one machine');return;}
-  var o={taskName:$('asTask').value||'Assigned check',doer:$('asDoer').value,date:$('asDate').value,
+  var tn=($('asTask').value||'').trim();
+  if(!tn){toast('No task selected. Add tasks in Manage -> Tasks first.');return;}
+  var o={taskName:tn,doer:$('asDoer').value,date:$('asDate').value,
     location:($('asLoc').value==='__all'?'':$('asLoc').value),assetIds:ids};
   $('asBtn').disabled=true;$('asBtn').textContent='Assigning...';
   run('api_assignTasks',[o],function(res){
@@ -1360,6 +1384,7 @@ function refreshCurrent(){
     else if(CURRENT==='assets')loadAssets(tok);
     else if(CURRENT==='issues')loadIssues(tok);
     else if(CURRENT==='bills')loadBills(tok);
+    else if(CURRENT==='reports')loadReports(tok);
     else if(CURRENT==='manage')loadManage(tok);
   }catch(e){}
   setTimeout(function(){_silent=false;},50);
@@ -1372,6 +1397,35 @@ function toggleSync(){
   if(on)startSync(); else stopSync();
 }
 function manualRefresh(){ var b=$('refreshBtn'); if(b){b.style.transform='rotate(360deg)';b.style.transition='transform .5s';setTimeout(function(){b.style.transform='';},500);} refreshCurrent(); toast('Synced from sheet'); }
+
+/* ---------------- REPORTS ---------------- */
+function loadReports(tok){
+  run('api_report',[''],function(d){
+    var t=(d&&d.totals)||{}, doers=(d&&d.doers)||[];
+    var h='<div class="section"><h2>Overall</h2><div class="cards">'+
+      '<div class="card"><div class="k">Total tasks</div><div class="v">'+(t.total||0)+'</div></div>'+
+      '<div class="card ok"><div class="k">Done</div><div class="v">'+(t.done||0)+'</div></div>'+
+      '<div class="card warn"><div class="k">Pending</div><div class="v">'+(t.pending||0)+'</div></div>'+
+      '<div class="card bad"><div class="k">Missed (overdue)</div><div class="v">'+(t.overdue||0)+'</div></div>'+
+      '<div class="card"><div class="k">Deleted</div><div class="v">'+(t.deleted||0)+'</div></div>'+
+      '</div></div>';
+    h+='<div class="section"><h2>Doer performance ('+doers.length+')</h2>';
+    if(!doers.length){h+='<div class="empty">No data yet.</div>';}
+    else{
+      h+='<table><tr><th>Doer</th><th>Done</th><th>Pending</th><th>Missed</th><th>Deleted</th><th>Total</th><th>Completion</th></tr>';
+      doers.forEach(function(r){
+        var pill=r.completion>=80?'green':(r.completion>=50?'amber':'red');
+        h+='<tr><td>'+esc(r.doer)+'</td><td>'+r.done+'</td><td>'+r.pending+'</td>'+
+          '<td>'+(r.overdue?('<span class="pill red">'+r.overdue+'</span>'):'0')+'</td>'+
+          '<td>'+r.deleted+'</td><td>'+r.total+'</td>'+
+          '<td><span class="pill '+pill+'">'+r.completion+'%</span></td></tr>';
+      });
+      h+='</table>';
+    }
+    h+='</div>';
+    setView(h,tok);
+  });
+}
 
 /* ---------------- BOOT ---------------- */
 run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');startSync();});
