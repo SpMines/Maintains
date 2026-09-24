@@ -223,7 +223,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycby6sipPFf1NqxNvPHTrxU3o0H89VRDWKbS8tVHoUr6WWmPNA_QqT329Yg66xUobl_6vqw/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbw85gJKK31OGOu_TVYMe4shiy8KtouasSdrUtdMRJMQtZDjytBk2DgNNqe8yJCXdzNnFg/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -305,7 +305,10 @@ function setView(html,tok){ if(tok!==undefined && tok!==_viewToken) return; $('v
 
 /* ---------------- DASHBOARD ---------------- */
 function loadDashboard(tok){
-  run('api_dashboard',[],function(d){
+  if(BOOT_DASH){ var d0=BOOT_DASH; BOOT_DASH=null; renderDashboard(d0,tok); return; }
+  run('api_dashboard',[],function(d){ renderDashboard(d,tok); });
+}
+function renderDashboard(d,tok){
     var cards=[
       ['Total Assets',d.totalAssets,''],['Active',d.activeAssets,'ok'],
       ['Tasks Today',d.tasksToday,'info'],['Pending',d.pending,'warn'],['Overdue',d.overdue,'bad'],
@@ -359,7 +362,6 @@ function loadDashboard(tok){
         d.expenseTrend.map(function(t){return '<td>'+money(t.total)+'</td>';}).join('')+'</tr></table></div>';
     }
     setView(h,tok);
-  });
 }
 
 /* ---------------- TODAY'S WORK ---------------- */
@@ -1510,9 +1512,14 @@ function loadReports(tok){
 }
 
 /* ---------------- BOOT ---------------- */
+var BOOT_DASH=null;
 function boot(){
   $('view').innerHTML=skeleton();
-  run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');},{retry:boot});
+  run('api_boot',[],function(d){
+    LOOKUPS=(d&&d.lookups)||{};
+    BOOT_DASH=(d&&d.dashboard)||null;
+    go('dashboard');
+  },{retry:boot});
 }
 boot();
 </script>
