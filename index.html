@@ -182,7 +182,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbzLHMFfNt62hyxgAhE4RdITuAnUc7PaZQXdWsNPRcp4A_WPxHadXVbzEC0D8RcC3U5bfg/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycby6sipPFf1NqxNvPHTrxU3o0H89VRDWKbS8tVHoUr6WWmPNA_QqT329Yg66xUobl_6vqw/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -317,6 +317,7 @@ function renderToday(tok){
       '<h2 style="border:0">Today &amp; overdue ('+shown.length+')</h2>'+
       '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
       '<button class="btn sm" onclick="openAssign()">+ Assign task</button>'+
+      '<button class="btn sm ghost" onclick="clearAllTasks()">Clear all</button>'+
       '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
       '<select class="f" style="max-width:240px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
       '</div>'+
@@ -338,6 +339,16 @@ function renderToday(tok){
   setView(h,tok);
 }
 function toggleAllToday(cb){ Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){c.checked=cb.checked;}); }
+function clearAllTasks(){
+  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Clear ALL tasks?</h3>'+
+    '<p style="color:var(--muted);margin:8px 0 14px">Master + For PC ki saari tasks hat jayengi (old auto-generated bhi). Task List (recurring) safe. Iske baad khud se assign karo.</p>'+
+    '<div style="display:flex;gap:8px"><button class="btn" id="catBtn" style="background:var(--red);border-color:var(--red)" onclick="doClearAll()">Yes, clear all</button>'+
+    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
+}
+function doClearAll(){
+  $('catBtn').disabled=true;$('catBtn').textContent='Clearing...';
+  run('api_clearAllTasks',[],function(res){closeModal();toast('Cleared '+(res&&res.cleared||0)+' task rows');loadToday();});
+}
 function deleteSelectedTasks(){
   var list=[];
   Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){ if(c.checked)list.push({taskId:c.dataset.t,assetId:c.dataset.a}); });
@@ -1189,11 +1200,10 @@ function manageMoney(){
 
 /* --- Manage: RUN SCHEDULER --- */
 function manageScheduler(){
-  $('mgBody').innerHTML='<div class="section"><h2>Sync / Scheduler</h2>'+
-    '<p style="color:var(--muted);margin-bottom:12px"><b>Sync all</b> reconciles every sheet (registry backfill, warranty/guarantee, tasks, generate checklist, refresh For PC). Use it after editing sheets directly or if things look out of step.</p>'+
+  $('mgBody').innerHTML='<div class="section"><h2>Sync / maintenance</h2>'+
+    '<p style="color:var(--muted);margin-bottom:12px"><b>Sync all</b> reconciles sheets (asset registry, warranty, refresh For PC). Tasks are NOT auto-generated - you assign them manually from Today\'s work.</p>'+
     '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="syncBtn" onclick="runSyncAll()">Sync all now</button>'+
-    '<button class="btn ghost" id="fmtBtn" onclick="runFormat()">Format all sheets</button>'+
-    '<button class="btn ghost" id="schBtn" onclick="runScheduler()">Generate + refresh only</button></div>'+
+    '<button class="btn ghost" id="fmtBtn" onclick="runFormat()">Format all sheets</button></div>'+
     '<div id="schOut" style="margin-top:14px"></div></div>';
 }
 function runSyncAll(){
@@ -1428,7 +1438,7 @@ function loadReports(tok){
 }
 
 /* ---------------- BOOT ---------------- */
-run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');startSync();});
+run('api_lookups',[],function(l){LOOKUPS=l;go('dashboard');});
 </script>
 </body>
 </html>
