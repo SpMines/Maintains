@@ -89,8 +89,8 @@
   .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;z-index:99}
   .gload{position:fixed;inset:0;background:rgba(10,10,16,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center}
   .gload.on{display:flex}
-  .gload .glbox{display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--ink);color:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.25);font-size:13px;font-weight:500}
-  .gload .sp{width:26px;height:26px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+  .gload .glbox{display:flex;flex-direction:column;align-items:center;gap:10px;background:#1c1c2a;color:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45);font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,.08)}
+  .gload .sp{width:26px;height:26px;border:3px solid rgba(125,82,255,.25);border-top-color:#7d52ff;border-right-color:#3d7bff;border-radius:50%;animation:spin .7s linear infinite}
   @keyframes spin{to{transform:rotate(360deg)}}
   .toast.show{opacity:1}
   .loader{text-align:center;padding:60px;color:var(--muted);font-weight:600;letter-spacing:2px;animation:pulse 1.2s infinite}
@@ -250,6 +250,9 @@ function run(fn,args,cb,opts){
   var quiet=_silent;
   if(!quiet)loadOn();
   var showErrCard=(opts.errCard!==false) && !quiet;
+  // any write action (not a read/list) invalidates the page cache so lists refresh
+  var READ_RE=/^api_(boot|dashboard|todaysWork|assetList|assetDetail|checklistFor|startTask|recentDone|report|checklistItems|openIssues|issuesNeedingBill|pendingBills|search|lookups|list|money)/;
+  if(!READ_RE.test(fn)) { try{clearCache();}catch(e){} }
   var done=function(r){if(!quiet)loadOff();cb(r);};
   var onErr=function(msg){
     if(!quiet)loadOff();
@@ -286,7 +289,7 @@ function go(tab){
   _viewToken++;                 // invalidate any in-flight loads from the previous tab
   var myTok=_viewToken;
   Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('active',b.dataset.t===tab);});
-  $('view').innerHTML=skeleton();
+  if(PAGE_CACHE[tab]===undefined) $('view').innerHTML=skeleton();   // skeleton only when not cached
   if(tab==='dashboard')loadDashboard(myTok);
   else if(tab==='today')loadToday(myTok);
   else if(tab==='done')loadDone(myTok);
@@ -295,6 +298,13 @@ function go(tab){
   else if(tab==='bills')loadBills(myTok);
   else if(tab==='reports')loadReports(myTok);
   else if(tab==='manage')loadManage(myTok);
+}
+/* ---- page cache: returning to a tab renders instantly (no re-fetch) ---- */
+var PAGE_CACHE={};
+function clearCache(){ PAGE_CACHE={}; }               // call after any write (assign/delete/done/save)
+function cachedRun(key,fn,args,cb){
+  if(PAGE_CACHE[key]!==undefined){ cb(PAGE_CACHE[key]); return; }   // instant from cache
+  run(fn,args,function(d){ PAGE_CACHE[key]=d; cb(d); });
 }
 /* true if this render still belongs to the current view (else a newer tab was opened) */
 function fresh(tok){ return tok===undefined || tok===_viewToken; }
@@ -305,8 +315,8 @@ function setView(html,tok){ if(tok!==undefined && tok!==_viewToken) return; $('v
 
 /* ---------------- DASHBOARD ---------------- */
 function loadDashboard(tok){
-  if(BOOT_DASH){ var d0=BOOT_DASH; BOOT_DASH=null; renderDashboard(d0,tok); return; }
-  run('api_dashboard',[],function(d){ renderDashboard(d,tok); });
+  if(BOOT_DASH){ var d0=BOOT_DASH; BOOT_DASH=null; PAGE_CACHE['dashboard']=d0; renderDashboard(d0,tok); return; }
+  cachedRun('dashboard','api_dashboard',[],function(d){ renderDashboard(d,tok); });
 }
 function renderDashboard(d,tok){
     var cards=[
@@ -367,7 +377,7 @@ function renderDashboard(d,tok){
 /* ---------------- TODAY'S WORK ---------------- */
 var TODAY_ROWS=[], TODAY_LOC='__all';
 function loadToday(tok){
-  run('api_todaysWork',[],function(rows){
+  cachedRun('today','api_todaysWork',[],function(rows){
     TODAY_ROWS=rows||[];
     renderToday(tok);   // always render so header + Assign button show even when empty
   });
@@ -439,7 +449,7 @@ function doDeleteSelected(list){
 
 /* ---------------- RECENT DONE ---------------- */
 function loadDone(tok){
-  run('api_recentDone',[100],function(res){
+  cachedRun('done','api_recentDone',[100],function(res){
     var clean=(res&&res.clean)||[], wi=(res&&res.withIssue)||[];
     if(!clean.length&&!wi.length){setView('<div class="empty">No completed tasks yet.</div>',tok);return;}
     var h='';
@@ -688,7 +698,7 @@ function finishChecklist(task,forceEmpty){
 
 /* ---------------- ASSETS ---------------- */
 function loadAssets(tok){
-  run('api_assetList',[],function(rows){
+  cachedRun('assets','api_assetList',[],function(rows){
     var head='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Assets ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
     if(!rows.length){setView(head+'<div class="empty">No machines yet. Click "+ Add machine" to add one.</div></div>',tok);return;}
     var h=head+'<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Warranty</th><th>Guarantee</th><th>Criticality</th></tr>';
@@ -808,7 +818,7 @@ function histSection(title,rows,cols){
 
 /* ---------------- ISSUES ---------------- */
 function loadIssues(tok){
-  run('api_openIssues',[],function(rows){
+  cachedRun('issues','api_openIssues',[],function(rows){
     var h='<div class="section"><h2>Open issues ('+rows.length+')</h2>'+issueTable(rows,true)+'</div>';
     setView(h,tok);
   });
@@ -1484,7 +1494,7 @@ function manualRefresh(){ var b=$('refreshBtn'); if(b){b.style.transform='rotate
 
 /* ---------------- REPORTS ---------------- */
 function loadReports(tok){
-  run('api_report',[''],function(d){
+  cachedRun('reports','api_report',[''],function(d){
     var t=(d&&d.totals)||{}, doers=(d&&d.doers)||[];
     var h='<div class="section"><h2>Overall</h2><div class="cards">'+
       '<div class="card"><div class="k">Total tasks</div><div class="v">'+(t.total||0)+'</div></div>'+
