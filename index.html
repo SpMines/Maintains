@@ -223,7 +223,7 @@ function statusPill(s){
  *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
  * Leave it "" when the file is served by Apps Script.
  * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbw85gJKK31OGOu_TVYMe4shiy8KtouasSdrUtdMRJMQtZDjytBk2DgNNqe8yJCXdzNnFg/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+var API_URL = "https://script.google.com/macros/s/AKfycbx0ojfZczfYEetprGpLaoLwK3iCfpt812Mk6ROFyLWF4uLAB8c6ecp3RHBQRwS_pyIyew/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
 
 function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
 
@@ -399,14 +399,10 @@ function renderToday(tok){
   var h='<div class="section">'+
     '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
       '<h2 style="border:0">Today &amp; overdue ('+shown.length+')</h2>'+
-      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'+
-      '<button class="btn sm" onclick="openAssign()">+ Assign task</button>'+
-      '<button class="btn sm ghost" onclick="clearAllTasks()">Clear all</button>'+
       '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
       '<select class="f" style="max-width:240px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
-      '</div>'+
     '</div>';
-  if(!shown.length){ h+='<div class="empty">No pending or overdue tasks here. Use "+ Assign task" to add work.</div></div>'; setView(h,tok); return; }
+  if(!shown.length){ h+='<div class="empty">No pending or overdue tasks. Tasks auto-generate from Task List.</div></div>'; setView(h,tok); return; }
   h+='<div style="margin-bottom:8px"><button class="btn sm ghost" onclick="deleteSelectedTasks()">Delete selected</button></div>';
   h+='<table><tr><th><input type="checkbox" onclick="toggleAllToday(this)"></th><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
   shown.forEach(function(r){
