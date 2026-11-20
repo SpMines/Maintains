@@ -1,1533 +1,924 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<base target="_top">
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SP Mines &amp; Minerals — Mineral Sourcing &amp; Industrial Supply</title>
+<meta name="description" content="Dependable mineral sourcing, trading and bulk industrial supply. SP Mines & Minerals connects mineral resources with industrial demand."/>
+<meta name="theme-color" content="#171A18"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet"/>
 <style>
-  :root{
-    --white:#1d1d29; --ink:#eef0f6; --muted:#9a9cb2; --line:#33334a; --band:#26263a;
-    --green:#7ddc8f; --greenbg:rgba(46,125,50,.20);
-    --amber:#f0cf72; --amberbg:rgba(138,109,0,.22);
-    --red:#ff8a80;   --redbg:rgba(179,38,30,.20);
-    --blue:#8ab4ff;  --bluebg:rgba(45,108,255,.18);
-    --grey:#b9bbcf;  --greybg:rgba(255,255,255,.08);
-    --acc1:#6d3bff;  --acc2:#2d6cff;   /* purple -> blue accent */
-    --accgrad:linear-gradient(90deg,#7d52ff,#3d7bff);
-    --shadow:0 1px 3px rgba(0,0,0,.30),0 1px 2px rgba(0,0,0,.25);
-  }
-  *{box-sizing:border-box;font-family:'Jost',sans-serif;margin:0;padding:0}
-  html,body{-webkit-text-size-adjust:100%}
-  body{background:linear-gradient(160deg,#0e0e14 0%,#14141f 45%,#191926 100%);background-attachment:fixed;color:var(--ink);font-size:14px;line-height:1.5;min-height:100dvh}
-  /* full-width app: stretches 100% on desktop, edge-to-edge on mobile */
-  .wrap{width:100%;max-width:100%;margin:0;min-height:100dvh;
-        background:linear-gradient(165deg,#191924 0%,#16161f 100%);
-        padding:18px 30px 90px}
-  @media (min-width:900px){ .wrap{padding:22px 40px 90px} }
-  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;
-             background:linear-gradient(135deg,#17171d 0%,#26263a 60%,#1a1a2e 100%);
-             padding:12px 14px;border-radius:14px;margin-bottom:16px;flex-wrap:wrap;
-             box-shadow:0 4px 18px rgba(20,20,40,.22)}
-  header.top h1{font-weight:800;font-size:20px;letter-spacing:.5px;color:#fff}
-  .htitle{display:flex;align-items:center;gap:10px}
-  header.top .search input{background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.18);color:#fff}
-  header.top .search input::placeholder{color:rgba(255,255,255,.55)}
-  .search{flex:1;min-width:200px;max-width:460px;display:flex;gap:8px;align-items:center}
-  .search input{flex:1;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#15151e;color:var(--ink)}
-  .synclbl{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);white-space:nowrap}
-  .syncDot{width:8px;height:8px;border-radius:50%;background:var(--grey);display:inline-block}
-  .syncDot.on{background:var(--green);animation:pulseDot 2s infinite}
-  @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.35}}
-  .hamb{display:none;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.28);border-radius:10px;
-        font-size:20px;line-height:1;cursor:pointer;color:#fff;padding:7px 11px}
-  .navhead{display:none}
-  .navbackdrop{display:none}
-  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-  nav.tabs button{padding:9px 15px;border:1px solid var(--line);background:var(--white);border-radius:22px;cursor:pointer;font-weight:500;font-size:13px;color:var(--muted);white-space:nowrap}
-  nav.tabs button.active{background:var(--accgrad);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(109,59,255,.25)}
-  .btn{padding:9px 15px;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;cursor:pointer;font-weight:500;font-size:13px}
-  .btn:not(.ghost){background:var(--accgrad);border-color:transparent}
-  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-  .btn.sm{padding:6px 11px;font-size:12px}
-  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:22px}
-  .card{border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);background:var(--band)}
-  .card .k{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.2px}
-  .card .v{font-size:26px;font-weight:700;margin-top:4px}
-  .card.warn .v{color:var(--amber)} .card.bad .v{color:var(--red)} .card.ok .v{color:var(--green)} .card.info .v{color:var(--blue)}
-  .section{margin-bottom:26px}
-  .section h2{font-size:15px;font-weight:600;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
-  td .btn,td .pill{vertical-align:middle}
-  td:last-child{text-align:right;white-space:nowrap}
-  th{background:var(--band);font-weight:600;color:var(--muted);font-size:11px;letter-spacing:.2px}
-  tr:hover td{background:rgba(255,255,255,.04)}
-  .pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
-  .pill.green{background:var(--greenbg);color:var(--green)} .pill.amber{background:var(--amberbg);color:var(--amber)}
-  .pill.red{background:var(--redbg);color:var(--red)} .pill.grey{background:var(--greybg);color:var(--grey)} .pill.blue{background:var(--bluebg);color:var(--blue)}
-  .link{color:var(--blue);cursor:pointer;text-decoration:none;font-weight:500}
-  .link:hover{text-decoration:underline}
-  .empty{color:var(--muted);padding:18px;text-align:center;font-style:italic}
-  .row{display:flex;gap:14px;flex-wrap:wrap}
-  .col{flex:1;min-width:260px}
-  label.f{display:block;font-size:12px;color:var(--muted);font-weight:500;margin:10px 0 3px}
-  input.f,select.f,textarea.f{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#15151e;color:var(--ink)}
-  textarea.f{min-height:64px;resize:vertical}
-  .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;z-index:50}
-  .modal-bg.show{display:flex}
-  .modal{background:#1e1e2c;border-radius:14px;width:100%;max-width:640px;padding:22px;box-shadow:0 10px 40px rgba(0,0,0,.2)}
-  .modal h3{font-size:17px;font-weight:600;margin-bottom:4px}
-  .modal .close{float:right;cursor:pointer;color:var(--muted);font-size:20px;line-height:1}
-  .chkitem{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
-  .chkitem .q{font-weight:500;margin-bottom:8px}
-  .chkitem.abn{border-color:var(--red);background:var(--redbg)}
-  .kv{display:grid;grid-template-columns:180px 1fr;gap:6px 14px;font-size:13px}
-  .kv .kk{color:var(--muted);font-weight:500}
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:11px 18px;border-radius:8px;font-size:13px;opacity:0;transition:.3s;z-index:99}
-  .gload{position:fixed;inset:0;background:rgba(10,10,16,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center}
-  .gload.on{display:flex}
-  .gload .glbox{display:flex;flex-direction:column;align-items:center;gap:10px;background:#1c1c2a;color:#fff;padding:18px 26px;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.45);font-size:13px;font-weight:500;border:1px solid rgba(255,255,255,.08)}
-  .gload .sp{width:26px;height:26px;border:3px solid rgba(125,82,255,.25);border-top-color:#7d52ff;border-right-color:#3d7bff;border-radius:50%;animation:spin .7s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .toast.show{opacity:1}
-  .loader{text-align:center;padding:60px;color:var(--muted);font-weight:600;letter-spacing:2px;animation:pulse 1.2s infinite}
-  @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
-  .subtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-  .subtabs button{padding:5px 11px;border:1px solid var(--line);background:transparent;border-radius:14px;cursor:pointer;font-size:12px;color:var(--muted)}
-  .subtabs button.active{background:var(--band);color:var(--ink);font-weight:600}
-  /* skeleton loaders */
-  .sk{background:linear-gradient(90deg,#23232f 25%,#2c2c3c 37%,#23232f 63%);background-size:400% 100%;animation:skmove 1.3s ease infinite;border-radius:8px}
-  @keyframes skmove{0%{background-position:100% 0}100%{background-position:-100% 0}}
-  .sk-card{border:1px solid var(--line);border-radius:14px;padding:14px 16px}
-  .sk-line{height:12px;margin:7px 0}
-  /* error card */
-  .errcard{border:1px solid var(--line);background:var(--band);border-radius:14px;padding:22px;text-align:center;box-shadow:var(--shadow);margin-top:10px}
-  .errcard .ei{font-size:30px;margin-bottom:6px}
-  .errcard .em{color:var(--muted);font-size:13px;margin:6px 0 14px}
+/* ============================================================
+   SP MINES & MINERALS — shared styles (multi-page)
+   Theme via :root vars (swap these to reskin for another brand)
+   ============================================================ */
+:root{
+  --obsidian:#171a18; --charcoal:#292c28; --slate:#343832;
+  --stone:#75634e; --copper:#b47745; --copper-dark:#9e6436;
+  --sandstone:#d0c5b2; --mineral:#f2efe8; --white:#fff;
+  --accent:var(--copper); --accent-dark:var(--copper-dark);
+  --ink:var(--obsidian); --bg:var(--mineral); --dark:var(--obsidian);
+  --maxw:1280px; --ease:cubic-bezier(.22,1,.36,1);
+  --font-head:"Manrope",system-ui,sans-serif;
+  --font-body:"Inter",system-ui,sans-serif;
+  --font-disp:"Space Grotesk",system-ui,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--font-head);line-height:1.08;letter-spacing:-.01em}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#fff}
+.container{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 clamp(24px,4vw,48px)}
+.section{padding:clamp(64px,9vw,104px) 0}
+.hidden{display:none!important}
 
-  /* ===================== MOBILE / RESPONSIVE ===================== */
-  @media (max-width: 760px){
-    .wrap{width:100%;max-width:100%;margin:0;padding:12px 14px 90px;box-shadow:none;border-radius:0}
-    .hamb{display:block}
-    header.top{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px}
-    .htitle{flex:1;min-width:0}
-    header.top h1{font-size:18px}
-    .search{order:2;flex-basis:100%;max-width:100%;min-width:0}
-    /* nav becomes a left slide-in drawer */
-    .navbackdrop.show{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150}
-    nav.tabs{position:fixed;top:0;left:0;bottom:0;width:75%;max-width:300px;background:#16161f;z-index:160;
-             flex-direction:column;gap:4px;padding:14px;margin:0;overflow-y:auto;
-             transform:translateX(-105%);transition:transform .25s ease;box-shadow:6px 0 30px rgba(0,0,0,.18)}
-    nav.tabs.open{transform:translateX(0)}
-    nav.tabs button{width:100%;text-align:left;border-radius:10px;padding:13px 14px;font-size:15px}
-    .navhead{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:16px;padding:2px 4px 10px;border-bottom:1px solid var(--line);margin-bottom:6px}
-    .navx{cursor:pointer;color:var(--muted);font-size:22px}
-    header.top{flex-direction:column;align-items:stretch;gap:10px;padding:10px 0}
-    header.top h1{font-size:22px;text-align:center}
-    .search{max-width:100%;min-width:0}
-    /* tabs scroll horizontally instead of wrapping into many rows */
-    nav.tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:6px;margin-bottom:14px}
-    nav.tabs::-webkit-scrollbar{height:0}
-    nav.tabs button{flex:0 0 auto}
-    /* stat cards: 2 per row on phone */
-    .cards{grid-template-columns:repeat(2,1fr);gap:10px}
-    .card .v{font-size:22px}
-    /* tables scroll sideways inside their section (no page-wide overflow) */
-    .section{overflow-x:auto;-webkit-overflow-scrolling:touch}
-    table{min-width:600px}
-    .section h2{font-size:14px}
-    /* bigger touch targets */
-    .btn{padding:11px 16px;font-size:14px}
-    .btn.sm{padding:8px 12px;font-size:13px}
-    nav.tabs button{padding:10px 16px;font-size:14px}
-    /* modal fills the screen nicely */
-    .modal-bg{padding:0;align-items:flex-end}
-    .modal{max-width:100%;border-radius:16px 16px 0 0;max-height:92vh;overflow:auto}
-    .row{flex-direction:column;gap:0}
-    .col{min-width:0}
-    .kv{grid-template-columns:130px 1fr}
-  }
-  @media (max-width: 400px){
-    .cards{grid-template-columns:1fr}
-    .kv{grid-template-columns:110px 1fr;font-size:12px}
-  }
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--accent)}
+.eyebrow::before{content:"";width:32px;height:2px;background:var(--accent)}
+.eyebrow.center{justify-content:center}
+.sec-head{max-width:640px}
+.sec-head.center{margin:0 auto;text-align:center}
+.sec-head h2{margin-top:18px;font-size:clamp(1.8rem,4.4vw,2.7rem);font-weight:800}
+.sec-head p{margin-top:16px;font-size:1rem;line-height:1.7;color:rgba(52,56,50,.8)}
+.sec-head.light h2{color:var(--mineral)}
+.sec-head.light p{color:rgba(242,239,232,.65)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 28px;font-size:12px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;border-radius:3px;border:1px solid transparent;cursor:pointer;transition:all .3s var(--ease);font-family:var(--font-body)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dark);box-shadow:0 14px 30px -12px rgba(180,119,69,.6)}
+.btn-light{border-color:rgba(255,255,255,.4);color:#fff}
+.btn-light:hover{border-color:#fff;background:rgba(255,255,255,.1)}
+.btn-dark{border-color:rgba(23,26,24,.25);color:var(--ink)}
+.btn-dark:hover{background:var(--ink);color:var(--mineral)}
+.btn-ghost{border-color:rgba(180,119,69,.5);color:var(--accent)}
+.btn-ghost:hover{background:var(--accent);color:#fff}
+.btn.sm{padding:10px 18px;font-size:11px}
+
+/* header */
+.header{position:fixed;inset:0 0 auto 0;z-index:50;padding:18px 0;transition:all .45s var(--ease);background:linear-gradient(to bottom,rgba(23,26,24,.72),transparent)}
+.header.solid,.header.scrolled{padding:10px 0;background:rgba(23,26,24,.97);backdrop-filter:blur(8px);box-shadow:0 8px 30px -18px rgba(0,0,0,.9)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.brand .mark{width:38px;height:38px;flex-shrink:0}
+.brand .word{display:flex;flex-direction:column;line-height:1}
+.brand .word b{font-family:var(--font-head);font-size:1.02rem;font-weight:800;color:#fff;letter-spacing:-.01em}
+.brand .word b span{font-weight:600;margin-left:4px}
+.brand .word small{margin-top:5px;font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.nav-links{display:flex;align-items:center;gap:26px;list-style:none}
+.nav-links a{position:relative;font-size:13px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(242,239,232,.85);transition:color .3s}
+.nav-links a:hover,.nav-links a.active{color:var(--accent)}
+.nav-links a.active::after{content:"";position:absolute;left:0;bottom:-7px;width:100%;height:2px;background:var(--accent)}
+.header-cta{padding:11px 22px}
+.burger{display:none;background:none;border:none;color:var(--mineral);cursor:pointer;padding:6px}
+.burger svg{width:26px;height:26px}
+.mobile-menu{position:fixed;inset:0;z-index:49;background:var(--obsidian);display:flex;flex-direction:column;justify-content:center;padding:0 clamp(24px,6vw,48px);transform:translateX(100%);transition:transform .4s var(--ease)}
+.mobile-menu.open{transform:translateX(0)}
+.mobile-menu a{padding:14px 0;border-bottom:1px solid rgba(255,255,255,.06);font-family:var(--font-head);font-size:1.3rem;font-weight:700;color:var(--mineral)}
+.mobile-menu a.active{color:var(--accent)}
+.mobile-menu .btn{margin-top:24px}
+
+/* page hero */
+.phero{position:relative;display:flex;align-items:flex-end;overflow:hidden;min-height:60vh}
+.phero.home{min-height:100svh}
+.phero .bg{position:absolute;inset:0}
+.phero .bg img{width:100%;height:100%;object-fit:cover;animation:zoom 1.6s var(--ease) both}
+@keyframes zoom{from{transform:scale(1.12)}to{transform:scale(1)}}
+.phero .ov{position:absolute;inset:0;background:linear-gradient(to top,var(--obsidian),rgba(23,26,24,.55) 45%,rgba(23,26,24,.3))}
+.phero .inner{position:relative;z-index:2;padding:150px 0 70px}
+.phero.home .inner{padding:160px 0 110px}
+.phero h1{margin-top:20px;max-width:16ch;color:var(--mineral);font-weight:800;letter-spacing:-.02em;font-size:clamp(2.4rem,6vw,4rem)}
+.phero.home h1{font-size:clamp(2.6rem,7vw,4.6rem)}
+.phero h1 .accent{color:var(--accent)}
+.phero p{margin-top:20px;max-width:46ch;color:rgba(242,239,232,.78);font-size:clamp(1rem,2vw,1.12rem);line-height:1.7}
+.phero .actions{margin-top:32px;display:flex;flex-wrap:wrap;gap:14px}
+.crumbs{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(242,239,232,.6)}
+.crumbs a:hover{color:var(--accent)}.crumbs .sep{opacity:.5}
+.scroll-ind{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:2;width:24px;height:40px;border:1px solid rgba(242,239,232,.4);border-radius:999px;display:flex;justify-content:center;padding-top:7px}
+.scroll-ind span{width:4px;height:8px;background:var(--accent);border-radius:999px;animation:dot 1.8s ease-in-out infinite}
+@keyframes dot{0%{transform:translateY(0);opacity:0}40%{opacity:1}100%{transform:translateY(16px);opacity:0}}
+
+.bg-min{background:var(--mineral)}.bg-sand{background:rgba(208,197,178,.4)}
+.bg-dark{background:var(--obsidian);color:var(--mineral)}.bg-char{background:var(--charcoal);color:var(--mineral)}
+
+.split{display:grid;gap:clamp(32px,5vw,64px);align-items:center}
+@media(min-width:1024px){.split{grid-template-columns:1fr 1fr}}
+.media{position:relative;border-radius:4px;overflow:hidden}
+.media.r45{aspect-ratio:4/5}.media.r43{aspect-ratio:4/3}
+.media img{width:100%;height:100%;object-fit:cover}
+.media-frame::after{content:"";position:absolute;right:-22px;bottom:-22px;width:150px;height:150px;border-right:3px solid var(--accent);border-bottom:3px solid var(--accent)}
+@media(max-width:1024px){.media-frame::after{display:none}}
+.chips{margin-top:28px;display:grid;gap:12px 32px;grid-template-columns:1fr 1fr;list-style:none}
+.chips li{display:flex;align-items:center;gap:12px;font-size:.9rem;font-weight:500;color:var(--slate)}
+.chips li::before{content:"";width:6px;height:6px;border-radius:999px;background:var(--accent);flex-shrink:0}
+.prose p{font-size:1rem;line-height:1.75;color:rgba(52,56,50,.85)}.prose p+p{margin-top:16px}
+
+.grid{display:grid;gap:24px}
+.grid.c4{grid-template-columns:repeat(4,1fr)}.grid.c3{grid-template-columns:repeat(3,1fr)}.grid.c2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1024px){.grid.c4,.grid.c3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.grid.c4,.grid.c3,.grid.c2{grid-template-columns:1fr}}
+
+.card{display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid rgba(23,26,24,.1);border-radius:4px;box-shadow:0 18px 50px -26px rgba(23,26,24,.5);transition:border-color .4s,transform .4s}
+.card:hover{border-color:rgba(180,119,69,.4);transform:translateY(-4px)}
+.card .thumb{position:relative;aspect-ratio:4/3;overflow:hidden}
+.card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.card:hover .thumb img{transform:scale(1.08)}
+.card .tag{position:absolute;top:14px;left:14px;padding:5px 12px;border-radius:3px;background:rgba(23,26,24,.8);color:var(--mineral);backdrop-filter:blur(4px);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+.card .body{padding:22px;display:flex;flex-direction:column;flex:1}
+.card .body h3{font-size:1.18rem;font-weight:700}
+.card .body p{margin-top:8px;flex:1;font-size:.875rem;line-height:1.6;color:rgba(52,56,50,.75)}
+.card .foot{margin-top:18px;padding-top:16px;border-top:1px solid rgba(23,26,24,.1);display:flex;align-items:center;gap:12px}
+.card .foot a{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;display:inline-flex;align-items:center;gap:6px;transition:color .3s}
+.card .foot .enq{margin-left:auto;color:var(--accent)}
+.card .foot a:hover{color:var(--accent)}
+
+/* strengths / why */
+.strata{position:relative;overflow:hidden}
+.strata::before{content:"";position:absolute;inset:0;opacity:.1;background:repeating-linear-gradient(115deg,transparent 0 60px,rgba(180,119,69,.4) 60px 61px),radial-gradient(circle at 70% 30%,rgba(117,99,78,.5),transparent 60%)}
+.cells{display:grid;gap:1px;border:1px solid rgba(255,255,255,.1);border-radius:4px;overflow:hidden;background:rgba(255,255,255,.1)}
+.cells.c4{grid-template-columns:repeat(4,1fr)}.cells.c5{grid-template-columns:repeat(5,1fr)}.cells.c3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:1024px){.cells.c4,.cells.c5,.cells.c3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.cells.c4,.cells.c5,.cells.c3{grid-template-columns:1fr}}
+.cell{background:var(--obsidian);padding:30px;transition:background .4s}
+.cell:hover{background:var(--charcoal)}
+.cell .top{display:flex;align-items:center;justify-content:space-between}
+.cell .top svg{width:26px;height:26px;color:var(--accent)}
+.cell .num{font-family:var(--font-disp);font-size:1.7rem;font-weight:700;color:rgba(255,255,255,.14)}
+.cell h3{margin-top:18px;font-size:1.02rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mineral)}
+.cell p{margin-top:10px;font-size:.85rem;line-height:1.55;color:rgba(242,239,232,.6)}
+
+/* industries / applications */
+.imgcard{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:4px}
+.imgcard img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.imgcard:hover img{transform:scale(1.08)}
+.imgcard .cap{position:absolute;inset:auto 0 0 0;padding:22px;background:linear-gradient(to top,var(--obsidian),rgba(23,26,24,.3),transparent)}
+.imgcard .cap h3{color:var(--mineral);font-size:1.05rem;font-weight:700}
+.imgcard .cap .line{display:block;margin-top:10px;width:36px;height:3px;background:var(--accent)}
+
+/* steps */
+.steps{display:flex;flex-direction:column;gap:22px}
+.step{display:flex;gap:18px}
+.step .ic{flex-shrink:0;width:48px;height:48px;border:1px solid rgba(180,119,69,.4);border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.step .ic svg{width:20px;height:20px}
+.step .no{font-family:var(--font-disp);font-size:12px;font-weight:700;color:var(--accent)}
+.step h3{margin-top:2px;font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.step p{margin-top:4px;font-size:.875rem;line-height:1.6;color:rgba(242,239,232,.6)}
+
+/* gallery */
+.masonry{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.masonry{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:440px){.masonry{grid-template-columns:1fr}}
+.masonry .g{position:relative;border-radius:4px;overflow:hidden;cursor:pointer;width:100%;border:none;padding:0;background:var(--charcoal);aspect-ratio:4/3}
+.masonry .g img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.masonry .g:hover img{transform:scale(1.08)}
+.masonry .g::after{content:"";position:absolute;inset:0;background:rgba(23,26,24,0);transition:background .5s}
+.masonry .g:hover::after{background:rgba(23,26,24,.25)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+.filters button{background:#fff;border:1px solid rgba(23,26,24,.15);border-radius:3px;padding:9px 18px;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--slate);cursor:pointer;transition:all .3s}
+.filters button.active,.filters button:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.lightbox{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(23,26,24,.95)}
+.lightbox.open{display:flex}
+.lightbox img{max-width:min(960px,92vw);max-height:82vh;object-fit:contain;border-radius:4px}
+.lb-btn{position:absolute;background:none;border:1px solid rgba(255,255,255,.2);color:var(--mineral);border-radius:999px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}
+.lb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lb-close{top:20px;right:20px}.lb-prev{left:16px;top:50%;transform:translateY(-50%)}.lb-next{right:16px;top:50%;transform:translateY(-50%)}
+.lb-btn svg{width:22px;height:22px}
+
+/* blog */
+.blog-grid{display:grid;gap:28px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:1024px){.blog-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){.blog-grid{grid-template-columns:1fr}}
+.post-card{display:flex;flex-direction:column;background:#fff;border:1px solid rgba(23,26,24,.1);border-radius:4px;overflow:hidden;transition:transform .4s,border-color .4s}
+.post-card:hover{transform:translateY(-4px);border-color:rgba(180,119,69,.4)}
+.post-card .thumb{aspect-ratio:16/10;overflow:hidden}
+.post-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.post-card:hover .thumb img{transform:scale(1.07)}
+.post-card .body{padding:22px;display:flex;flex-direction:column;flex:1}
+.post-card .meta{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--stone)}
+.post-card h3{margin-top:10px;font-size:1.2rem;font-weight:700;line-height:1.25}
+.post-card p{margin-top:10px;flex:1;font-size:.9rem;line-height:1.6;color:rgba(52,56,50,.75)}
+.post-card .more{margin-top:16px;font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:6px}
+.article{max-width:760px;margin:0 auto}
+.article h2{margin:36px 0 14px;font-size:1.6rem;font-weight:800}
+.article h3{margin:28px 0 10px;font-size:1.25rem;font-weight:700}
+.article p{margin-top:14px;font-size:1.05rem;line-height:1.8;color:rgba(52,56,50,.88)}
+.article ul{margin:14px 0 14px 22px}.article li{margin-top:8px;line-height:1.7}
+.article img{margin:24px 0;border-radius:4px;width:100%}
+
+/* contact */
+.contact-grid{display:grid;gap:clamp(32px,5vw,64px)}
+@media(min-width:1024px){.contact-grid{grid-template-columns:5fr 7fr}}
+.info-row{display:flex;gap:16px;align-items:flex-start;padding:16px;border:1px solid rgba(23,26,24,.1);border-radius:4px;background:#fff;transition:border-color .3s}
+.info-row:hover{border-color:rgba(180,119,69,.4)}
+.info-row .ic{flex-shrink:0;width:40px;height:40px;border-radius:4px;background:var(--obsidian);color:var(--accent);display:flex;align-items:center;justify-content:center}
+.info-row .ic svg{width:20px;height:20px}
+.info-row small{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--stone)}
+.info-row p{margin-top:4px;font-size:.9rem;font-weight:500;color:var(--ink)}
+.info-list{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.form-wrap{background:#fff;border:1px solid rgba(23,26,24,.1);border-radius:4px;box-shadow:0 18px 50px -26px rgba(23,26,24,.5);padding:clamp(24px,4vw,40px)}
+.form-grid{display:grid;gap:18px;grid-template-columns:1fr 1fr}
+@media(max-width:560px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px}.field.full{grid-column:1/-1}
+.field label{font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--slate)}
+.field label .req{color:var(--accent)}
+.field input,.field select,.field textarea{border:1px solid rgba(23,26,24,.15);border-radius:3px;padding:12px 15px;font-family:inherit;font-size:.9rem;color:var(--ink);background:#fff;outline:none;transition:border-color .3s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+.field .err{font-size:12px;color:#c0392b}.field .invalid{border-color:#e06666}
+.form-note{margin-bottom:20px;border:1px solid rgba(180,119,69,.25);background:rgba(180,119,69,.06);border-radius:3px;padding:12px 15px;font-size:12px;line-height:1.6;color:var(--stone)}
+.form-ok{text-align:center;padding:24px 8px}
+.form-ok svg{width:48px;height:48px;color:var(--accent);margin:0 auto}
+.form-ok h3{margin-top:16px;font-size:1.4rem;font-weight:700}
+.form-ok p{margin:12px auto 0;max-width:46ch;font-size:.9rem;line-height:1.6;color:var(--stone)}
+.wa-btn{display:inline-flex;align-items:center;gap:10px;margin-top:18px;background:#25d366;color:#fff;padding:12px 22px;border-radius:3px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;transition:filter .3s}
+.wa-btn:hover{filter:brightness(.92)}.wa-btn svg{width:18px;height:18px}
+
+/* footer */
+.footer{background:var(--obsidian);color:var(--mineral)}
+.footer .top{display:grid;gap:40px;padding:clamp(56px,7vw,80px) 0}
+@media(min-width:768px){.footer .top{grid-template-columns:2fr 1fr 1.5fr 1.5fr}}
+.footer h4{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--accent)}
+.footer ul{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:11px}
+.footer .cols2{display:grid;grid-template-columns:1fr 1fr;gap:11px 22px}
+.footer a{font-size:.9rem;color:rgba(242,239,232,.7);transition:color .3s}.footer a:hover{color:#fff}
+.footer .desc{margin-top:18px;max-width:36ch;font-size:.875rem;line-height:1.7;color:rgba(242,239,232,.6)}
+.footer .bottom{border-top:1px solid rgba(255,255,255,.1);padding:22px 0;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.footer .bottom small{font-size:12px;color:rgba(242,239,232,.45)}
+.to-top{background:none;border:none;color:rgba(242,239,232,.6);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;transition:color .3s}
+.to-top:hover{color:var(--accent)}
+.to-top .circ{width:28px;height:28px;border:1px solid rgba(255,255,255,.2);border-radius:999px;display:inline-flex;align-items:center;justify-content:center;transition:border-color .3s}
+.to-top:hover .circ{border-color:var(--accent)}.to-top svg{width:14px;height:14px}
+
+.note{font-size:13px;line-height:1.6;color:var(--stone)}.note.center{text-align:center;max-width:60ch;margin:0 auto}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.visible{opacity:1;transform:none}
+img.img-fallback{background:linear-gradient(135deg,var(--charcoal),var(--stone) 55%,var(--slate))!important}
+.mark path{stroke-linejoin:round}
+
+/* ===== ADMIN PANEL ===== */
+.admin-body{background:#13100d;color:#e9e4da;min-height:100vh;font-family:var(--font-body)}
+.admin-login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.admin-card{width:100%;max-width:400px;background:#1c1915;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:34px}
+.admin-card h1{font-size:1.4rem;font-weight:800;color:#fff}
+.admin-card p{margin-top:8px;font-size:.85rem;color:#9a9186}
+.admin-card .field{margin-top:18px}
+.admin-card .field label{color:#9a9186}
+.admin-card input{background:#13100d;border-color:rgba(255,255,255,.12);color:#fff}
+.admin-shell{display:flex;min-height:100vh}
+.admin-side{width:240px;background:#1c1915;border-right:1px solid rgba(255,255,255,.08);padding:24px 16px;flex-shrink:0;display:flex;flex-direction:column}
+.admin-side .logo{display:flex;align-items:center;gap:10px;padding:0 8px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.admin-side .logo b{font-family:var(--font-head);font-weight:800;color:#fff;font-size:.95rem}
+.admin-nav{margin-top:16px;display:flex;flex-direction:column;gap:4px;flex:1}
+.admin-nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;color:#b7afa3;padding:11px 12px;border-radius:6px;font-size:.9rem;font-weight:500;cursor:pointer;transition:all .2s}
+.admin-nav button:hover{background:rgba(255,255,255,.04);color:#fff}
+.admin-nav button.active{background:var(--accent);color:#fff}
+.admin-nav button svg{width:18px;height:18px}
+.admin-main{flex:1;min-width:0}
+.admin-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 28px;background:#1c1915;border-bottom:1px solid rgba(255,255,255,.08)}
+.admin-top h2{font-size:1.1rem;font-weight:700;color:#fff}
+.admin-top .right{display:flex;align-items:center;gap:12px}
+.admin-burger{display:none;background:none;border:none;color:#e9e4da;cursor:pointer}
+.admin-content{padding:28px;max-width:1000px}
+.a-btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:10px 18px;font-size:.85rem;font-weight:600;cursor:pointer;transition:background .2s}
+.a-btn:hover{background:var(--accent-dark)}
+.a-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:#e9e4da}
+.a-btn.ghost:hover{background:rgba(255,255,255,.06)}
+.a-btn.danger{background:#7a2e22}.a-btn.danger:hover{background:#8f372a}
+.a-btn svg{width:16px;height:16px}
+.panel{display:none}.panel.active{display:block}
+.a-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.a-list{display:flex;flex-direction:column;gap:10px}
+.a-item{display:flex;align-items:center;gap:14px;background:#1c1915;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 14px}
+.a-item img{width:56px;height:46px;object-fit:cover;border-radius:4px;flex-shrink:0;background:#2a2620}
+.a-item .info{flex:1;min-width:0}
+.a-item .info b{display:block;color:#fff;font-size:.95rem;font-weight:600}
+.a-item .info span{font-size:.8rem;color:#9a9186}
+.a-item .acts{display:flex;gap:8px}
+.icon-btn{background:none;border:1px solid rgba(255,255,255,.14);color:#cfc7bb;width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent)}
+.icon-btn svg{width:16px;height:16px}
+.a-field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.a-field label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#9a9186}
+.a-field input,.a-field select,.a-field textarea{background:#13100d;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:11px 13px;color:#fff;font-family:inherit;font-size:.9rem;outline:none;transition:border-color .2s}
+.a-field input:focus,.a-field select:focus,.a-field textarea:focus{border-color:var(--accent)}
+.a-grid2{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media(max-width:620px){.a-grid2{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;z-index:60;display:none;align-items:flex-start;justify-content:center;padding:40px 16px;background:rgba(0,0,0,.6);overflow-y:auto}
+.modal.open{display:flex}
+.modal .box{width:100%;max-width:640px;background:#1c1915;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:26px}
+.modal h3{font-size:1.15rem;font-weight:700;color:#fff;margin-bottom:18px}
+.modal .foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#1c1915;border:1px solid var(--accent);color:#fff;padding:12px 22px;border-radius:8px;font-size:.9rem;opacity:0;pointer-events:none;transition:all .3s;z-index:80}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.admin-note{background:rgba(180,119,69,.1);border:1px solid rgba(180,119,69,.3);border-radius:8px;padding:14px 16px;font-size:.85rem;line-height:1.6;color:#d8cfc2;margin-bottom:22px}
+.muted{color:#9a9186;font-size:.85rem}
+.chip{display:inline-block;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.08);font-size:11px;color:#cfc7bb}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}.reveal{opacity:1;transform:none}}
+
+/* nav collapse */
+@media(max-width:1024px){.nav-links{display:none}.burger{display:inline-flex}.header-cta{padding:8px 14px;font-size:10px;letter-spacing:.07em}.admin-side{position:fixed;z-index:40;height:100vh;transform:translateX(-100%);transition:transform .3s}.admin-side.open{transform:none}.admin-burger{display:inline-flex}}
+@media(max-width:360px){.header-cta{display:none}}
+
+/* mobile spacing */
+@media(max-width:640px){
+  .phero .inner{padding:122px 26px 72px}
+  .phero.home .inner{padding:124px 26px 88px}
+  .phero h1{font-size:clamp(2rem,8vw,2.6rem);line-height:1.14}
+  .phero.home h1{font-size:clamp(2rem,8.5vw,2.8rem)}
+  .phero p{margin-top:16px}
+  .phero .actions{gap:12px}
+  .sec-head h2{font-size:clamp(1.5rem,7vw,2rem)}
+  .chips{grid-template-columns:1fr}
+}
+@media(max-width:380px){.phero .actions .btn{width:100%}}
+
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header class="top">
-    <div class="htitle">
-      <button class="hamb" id="hambBtn" onclick="toggleMenu()" aria-label="Menu">&#9776;</button>
-      <h1>Asset control center</h1>
+<body data-page="home">
+<div id="site-header"></div>
+
+<section class="phero home">
+  <div class="bg"><img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=2000&q=80" alt="Aerial view of an open-pit mine"/></div>
+  <div class="ov"></div>
+  <div class="container inner">
+    <span class="eyebrow">Mineral Resources · Industrial Supply</span>
+    <h1 id="hero-title">Powering industry through earth's <span class="accent">resources.</span></h1>
+    <p id="hero-text">Connecting mineral resources with industrial demand through dependable sourcing, quality-focused supply and business relationships.</p>
+    <div class="actions">
+      <a href="minerals.html" class="btn btn-primary">Explore Our Minerals <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      <a href="contact.html" class="btn btn-light">Contact Our Team</a>
     </div>
-    <div class="search">
-      <input id="q" placeholder="Search asset / issue / bill / task / vendor..." onkeydown="if(event.key==='Enter')doSearch()">
-      <button class="btn" onclick="doSearch()">Search</button>
+  </div>
+  <div class="scroll-ind"><span></span></div>
+</section>
+
+<section class="section bg-min">
+  <div class="container split">
+    <div class="reveal"><div class="media r45 media-frame"><img src="https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=1200&q=80" alt="Open-pit mine terraces"/></div></div>
+    <div class="reveal">
+      <div class="sec-head"><span class="eyebrow">Who We Are</span><h2>Grounded in resources.<br/>Driven by reliability.</h2><p id="about-text">SP Mines &amp; Minerals is a mineral-focused business engaged in mineral resources, sourcing, trading and supply — working to connect dependable material with industrial demand.</p></div>
+      <ul class="chips"><li>Business relationships</li><li>Mineral sourcing</li><li>Supply capability</li><li>Industrial demand</li><li>Professional service</li></ul>
+      <a href="about.html" class="btn btn-dark" style="margin-top:32px">Discover Our Company <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
     </div>
-  </header>
+  </div>
+</section>
 
-  <div class="navbackdrop" id="navBackdrop" onclick="closeMenu()"></div>
-  <nav class="tabs" id="tabs">
-    <div class="navhead">Menu <span class="navx" onclick="closeMenu()">&times;</span></div>
-    <button data-t="dashboard" class="active" onclick="go('dashboard');closeMenu()">Dashboard</button>
-    <button data-t="today" onclick="go('today');closeMenu()">Today's work</button>
-    <button data-t="done" onclick="go('done');closeMenu()">Recent done</button>
-    <button data-t="assets" onclick="go('assets');closeMenu()">Assets</button>
-    <button data-t="issues" onclick="go('issues');closeMenu()">Issues / breakdowns</button>
-    <button data-t="bills" onclick="go('bills');closeMenu()">Bills</button>
-    <button data-t="reports" onclick="go('reports');closeMenu()">Reports</button>
-    <button data-t="manage" onclick="go('manage');closeMenu()">Manage</button>
-  </nav>
+<section class="section bg-sand">
+  <div class="container">
+    <div class="sec-head reveal"><span class="eyebrow">Our Materials</span><h2>Minerals that move industries.</h2><p>A sample portfolio — editable in the admin panel, illustrative until inventory is confirmed.</p></div>
+    <div class="grid c4" id="mineral-grid" style="margin-top:52px"></div>
+    <div style="text-align:center;margin-top:44px"><a href="minerals.html" class="btn btn-ghost">View Full Catalogue <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  </div>
+</section>
 
-  <div id="view"><div class="loader">Loading</div></div>
-</div>
+<section class="section bg-dark strata">
+  <div class="container" style="position:relative">
+    <div class="sec-head light reveal"><span class="eyebrow">Why SP Mines &amp; Minerals</span><h2>Built on trust.<br/>Driven by material.</h2></div>
+    <div class="cells c4 reveal" style="margin-top:52px">
+      <div class="cell"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg><span class="num">01</span></div><h3>Sourcing</h3><p>Connecting mineral requirements with appropriate sourcing opportunities.</p></div>
+      <div class="cell"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="num">02</span></div><h3>Reliability</h3><p>Business-focused supply coordination and professional communication.</p></div>
+      <div class="cell"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12l4 6-10 13L2 9z"/></svg><span class="num">03</span></div><h3>Quality Focus</h3><p>Attention to material requirements and specifications.</p></div>
+      <div class="cell"><div class="top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17 2 2a1 1 0 0 0 3-3M18 15l-5-5"/></svg><span class="num">04</span></div><h3>Relationships</h3><p>Long-term connections with customers, suppliers and partners.</p></div>
+    </div>
+  </div>
+</section>
 
-<!-- generic modal -->
-<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
-<div class="gload" id="gload"><div class="glbox"><span class="sp"></span>Loading...</div></div>
-<div class="toast" id="toast"></div>
+<section class="relative" style="position:relative;overflow:hidden;background:var(--charcoal);color:var(--mineral)">
+  <div style="display:grid" class="band-grid">
+    <div style="position:relative;min-height:320px"><img src="https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?auto=format&fit=crop&w=1400&q=80" alt="Industrial loading" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/><div style="position:absolute;inset:0;background:linear-gradient(to right,rgba(41,44,40,.4),var(--charcoal))"></div></div>
+    <div style="padding:clamp(48px,7vw,96px) clamp(24px,5vw,64px)">
+      <div class="sec-head light reveal"><span class="eyebrow">Sourcing &amp; Supply</span><h2>A dependable link between resources and requirements.</h2></div>
+      <div class="steps reveal" style="margin-top:36px">
+        <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="16" rx="2"/><path d="M8 2h8v4H8zM9 12h6"/></svg></div><div><span class="no">01</span><h3>Requirement</h3><p>Understand buyer material requirements.</p></div></div>
+        <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div><div><span class="no">02</span><h3>Sourcing</h3><p>Identify relevant material sourcing opportunities.</p></div></div>
+        <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="15" width="6" height="6"/><path d="M9 6h6a2 2 0 0 1 2 2v7"/></svg></div><div><span class="no">03</span><h3>Coordination</h3><p>Coordinate commercial and supply requirements.</p></div></div>
+        <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div><span class="no">04</span><h3>Delivery</h3><p>Support the supply process to agreed terms.</p></div></div>
+      </div>
+      <a href="sourcing.html" class="btn btn-primary" style="margin-top:34px">Explore Sourcing <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+    </div>
+  </div>
+</section>
 
+<section class="section bg-min">
+  <div class="container">
+    <div class="sec-head center reveal"><span class="eyebrow center">Earth &amp; Materials</span><h2>A closer look at the material.</h2><p>Illustrative imagery of minerals, ore textures and mining landscapes.</p></div>
+    <div class="masonry" id="gallery-grid" style="margin-top:44px"></div>
+    <div style="text-align:center;margin-top:40px"><a href="gallery.html" class="btn btn-ghost">View Full Gallery <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  </div>
+</section>
+
+<section class="cta-band" style="position:relative;overflow:hidden">
+  <img src="https://images.unsplash.com/photo-1454942901704-3c44c11b2ad1?auto=format&fit=crop&w=2000&q=80" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
+  <div style="position:absolute;inset:0;background:rgba(23,26,24,.85)"></div>
+  <div class="container reveal" style="position:relative;z-index:2;padding:clamp(72px,9vw,104px) 0;display:flex;flex-wrap:wrap;gap:28px;align-items:center;justify-content:space-between">
+    <div style="max-width:620px"><span class="eyebrow">Partner With Us</span><h2 style="margin-top:18px;color:var(--mineral);font-size:clamp(1.9rem,4vw,3rem);font-weight:800">Looking for the right mineral supply partner?</h2><p style="margin-top:16px;color:rgba(242,239,232,.7);line-height:1.7">Let's discuss your material requirements and explore how we can work together.</p></div>
+    <a href="contact.html" class="btn btn-primary">Start a Business Enquiry <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17 17 7M9 7h8v8"/></svg></a>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<style>.band-grid{grid-template-columns:1fr}@media(min-width:1024px){.band-grid{grid-template-columns:1fr 1fr}}</style>
 <script>
-/* ------- tiny helpers ------- */
-var LOOKUPS = null, CURRENT = 'dashboard';
-var _silent = false;
-var _viewToken = 0;   // bumped on every tab change; stale renders are ignored
-function $(id){return document.getElementById(id);}
-function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},2600);}
-function openModal(html){$('modalBox').innerHTML=html;$('modalBg').classList.add('show');}
-function closeModal(){$('modalBg').classList.remove('show');}
-$('modalBg').addEventListener('click',function(e){if(e.target===this)closeModal();});
-function money(n){n=Number(n)||0;return '\u20B9'+n.toLocaleString('en-IN');}
+/* ============================================================
+   SITE CONFIG — edit brand / contact / API here.
+   To connect the admin CMS, paste your Google Apps Script
+   Web App URL into API_URL (see gas/SETUP.md).
+   ============================================================ */
+window.SITE = {
+  brand: "SP Mines & Minerals",
+  brandA: "SP",
+  brandB: "Mines & Minerals",
+  subline: "Mineral Resources · Supply",
+  tagline: "Mineral Resources · Industrial Supply",
+  // Google Apps Script Web App URL. Empty = site runs on built-in defaults (data.js).
+  API_URL: "",
 
-function statusPill(s){
-  s=String(s||'').trim();var c='grey';
-  if(/done|active|normal|paid/i.test(s))c='green';
-  else if(/pending|expiring|maintenance|repair|progress|partial/i.test(s))c='amber';
-  else if(/overdue|breakdown|expired|open|abnormal|unpaid|not ok/i.test(s))c='red';
-  else if(/hold|recorded|inactive/i.test(s))c='grey';
-  return '<span class="pill '+c+'">'+esc(s||'-')+'</span>';
-}
+  contact: {
+    phone: "+91 00000 00000",
+    whatsapp: "+91 00000 00000",
+    email: "info@spminesandminerals.com",
+    address: "[Address line], Purulia, West Bengal, India",
+  },
 
-/* run wrapper */
-/* ========================================================================================
- * BACKEND CONNECTION
- * Two ways this HTML talks to the Apps Script backend:
- *   1. Served BY Apps Script (doGet)  -> google.script.run is available -> use it.
- *   2. Hosted STANDALONE (GitHub Pages, any host) -> set API_URL to your GAS web app /exec URL
- *      and it POSTs (CORS-safe text/plain) to the doPost router.
- * To go standalone: paste your deployment URL below, e.g.
- *   var API_URL = "https://script.google.com/macros/s/AKfy..../exec";
- * Leave it "" when the file is served by Apps Script.
- * ====================================================================================== */
-var API_URL = "https://script.google.com/macros/s/AKfycbx0ojfZczfYEetprGpLaoLwK3iCfpt812Mk6ROFyLWF4uLAB8c6ecp3RHBQRwS_pyIyew/exec";   // <-- paste your GAS web app /exec URL here to run this HTML anywhere
+  nav: [
+    { label: "Home", href: "index.html" },
+    { label: "About", href: "about.html" },
+    { label: "Minerals", href: "minerals.html" },
+    { label: "Sourcing", href: "sourcing.html" },
+    { label: "Operations", href: "operations.html" },
+    { label: "Why Us", href: "why-us.html" },
+    { label: "Gallery", href: "gallery.html" },
+    { label: "Blog", href: "blog.html" },
+    { label: "Contact", href: "contact.html" },
+  ],
 
-function hasGSR(){ try { return (typeof google!=='undefined') && google.script && google.script.run; } catch(e){ return false; } }
-
-var _busy=0;
-var _loadTimer=null;
-function loadOn(){_busy++;if(!_loadTimer){_loadTimer=setTimeout(function(){var g=$('gload');if(g&&_busy>0)g.classList.add('on');},220);}}
-function loadOff(){_busy=Math.max(0,_busy-1);if(_busy===0){if(_loadTimer){clearTimeout(_loadTimer);_loadTimer=null;}var g=$('gload');if(g)g.classList.remove('on');}}
-
-/* skeleton shown while a page loads */
-function skeleton(){
-  var card='<div class="sk-card" style="margin-bottom:12px"><div class="sk sk-line" style="width:40%"></div><div class="sk sk-line" style="width:80%"></div><div class="sk sk-line" style="width:65%"></div></div>';
-  return card+card+card;
-}
-/* friendly error card with Retry (fixes raw "Failed to fetch") */
-function errorCard(msg,retryFn){
-  window.__retry=retryFn||function(){go(CURRENT);};
-  return '<div class="errcard"><div class="ei">\u26A0\uFE0F</div><div style="font-weight:600">Could not load</div>'+
-    '<div class="em">'+esc(msg||'Please check your connection and try again.')+'</div>'+
-    '<button class="btn" onclick="window.__retry&&window.__retry()">Retry</button></div>';
-}
-
-function run(fn,args,cb,opts){
-  args=args||[]; opts=opts||{};
-  var quiet=_silent;
-  if(!quiet)loadOn();
-  var showErrCard=(opts.errCard!==false) && !quiet;
-  // any write action (not a read/list) invalidates the page cache so lists refresh
-  var READ_RE=/^api_(boot|dashboard|todaysWork|assetList|assetDetail|checklistFor|startTask|recentDone|report|checklistItems|openIssues|issuesNeedingBill|pendingBills|search|lookups|list|money)/;
-  if(!READ_RE.test(fn)) { try{clearCache();}catch(e){} }
-  var done=function(r){if(!quiet)loadOff();cb(r);};
-  var onErr=function(msg){
-    if(!quiet)loadOff();
-    if(showErrCard){ $('view').innerHTML=errorCard(msg, opts.retry); }
-    else if(!quiet){ toast('Error: '+msg); }
-    if(window.console)console.error('[callServer]',fn,msg);
-  };
-
-  // Mode 1: served by Apps Script
-  if(hasGSR() && !API_URL){
-    google.script.run.withSuccessHandler(done).withFailureHandler(function(e){onErr(e&&e.message||'Server error');})[fn].apply(google.script.run,args);
-    return;
-  }
-  if(!API_URL){ onErr('API URL not set.'); return; }
-
-  // Mode 2: fetch with 20s timeout + ONE auto-retry on network failure
-  function attempt(triesLeft){
-    var ctrl=(typeof AbortController!=='undefined')?new AbortController():null;
-    var t=ctrl?setTimeout(function(){ctrl.abort();},20000):null;
-    fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:fn,args:args}),signal:ctrl?ctrl.signal:undefined})
-      .then(function(r){ if(t)clearTimeout(t); return r.json(); })
-      .then(function(d){ if(d&&d.ok){done(d.result);} else {onErr((d&&d.error)||'Unknown error');} })
-      .catch(function(e){
-        if(t)clearTimeout(t);
-        if(triesLeft>0){ setTimeout(function(){attempt(triesLeft-1);},700); }   // silent retry once
-        else { onErr('Network problem (failed to fetch). Tap Retry.'); }
-      });
-  }
-  attempt(1);
-}
-
-function go(tab){
-  CURRENT=tab;
-  _viewToken++;                 // invalidate any in-flight loads from the previous tab
-  var myTok=_viewToken;
-  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.toggle('active',b.dataset.t===tab);});
-  if(PAGE_CACHE[tab]===undefined) $('view').innerHTML=skeleton();   // skeleton only when not cached
-  if(tab==='dashboard')loadDashboard(myTok);
-  else if(tab==='today')loadToday(myTok);
-  else if(tab==='done')loadDone(myTok);
-  else if(tab==='assets')loadAssets(myTok);
-  else if(tab==='issues')loadIssues(myTok);
-  else if(tab==='bills')loadBills(myTok);
-  else if(tab==='reports')loadReports(myTok);
-  else if(tab==='manage')loadManage(myTok);
-}
-/* ---- page cache: returning to a tab renders instantly (no re-fetch) ---- */
-var PAGE_CACHE={};
-function clearCache(){ PAGE_CACHE={}; }               // call after any write (assign/delete/done/save)
-function cachedRun(key,fn,args,cb){
-  if(PAGE_CACHE[key]!==undefined){ cb(PAGE_CACHE[key]); return; }   // instant from cache
-  run(fn,args,function(d){ PAGE_CACHE[key]=d; cb(d); });
-}
-/* true if this render still belongs to the current view (else a newer tab was opened) */
-function fresh(tok){ return tok===undefined || tok===_viewToken; }
-function toggleMenu(){ var n=$('tabs'),b=$('navBackdrop'); if(n){n.classList.toggle('open'); if(b)b.classList.toggle('show', n.classList.contains('open'));} }
-function closeMenu(){ var n=$('tabs'),b=$('navBackdrop'); if(n)n.classList.remove('open'); if(b)b.classList.remove('show'); }
-function setView(html,tok){ if(tok!==undefined && tok!==_viewToken) return; $('view').innerHTML=html; }
-
-
-/* ---------------- DASHBOARD ---------------- */
-function loadDashboard(tok){
-  if(BOOT_DASH){ var d0=BOOT_DASH; BOOT_DASH=null; PAGE_CACHE['dashboard']=d0; renderDashboard(d0,tok); return; }
-  cachedRun('dashboard','api_dashboard',[],function(d){ renderDashboard(d,tok); });
-}
-function renderDashboard(d,tok){
-    var cards=[
-      ['Total Assets',d.totalAssets,''],['Active',d.activeAssets,'ok'],
-      ['Tasks Today',d.tasksToday,'info'],['Pending',d.pending,'warn'],['Overdue',d.overdue,'bad'],
-      ['Open issues',d.openIssues,'warn'],['Open Breakdowns',d.openBreakdowns,'bad'],
-      ['Under Maintenance',d.underMaintenance,'warn'],
-      ['Warranty Expiring',d.warrantyExpiring,'warn'],['Warranty Expired',d.warrantyExpired,'bad'],
-      ['Pending bills',d.pendingBills,'warn'],['Unpaid Amount',money(d.unpaidAmount),'bad'],
-      ['This Month Expense',money(d.monthExpense),'info']
-    ];
-    var h='<div class="cards">'+cards.map(function(c){
-      return '<div class="card '+(c[2]||'')+'"><div class="k">'+c[0]+'</div><div class="v">'+esc(c[1])+'</div></div>';
-    }).join('')+'</div>';
-
-    // Bill Generate Pending (escalated / breakdown issues awaiting a bill+proof)
-    if(d.billPending&&d.billPending.length){
-      h+='<div class="section"><h2>Bill generate pending &mdash; breakdowns ('+d.billPending.length+')</h2>'+
-        '<table><tr><th>Issue</th><th>Asset</th><th>Problem</th><th>Severity</th><th></th></tr>';
-      d.billPending.forEach(function(r){
-        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
-          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
-          '<td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
-          '<td><button class="btn sm" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Generate bill + proof</button></td></tr>';
-      });
-      h+='</table></div>';
-    }
-
-    // Recent issues - actionable (escalate / generate bill) right here
-    h+='<div class="section"><h2>Recent issues</h2>';
-    if(!d.recentIssues||!d.recentIssues.length){h+='<div class="empty">No open issues.</div>';}
-    else{
-      h+='<table><tr><th>ID</th><th>Asset</th><th>Type</th><th>Problem</th><th>Severity</th><th>Status</th><th></th></tr>';
-      d.recentIssues.forEach(function(r){
-        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
-          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
-          '<td>'+esc(r['Issue Type'])+'</td><td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
-          '<td>'+statusPill(r['Status'])+(String(r['Needs Bill']).toLowerCase()==='yes'?' <span class="pill amber">bill pending</span>':'')+'</td>'+
-          '<td style="white-space:nowrap"><button class="btn sm" onclick=\'openEscalate('+JSON.stringify(r)+')\'>Escalate</button> '+
-          (String(r['Needs Bill']).toLowerCase()==='yes'?'<button class="btn sm ghost" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Bill</button>':'')+'</td></tr>';
-      });
-      h+='</table>';
-    }
-    h+='</div>';
-
-    if(d.repeatBreakdowns&&d.repeatBreakdowns.length){
-      h+='<div class="section"><h2>Repeated breakdowns</h2><table><tr><th>Asset</th><th>Breakdowns</th></tr>'+
-        d.repeatBreakdowns.map(function(r){return '<tr><td><a class="link" onclick="assetDetail(\''+r.assetId+'\')">'+esc(r.assetId)+'</a></td><td>'+r.breakdowns+'</td></tr>';}).join('')+'</table></div>';
-    }
-    if(d.expenseTrend&&d.expenseTrend.length){
-      h+='<div class="section"><h2>Expense trend (6 mo)</h2><table><tr>'+
-        d.expenseTrend.map(function(t){return '<th>'+esc(t.month)+'</th>';}).join('')+'</tr><tr>'+
-        d.expenseTrend.map(function(t){return '<td>'+money(t.total)+'</td>';}).join('')+'</tr></table></div>';
-    }
-    setView(h,tok);
-}
-
-/* ---------------- TODAY'S WORK ---------------- */
-var TODAY_ROWS=[], TODAY_LOC='__all';
-function loadToday(tok){
-  cachedRun('today','api_todaysWork',[],function(rows){
-    TODAY_ROWS=rows||[];
-    renderToday(tok);   // always render so header + Assign button show even when empty
-  });
-}
-function renderToday(tok){
-  // unique locations from the rows
-  var locs={}; TODAY_ROWS.forEach(function(r){ var l=(r.location||'').trim()||'(no location)'; locs[l]=true; });
-  var locList=Object.keys(locs).sort();
-  var shown=TODAY_ROWS.filter(function(r){
-    if(TODAY_LOC==='__all')return true;
-    var l=(r.location||'').trim()||'(no location)';
-    return l===TODAY_LOC;
-  });
-  var opts='<option value="__all">All locations ('+TODAY_ROWS.length+')</option>'+
-    locList.map(function(l){
-      var n=TODAY_ROWS.filter(function(r){return ((r.location||'').trim()||'(no location)')===l;}).length;
-      return '<option value="'+esc(l)+'"'+(l===TODAY_LOC?' selected':'')+'>'+esc(l)+' ('+n+')</option>';
-    }).join('');
-  var h='<div class="section">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
-      '<h2 style="border:0">Today &amp; overdue ('+shown.length+')</h2>'+
-      '<label class="f" style="margin:0;display:flex;align-items:center;gap:6px">Location: '+
-      '<select class="f" style="max-width:240px;margin:0" onchange="TODAY_LOC=this.value;renderToday()">'+opts+'</select></label>'+
-    '</div>';
-  if(!shown.length){ h+='<div class="empty">No pending or overdue tasks. Tasks auto-generate from Task List.</div></div>'; setView(h,tok); return; }
-  h+='<div style="margin-bottom:8px"><button class="btn sm ghost" onclick="deleteSelectedTasks()">Delete selected</button></div>';
-  h+='<table><tr><th><input type="checkbox" onclick="toggleAllToday(this)"></th><th>Asset</th><th>Type</th><th>Location</th><th>Task</th><th>Freq</th><th>Planned</th><th>Doer</th><th>Status</th><th></th></tr>';
-  shown.forEach(function(r){
-    h+='<tr>'+
-      '<td><input type="checkbox" class="tchk" data-t="'+esc(r.taskId)+'" data-a="'+esc(r.assetId)+'"></td>'+
-      '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId||'-')+'</a></td>'+
-      '<td>'+esc(r.assetType)+'</td><td>'+esc(r.location)+'</td><td>'+esc(r.task)+'</td>'+
-      '<td>'+esc(r.frequency)+'</td><td>'+esc(r.plannedDate)+(r.overdue?' <span class="pill red">OVERDUE</span>':'')+'</td>'+
-      '<td>'+esc(r.doer)+'</td><td>'+statusPill(r.status)+'</td>'+
-      '<td style="white-space:nowrap"><button class="btn sm" onclick=\'startChecklist('+JSON.stringify(r)+')\'>Start</button> '+
-      '<button class="btn sm ghost" onclick="removeTask(\''+esc(r.taskId)+'\',\''+esc(r.assetId)+'\',\''+esc(r.plannedDate)+'\')">Remove</button></td></tr>';
-  });
-  h+='</table></div>';
-  setView(h,tok);
-}
-function toggleAllToday(cb){ Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){c.checked=cb.checked;}); }
-function clearAllTasks(){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Clear ALL tasks?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">Master + For PC ki saari tasks hat jayengi (old auto-generated bhi). Task List (recurring) safe. Iske baad khud se assign karo.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" id="catBtn" style="background:var(--red);border-color:var(--red)" onclick="doClearAll()">Yes, clear all</button>'+
-    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
-}
-function doClearAll(){
-  $('catBtn').disabled=true;$('catBtn').textContent='Clearing...';
-  run('api_clearAllTasks',[],function(res){closeModal();toast('Cleared '+(res&&res.cleared||0)+' task rows');loadToday();});
-}
-function deleteSelectedTasks(){
-  var list=[];
-  Array.prototype.forEach.call(document.querySelectorAll('#view .tchk'),function(c){ if(c.checked)list.push({taskId:c.dataset.t,assetId:c.dataset.a}); });
-  if(!list.length){toast('Select tasks first (tick the boxes)');return;}
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Delete '+list.length+' task(s)?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">Selected tasks Today\'s work aur For PC se hat jayenge (Status = Deleted). Task List safe.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" id="dsBtn" onclick=\'doDeleteSelected('+JSON.stringify(list)+')\'>Yes, delete</button>'+
-    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
-}
-function doDeleteSelected(list){
-  $('dsBtn').disabled=true;$('dsBtn').textContent='Deleting...';
-  run('api_deleteTasksBulk',[list],function(res){closeModal();toast('Deleted '+(res&&res.deleted||0));loadToday();});
-}
-
-/* ---------------- RECENT DONE ---------------- */
-function loadDone(tok){
-  cachedRun('done','api_recentDone',[100],function(res){
-    var clean=(res&&res.clean)||[], wi=(res&&res.withIssue)||[];
-    if(!clean.length&&!wi.length){setView('<div class="empty">No completed tasks yet.</div>',tok);return;}
-    var h='';
-    // With issue / breakdown first (needs attention)
-    h+='<div class="section"><h2>Done with issue / breakdown ('+wi.length+')</h2>';
-    if(!wi.length){h+='<div class="empty">None.</div>';}
-    else{
-      h+='<table><tr><th>Done on</th><th>Asset</th><th>Type</th><th>Task</th><th>Issue</th><th>Doer</th></tr>';
-      wi.forEach(function(r){
-        h+='<tr><td><span class="pill amber">'+esc(r.actualDate||'-')+'</span></td>'+
-          '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
-          '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td>'+
-          '<td><span class="pill red">'+esc(r.issueSummary||'issue')+'</span></td><td>'+esc(r.doer)+'</td></tr>';
-      });
-      h+='</table>';
-    }
-    h+='</div>';
-    // Clean done
-    h+='<div class="section"><h2>Recent done &mdash; no issue ('+clean.length+')</h2>';
-    if(!clean.length){h+='<div class="empty">None.</div>';}
-    else{
-      h+='<table><tr><th>Done on</th><th>Asset</th><th>Type</th><th>Task</th><th>Freq</th><th>Doer</th></tr>';
-      clean.forEach(function(r){
-        h+='<tr><td><span class="pill green">'+esc(r.actualDate||'-')+'</span></td>'+
-          '<td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
-          '<td>'+esc(r.assetType)+'</td><td>'+esc(r.task)+'</td><td>'+esc(r.frequency)+'</td><td>'+esc(r.doer)+'</td></tr>';
-      });
-      h+='</table>';
-    }
-    h+='</div>';
-    setView(h,tok);
-  });
-}
-
-/* remove a task instance from Today's work / For PC (assigned or generated) */
-function removeTask(taskId,assetId,plannedDate){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Remove task?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">'+esc(assetId)+' ('+esc(plannedDate)+')<br>Ye task Today\'s work aur For PC se hat jayega. Task List (recurring) safe rahega.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" onclick="doRemoveTask(\''+esc(taskId)+'\',\''+esc(assetId)+'\',\''+esc(plannedDate)+'\')">Yes, remove</button>'+
-    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
-}
-function doRemoveTask(t,a,p){
-  run('api_deleteTask',[t,a,p],function(res){closeModal();toast(res&&res.deleted?('Removed '+res.deleted):'Removed');loadToday();});
-}
-
-/* ---------------- ASSIGN TASK (location-wise, all or partial machines) ---------------- */
-var ASSIGN_ASSETS=[];
-function openAssign(){
-  run('api_assetList',[],function(all){
-    ASSIGN_ASSETS=(all||[]).filter(function(a){return String(a.status).toLowerCase()!=='inactive';});
-    var locs={}; ASSIGN_ASSETS.forEach(function(a){var l=(a.location||'').trim()||'(no location)';locs[l]=true;});
-    var locList=Object.keys(locs).sort();
-    var locOpts='<option value="__all">All locations</option>'+locList.map(function(l){
-      var n=ASSIGN_ASSETS.filter(function(a){return ((a.location||'').trim()||'(no location)')===l;}).length;
-      return '<option value="'+esc(l)+'">'+esc(l)+' ('+n+')</option>';
-    }).join('');
-    var doers=[''].concat(LOOKUPS.doers||[]).map(function(dd){return '<option>'+esc(dd)+'</option>';}).join('');
-    var tnames=(LOOKUPS.taskNames||[]);
-    var taskOpts=tnames.length
-      ? tnames.map(function(t){return '<option>'+esc(t)+'</option>';}).join('')
-      : '<option value="">(no tasks defined - add in Manage &rarr; Tasks)</option>';
-    var today=new Date().toISOString().slice(0,10);
-    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Assign task</h3>'+
-      '<div class="row"><div class="col"><label class="f">Location</label>'+
-      '<select class="f" id="asLoc" onchange="renderAssignMachines()">'+locOpts+'</select></div>'+
-      '<div class="col"><label class="f">Date</label><input class="f" id="asDate" type="date" value="'+today+'"></div></div>'+
-      '<div class="row"><div class="col"><label class="f">Task</label><select class="f" id="asTask">'+taskOpts+'</select></div>'+
-      '<div class="col"><label class="f">Assign to (doer)</label><select class="f" id="asDoer">'+doers+'</select></div></div>'+
-      '<label class="f" style="display:flex;justify-content:space-between;align-items:center">Machines '+
-      '<span><button class="btn sm ghost" onclick="assignAllToggle(true)">All</button> '+
-      '<button class="btn sm ghost" onclick="assignAllToggle(false)">None</button></span></label>'+
-      '<div id="asMachines" style="max-height:230px;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:8px"></div>'+
-      '<div style="margin-top:14px"><button class="btn" id="asBtn" onclick="doAssign()">Assign</button></div>');
-    renderAssignMachines();
-  });
-}
-function assignFiltered(){
-  var loc=$('asLoc').value;
-  return ASSIGN_ASSETS.filter(function(a){
-    if(loc==='__all')return true;
-    return ((a.location||'').trim()||'(no location)')===loc;
-  });
-}
-function renderAssignMachines(){
-  var list=assignFiltered();
-  if(!list.length){$('asMachines').innerHTML='<div class="empty" style="padding:8px">No machines here.</div>';return;}
-  $('asMachines').innerHTML=list.map(function(a){
-    return '<label style="display:flex;align-items:center;gap:8px;padding:4px 2px;font-size:13px">'+
-      '<input type="checkbox" class="asChk" value="'+esc(a.assetId)+'" checked> '+
-      '<b>'+esc(a.assetId)+'</b> &middot; '+esc(a.name||'')+' <span style="color:var(--muted)">('+esc(a.type||'')+')</span></label>';
-  }).join('');
-}
-function assignAllToggle(on){
-  Array.prototype.forEach.call(document.querySelectorAll('#asMachines .asChk'),function(c){c.checked=on;});
-}
-function doAssign(){
-  var ids=[];
-  Array.prototype.forEach.call(document.querySelectorAll('#asMachines .asChk'),function(c){if(c.checked)ids.push(c.value);});
-  if(!ids.length){toast('Select at least one machine');return;}
-  var tn=($('asTask').value||'').trim();
-  if(!tn){toast('No task selected. Add tasks in Manage -> Tasks first.');return;}
-  var o={taskName:tn,doer:$('asDoer').value,date:$('asDate').value,
-    location:($('asLoc').value==='__all'?'':$('asLoc').value),assetIds:ids};
-  $('asBtn').disabled=true;$('asBtn').textContent='Assigning...';
-  run('api_assignTasks',[o],function(res){
-    closeModal();
-    toast('Assigned to '+res.added+' machine(s)');
-    if(CURRENT==='today')loadToday(); else go('today');
-  });
-}
-
-/* ---------------- CHECKLIST EXECUTION ---------------- */
-function startChecklist(task){
-  // One round-trip: asset detail + checklist together (faster).
-  run('api_startTask',[task.assetId,task.assetType,task.frequency],function(res){
-    renderChecklistModal(task,(res&&res.detail)||null,(res&&res.checklist)||[]);
-  });
-}
-
-function renderChecklistModal(task,d,items){
-  var o=(d&&d.overview)||{}, rel=(d&&d.reliability)||{};
-  var panel='<div class="section" style="margin-bottom:14px"><div class="kv">'+
-    kv('Machine',(o['Asset Name']||task.assetId)+' ('+esc(o['Asset Type']||task.assetType||'')+')')+
-    kv('Location',o['Current Location']||o['Location']||task.location||'-')+
-    kv('Status',o['Current Status']||'-')+
-    kv('Warranty',(o['Warranty Status']||'-')+(o['Warranty End']?(' till '+o['Warranty End']):''))+
-    kv('Guarantee',(o['Guarantee Status']||'-')+(o['Guarantee End']?(' till '+o['Guarantee End']):''))+
-    kv('Breakdowns',(rel.breakdownCount||0)+(rel.lastBreakdownDate?(' (last '+rel.lastBreakdownDate+')'):''))+
-    kv('Open issues',(d&&d.issues?d.issues.filter(function(x){return String(x['Status']).toLowerCase()!=='closed';}).length:0))+
-    kv('Total spend',money((d&&d.totalCost)||0))+
-    '</div></div>';
-
-  // problem block html (re-used)
-  function probBlock(){
-    return '<div class="probBlock" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--red);border-radius:8px;background:var(--redbg)">'+
-      '<label class="f" style="margin-top:0;color:var(--red)">What is wrong? / What is happening?</label>'+
-      '<textarea class="f prob" placeholder="Describe the problem"></textarea>'+
-      '<label class="f">Photo (proof)</label><input class="f photo" type="file" accept="image/*">'+
-      '<label class="f" style="display:flex;align-items:center;gap:6px;margin-top:8px"><input type="checkbox" class="esc"> Escalate this issue? (Breakdown + bill pending)</label>'+
-      '</div>';
-  }
-
-  var h='<span class="close" onclick="closeModal()">&times;</span>'+
-    '<h3>'+esc(task.task)+'</h3>'+panel+
-    '<p style="color:var(--muted);margin-bottom:8px">Check the machine. If something is wrong, a form opens at that point (what is wrong + photo + escalate).</p>'+
-    '<div id="chkList">';
-
-  // ---- ALWAYS: overall Machine OK? gate (works even when no checklist items exist) ----
-  h+='<div class="chkitem overall" data-item="OVERALL" data-rt="Yes / No" data-mn="" data-mx="" data-q="Overall — is the machine OK?">'+
-     '<div class="q"><b>Overall — is the machine OK?</b></div>'+
-     '<select class="f resp"><option value="">-- select --</option><option>Yes</option><option>No</option></select>'+
-     probBlock()+
-     '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
-     '</div>';
-
-  // ---- per-item checklist questions (if any for this asset type) ----
-  items.forEach(function(it,i){
-    h+='<div class="chkitem" data-item="'+esc(it['Item ID'])+'" data-rt="'+esc(it['Response Type'])+'" data-mn="'+esc(it['Minimum Value'])+'" data-mx="'+esc(it['Maximum Value'])+'" data-q="'+esc(it['Question'])+'">'+
-       '<div class="q">'+(i+1)+'. '+esc(it['Question'])+(it['Unit']?(' ('+esc(it['Unit'])+')'):'')+'</div>'+
-       responseInput(it,i)+ probBlock()+
-       '<input class="f rem" style="margin-top:6px" placeholder="Remark (optional)">'+
-       '</div>';
-  });
-  h+='</div>'+
-     '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick=\'finishChecklist('+JSON.stringify(task)+')\'>Save &amp; complete (mark done)</button>'+
-     '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>';
-  openModal(h);
-  Array.prototype.forEach.call(document.querySelectorAll('#chkList .resp'),function(el){
-    el.addEventListener('change',function(){abnCheck(el.closest('.chkitem'));});
-    el.addEventListener('keyup',function(){abnCheck(el.closest('.chkitem'));});
-  });
-}
-
-function responseInput(it){
-  var rt=String(it['Response Type']||'').trim();
-  if(rt==='Numeric Reading') return '<input class="f resp" type="number" step="any" placeholder="reading">';
-  if(rt==='OK / NOT OK') return sel(['OK','NOT OK']);
-  if(rt==='Yes / No') return sel(['Yes','No']);
-  if(rt==='Done / Not Done') return sel(['Done','Not Done']);
-  if(rt==='Date') return '<input class="f resp" type="date">';
-  if(rt==='Time') return '<input class="f resp" type="time">';
-  return '<input class="f resp" placeholder="answer">';
-  function sel(opts){return '<select class="f resp"><option value="">-- select --</option>'+opts.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select>';}
-}
-
-/* decide if an answer is a problem and show/hide its problem block */
-function abnCheck(el){
-  if(!el)return;
-  var rt=el.dataset.rt, resp=el.querySelector('.resp'), val=resp?String(resp.value):'';
-  var bad=false;
-  if(rt==='OK / NOT OK') bad=(val==='NOT OK');
-  else if(rt==='Yes / No') bad=(val==='No');
-  else if(rt==='Done / Not Done') bad=(val==='Not Done');
-  else if(rt==='Numeric Reading'){
-    var v=parseFloat(val); if(!isNaN(v)){var mn=parseFloat(el.dataset.mn),mx=parseFloat(el.dataset.mx);
-      if(!isNaN(mn)&&v<mn)bad=true; if(!isNaN(mx)&&v>mx)bad=true;}
-  }
-  var pb=el.querySelector('.probBlock');
-  if(pb){pb.style.display=bad?'block':'none'; el.classList.toggle('abn',bad);}
-}
-
-function finishChecklist(task,forceEmpty){
-  var items=forceEmpty?[]:Array.prototype.slice.call(document.querySelectorAll('#chkList .chkitem'));
-  var answers=[], photoJobs=[];
-  items.forEach(function(el){
-    var resp=el.querySelector('.resp'); var rem=el.querySelector('.rem');
-    var rt=el.dataset.rt; var val=resp?resp.value:'';
-    var pb=el.querySelector('.probBlock'); var isBad=pb&&pb.style.display!=='none';
-    var isOverall=el.classList.contains('overall');
-    if(val===''&&(!rem||rem.value==='')&&!isBad) return; // skip fully blank
-    var a={itemId:el.dataset.item,question:el.dataset.q||'',remarks:rem?rem.value:''};
-    if(rt==='Numeric Reading'){a.numeric=val;} else {a.response=val;}
-    if(isOverall) a.overall=true;
-    if(isBad){
-      a.problem=el.querySelector('.prob')?el.querySelector('.prob').value:'';
-      a.escalate=el.querySelector('.esc')?el.querySelector('.esc').checked:false;
-      a.raiseIssue=true;
-      var pf=el.querySelector('.photo');
-      if(pf&&pf.files&&pf.files[0]){
-        (function(ans,file){ photoJobs.push(new Promise(function(res){
-          var r=new FileReader();
-          r.onload=function(){ans.photoBase64=r.result.split(',')[1];ans.photoMime=file.type;ans.photoName=file.name;res();};
-          r.onerror=function(){res();}; r.readAsDataURL(file);
-        })); })(a,pf.files[0]);
-      }
-    }
-    answers.push(a);
-  });
-
-  toast('Saving...');
-  Promise.all(photoJobs).then(function(){
-    var payload={assetId:task.assetId,taskId:task.taskId,plannedDate:task.plannedDate,doer:task.doer,
-      answers:answers,markDone:true};
-    run('api_saveChecklist',[payload],function(res){
-      closeModal();
-      var msg='Task done.';
-      if(res.issues&&res.issues.length)msg+=' '+res.issues.length+' issue raised.';
-      if(res.escalated&&res.escalated.length)msg+=' Escalated (breakdown).';
-      toast(msg);
-      // If an escalation auto-created a draft bill, ask for its photo now.
-      if(res.draftBills&&res.draftBills.length){ setTimeout(function(){openBillProof(res.draftBills[0]);},400); return; }
-      if(CURRENT==='today')loadToday(); else if(CURRENT==='dashboard')loadDashboard();
-    });
-  });
-}
-
-/* ---------------- ASSETS ---------------- */
-function loadAssets(tok){
-  cachedRun('assets','api_assetList',[],function(rows){
-    var head='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Assets ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
-    if(!rows.length){setView(head+'<div class="empty">No machines yet. Click "+ Add machine" to add one.</div></div>',tok);return;}
-    var h=head+'<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th>Warranty</th><th>Guarantee</th><th>Criticality</th></tr>';
-    rows.forEach(function(r){
-      h+='<tr><td><a class="link" onclick="assetDetail(\''+esc(r.assetId)+'\')">'+esc(r.assetId)+'</a></td>'+
-        '<td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td>'+
-        '<td>'+statusPill(r.status)+'</td><td>'+statusPill(r.warranty)+'</td><td>'+statusPill(r.guarantee||'-')+'</td><td>'+esc(r.criticality||'-')+'</td></tr>';
-    });
-    setView(h+'</table></div>',tok);
-  });
-}
-
-/* ---- Add / Edit Machine ---- */
-function openAddMachine(){
-  var types=(LOOKUPS.assetTypes||[]).map(function(o){return '<option>'+esc(o)+'</option>';}).join('');
-  var crit=(LOOKUPS.criticality||[]).map(function(o){return '<option'+(o==='Medium'?' selected':'')+'>'+esc(o)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add machine</h3>'+
-    '<p style="color:var(--muted);margin-bottom:10px">Asset ID auto-generates (AST-xxx).</p>'+
-    '<div class="row"><div class="col"><label class="f">Machine name</label><input class="f" id="mName"></div>'+
-    '<div class="col"><label class="f">Type</label><select class="f" id="mType">'+types+'</select></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Location</label><input class="f" id="mLoc"></div>'+
-    '<div class="col"><label class="f">Criticality</label><select class="f" id="mCrit">'+crit+'</select></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Make</label><input class="f" id="mMake"></div>'+
-    '<div class="col"><label class="f">Model</label><input class="f" id="mModel"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Serial / tag</label><input class="f" id="mSerial"></div>'+
-    '<div class="col"><label class="f">Vendor</label><input class="f" id="mVendor"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Install date</label><input class="f" id="mInstall" type="date"></div>'+
-    '<div class="col"><label class="f">Purchase cost</label><input class="f" id="mCost" type="number" step="any"></div></div>'+
-    '<hr style="margin:12px 0;border:none;border-top:1px solid var(--line)"><b style="font-size:13px">Warranty</b>'+
-    '<div class="row"><div class="col"><label class="f">Warranty start</label><input class="f" id="mWStart" type="date"></div>'+
-    '<div class="col"><label class="f">Warranty end</label><input class="f" id="mWEnd" type="date"></div></div>'+
-    '<label class="f">Warranty provider</label><input class="f" id="mWProv">'+
-    '<b style="font-size:13px">Guarantee</b>'+
-    '<div class="row"><div class="col"><label class="f">Guarantee start</label><input class="f" id="mGStart" type="date"></div>'+
-    '<div class="col"><label class="f">Guarantee end</label><input class="f" id="mGEnd" type="date"></div></div>'+
-    '<label class="f">Guarantee provider</label><input class="f" id="mGProv">'+
-    '<div style="margin-top:14px"><button class="btn" id="mBtn" onclick="saveMachine()">Save machine</button></div>');
-}
-function saveMachine(){
-  var o={name:$('mName').value,type:$('mType').value,location:$('mLoc').value,criticality:$('mCrit').value,
-    make:$('mMake').value,model:$('mModel').value,serial:$('mSerial').value,vendor:$('mVendor').value,
-    installDate:$('mInstall').value,purchaseCost:$('mCost').value,
-    warrantyStart:$('mWStart').value,warrantyEnd:$('mWEnd').value,warrantyProvider:$('mWProv').value,
-    guaranteeStart:$('mGStart').value,guaranteeEnd:$('mGEnd').value,guaranteeProvider:$('mGProv').value};
-  if(!o.name){toast('Machine name required');return;}
-  $('mBtn').disabled=true;$('mBtn').textContent='Saving...';
-  run('api_addAsset',[o],function(id){closeModal();toast('Machine '+id+' added');loadAssets();});
-}
-function openEditWarranty(id,o){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Edit warranty / guarantee &middot; '+esc(id)+'</h3>'+
-    '<b style="font-size:13px">Warranty</b>'+
-    '<div class="row"><div class="col"><label class="f">Start</label><input class="f" id="eWS" type="date" value="'+esc(o['Warranty Start']||'')+'"></div>'+
-    '<div class="col"><label class="f">End</label><input class="f" id="eWE" type="date" value="'+esc(o['Warranty End']||'')+'"></div></div>'+
-    '<label class="f">Provider</label><input class="f" id="eWP" value="'+esc(o['Warranty Provider']||'')+'">'+
-    '<b style="font-size:13px">Guarantee</b>'+
-    '<div class="row"><div class="col"><label class="f">Start</label><input class="f" id="eGS" type="date" value="'+esc(o['Guarantee Start']||'')+'"></div>'+
-    '<div class="col"><label class="f">End</label><input class="f" id="eGE" type="date" value="'+esc(o['Guarantee End']||'')+'"></div></div>'+
-    '<label class="f">Provider</label><input class="f" id="eGP" value="'+esc(o['Guarantee Provider']||'')+'">'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveWarranty(\''+esc(id)+'\')">Save</button></div>');
-}
-function saveWarranty(id){
-  var patch={'Warranty Start':$('eWS').value,'Warranty End':$('eWE').value,'Warranty Provider':$('eWP').value,
-    'Guarantee Start':$('eGS').value,'Guarantee End':$('eGE').value,'Guarantee Provider':$('eGP').value};
-  run('api_updateAsset',[id,patch],function(){closeModal();toast('Warranty/Guarantee updated');assetDetail(id);});
-}
-
-function assetDetail(id){
-  $('view').innerHTML='<div class="loader">Loading</div>';
-  run('api_assetDetail',[id],function(d){
-    if(!d){$('view').innerHTML='<div class="empty">Asset not found.</div>';return;}
-    var o=d.overview,rel=d.reliability;
-    var h='<button class="btn ghost sm" onclick="go(\'assets\')">&larr; Back</button>'+
-      '<div class="section" style="margin-top:12px"><h2>'+esc(o['Asset ID'])+' &middot; '+esc(o['Asset Name']||'')+'</h2>'+
-      '<div class="row"><div class="col"><div class="kv">'+
-      kv('Type',o['Asset Type'])+kv('Category',o['Category'])+kv('Location',o['Current Location']||o['Location'])+
-      kv('Status',o['Current Status'])+kv('Criticality',o['Criticality'])+kv('Vendor',o['Vendor'])+
-      '</div></div><div class="col"><div class="kv">'+
-      kv('Warranty',(o['Warranty Status']||'')+(o['Warranty End']?(' (till '+o['Warranty End']+')'):''))+
-      kv('Guarantee',(o['Guarantee Status']||'')+(o['Guarantee End']?(' (till '+o['Guarantee End']+')'):''))+
-      kv('Installed',rel.installDate)+kv('Days since install',rel.daysSinceInstall)+
-      kv('Breakdowns',rel.breakdownCount)+kv('Last breakdown',rel.lastBreakdownDate||'-')+
-      kv('Days since last BD',rel.daysSinceLastBreakdown)+kv('Avg days between BD',rel.avgDaysBetweenBreakdowns||'-')+
-      kv('Total spend',money(d.totalCost))+
-      '</div></div></div></div>';
-
-    h+='<div class="row" style="margin-bottom:14px">'+
-       '<button class="btn sm" onclick=\'openMaint("'+esc(id)+'")\'>+ Maintenance</button>'+
-       '<button class="btn sm" onclick=\'openMove("'+esc(id)+'")\'>+ Movement</button>'+
-       '<button class="btn sm" onclick=\'openBill("'+esc(id)+'")\'>+ Bill</button>'+
-       '<button class="btn sm ghost" onclick=\'openIssue("'+esc(id)+'")\'>+ Issue</button>'+
-       '<button class="btn sm ghost" onclick=\'openEditWarranty("'+esc(id)+'",'+JSON.stringify(o)+')\'>Edit Warranty/Guarantee</button></div>';
-
-    h+=histSection('Checklist history',d.checklist,['Actual DateTime','Question','Response','Numeric Reading','Result','Issue ID']);
-    h+=histSection('Issues',d.issues,['Issue ID','Detected DateTime','Issue Type','Problem','Severity','Status']);
-    h+=histSection('Maintenance',d.maintenance,['History ID','Event Date','Event Type','Description','Cost','Bill ID']);
-    h+=histSection('Movement',d.movement,['Movement ID','Movement Date','From Location','To Location','Reason']);
-    h+=histSection('Bills',d.bills,['Bill ID','Invoice Date','Vendor','Total Amount','Payment Status','Drive File URL']);
-    $('view').innerHTML=h;
-  });
-}
-function kv(k,v){return '<div class="kk">'+esc(k)+'</div><div>'+esc(v||'-')+'</div>';}
-function histSection(title,rows,cols){
-  var h='<div class="section"><h2>'+esc(title)+' ('+(rows?rows.length:0)+')</h2>';
-  if(!rows||!rows.length){return h+'<div class="empty">None.</div></div>';}
-  h+='<table><tr>'+cols.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr>';
-  rows.forEach(function(r){
-    h+='<tr>'+cols.map(function(c){
-      var v=r[c]||'';
-      if(c==='Result'||c==='Status'||c==='Payment Status')return '<td>'+statusPill(v)+'</td>';
-      if(c==='Drive File URL'&&v)return '<td><a class="link" href="'+esc(v)+'" target="_blank">view</a></td>';
-      if((c==='Cost'||c==='Total Amount')&&v!=='')return '<td>'+money(v)+'</td>';
-      return '<td>'+esc(v)+'</td>';
-    }).join('')+'</tr>';
-  });
-  return h+'</table></div>';
-}
-
-/* ---------------- ISSUES ---------------- */
-function loadIssues(tok){
-  cachedRun('issues','api_openIssues',[],function(rows){
-    var h='<div class="section"><h2>Open issues ('+rows.length+')</h2>'+issueTable(rows,true)+'</div>';
-    setView(h,tok);
-  });
-}
-function issueTable(rows,actions){
-  if(!rows||!rows.length)return '<div class="empty">No open issues.</div>';
-  var h='<table><tr><th>ID</th><th>Asset</th><th>Type</th><th>Problem</th><th>Severity</th><th>Lvl</th><th>Status</th><th>Assigned</th>'+(actions?'<th></th>':'')+'</tr>';
-  rows.forEach(function(r){
-    h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
-      '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
-      '<td>'+esc(r['Issue Type'])+'</td><td>'+esc(r['Problem'])+'</td>'+
-      '<td>'+esc(r['Severity'])+'</td><td>'+esc(r['Escalation Level']||'0')+'</td><td>'+statusPill(r['Status'])+(String(r['Needs Bill']).toLowerCase()==='yes'?' <span class="pill amber">needs bill</span>':'')+'</td><td>'+esc(r['Assigned Doer']||'-')+'</td>'+
-      (actions?('<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editIssue('+JSON.stringify(r)+')\'>Update</button> <button class="btn sm" onclick=\'openEscalate('+JSON.stringify(r)+')\'>Escalate</button></td>'):'')+'</tr>';
-  });
-  return h+'</table>';
-}
-function openEscalate(r){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Escalate '+esc(r['Issue ID'])+'</h3>'+
-    '<p style="color:var(--muted);margin-bottom:10px">Severity badhega, Breakdown + bill pending. Current level: '+esc(r['Escalation Level']||'0')+'</p>'+
-    '<label class="f">Escalate to</label><input class="f" id="escTo" placeholder="e.g. Maintenance Head" value="'+esc(r['Escalated To']||'')+'">'+
-    '<label class="f">Expected fix time in days? (optional)</label><input class="f" id="escEta" type="number" min="0" placeholder="days">'+
-    '<label class="f">Note</label><textarea class="f" id="escNote" placeholder="why escalating"></textarea>'+
-    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escMail"> Send follow-up mail (to assigned doer)</label>'+
-    '<label class="f" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="escBill" checked> Auto-generate draft bill (add photo later)</label>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveEscalate(\''+esc(r['Issue ID'])+'\')">Escalate</button></div>');
-}
-function saveEscalate(id){
-  var o={escalatedTo:$('escTo').value,remarks:$('escNote').value,etaDays:$('escEta').value,
-    notify:$('escMail')?$('escMail').checked:false,autoBill:$('escBill')?$('escBill').checked:false};
-  run('api_escalateIssue',[id,o],function(res){
-    closeModal();
-    var draft=(res&&res.draftBill)?res.draftBill:'';
-    toast('Escalated to Breakdown, bill pending'+(draft?(' ('+draft+')'):''));
-    if(draft){ setTimeout(function(){ openBillProof(draft); },400); }
-    else if(CURRENT==='dashboard')loadDashboard(); else loadIssues();
-  });
-}
-/* upload proof photo for an (auto-draft) bill */
-function openBillProof(billId){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Bill photo upload &middot; '+esc(billId)+'</h3>'+
-    '<p style="color:var(--muted);margin-bottom:10px">Bill created. Now upload its photo/PDF (proof).</p>'+
-    '<input class="f" id="bpFile" type="file" accept="application/pdf,image/*">'+
-    '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" id="bpBtn" onclick="saveBillProof(\''+esc(billId)+'\')">Upload</button>'+
-    '<button class="btn ghost" onclick="closeModal();if(CURRENT===\'dashboard\')loadDashboard();else loadIssues();">Later</button></div>');
-}
-function saveBillProof(billId){
-  var f=$('bpFile');
-  if(!f||!f.files||!f.files[0]){toast('Please select a file');return;}
-  var file=f.files[0],reader=new FileReader();
-  $('bpBtn').disabled=true;$('bpBtn').textContent='Uploading...';
-  reader.onload=function(){
-    var payload={base64:reader.result.split(',')[1],mimeType:file.type,filename:file.name};
-    run('api_addBillProof',[billId,payload],function(){closeModal();toast('Proof uploaded');
-      if(CURRENT==='dashboard')loadDashboard();else if(CURRENT==='bills')loadBills();else loadIssues();});
-  };
-  reader.readAsDataURL(file);
-}
-function editIssue(r){
-  var h='<span class="close" onclick="closeModal()">&times;</span><h3>Update '+esc(r['Issue ID'])+'</h3>'+
-    '<label class="f">Status</label>'+selEl('st',LOOKUPS.issueStatus,r['Status'])+
-    '<label class="f">Assigned doer</label>'+selEl('as',['',].concat(LOOKUPS.doers),r['Assigned Doer'])+
-    '<label class="f">Root cause</label><input class="f" id="rc" value="'+esc(r['Root Cause']||'')+'">'+
-    '<label class="f">Action taken</label><textarea class="f" id="at">'+esc(r['Action Taken']||'')+'</textarea>'+
-    '<div style="margin-top:14px;display:flex;gap:8px"><button class="btn" onclick="saveIssue(\''+esc(r['Issue ID'])+'\')">Save</button>'+
-    '<button class="btn ghost" onclick="askDelete(\'issue\',\''+esc(r['Issue ID'])+'\',loadIssues)">Delete</button></div>';
-  openModal(h);
-}
-function saveIssue(id){
-  var patch={'Status':$('st').value,'Assigned Doer':$('as').value,'Root Cause':$('rc').value,'Action Taken':$('at').value};
-  run('api_updateIssue',[id,patch],function(){closeModal();toast('Issue updated');loadIssues();});
-}
-
-/* ---------------- BILLS ---------------- */
-function loadBills(tok){
-  run('api_issuesNeedingBill',[],function(need){
-    var h='';
-    // Section 1: issues awaiting a bill + proof
-    h+='<div class="section"><h2>Awaiting bill &amp; proof ('+need.length+')</h2>';
-    if(!need.length){h+='<div class="empty">Nothing awaiting proof.</div>';}
-    else{
-      h+='<table><tr><th>Issue</th><th>Asset</th><th>Problem</th><th>Severity</th><th></th></tr>';
-      need.forEach(function(r){
-        h+='<tr><td>'+esc(r['Issue ID'])+'</td>'+
-          '<td><a class="link" onclick="assetDetail(\''+esc(r['Asset ID'])+'\')">'+esc(r['Asset ID'])+'</a></td>'+
-          '<td>'+esc(r['Problem'])+'</td><td>'+esc(r['Severity'])+'</td>'+
-          '<td><button class="btn sm" onclick=\'openBill("'+esc(r['Asset ID'])+'","'+esc(r['Issue ID'])+'")\'>Submit bill + proof</button></td></tr>';
-      });
-      h+='</table>';
-    }
-    h+='</div>';
-    // Section 2: pending bills
-    run('api_pendingBills',[],function(rows){
-      h+='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Pending bills ('+rows.length+')</h2><button class="btn sm" onclick="openBill(\'\')">+ New bill</button></div>';
-      if(!rows.length){h+='<div class="empty">No pending bills.</div>';}
-      else{
-        h+='<table><tr><th>ID</th><th>Asset</th><th>Issue</th><th>Vendor</th><th>Total</th><th>Status</th><th>Proof</th><th></th></tr>';
-        rows.forEach(function(r){
-          var hasFile=!!r['Drive File URL'];
-          h+='<tr><td>'+esc(r['Bill ID'])+'</td><td>'+esc(r['Asset ID'])+'</td><td>'+esc(r['Issue ID']||'-')+'</td><td>'+esc(r['Vendor'])+'</td>'+
-            '<td>'+money(r['Total Amount'])+'</td><td>'+statusPill(r['Payment Status'])+'</td>'+
-            '<td>'+(hasFile?'<a class="link" href="'+esc(r['Drive File URL'])+'" target="_blank">view</a>':'<button class="btn sm" onclick="openBillProof(\''+esc(r['Bill ID'])+'\')">Add proof</button>')+'</td>'+
-            '<td><button class="btn sm ghost" onclick="askDelete(\'bill\',\''+esc(r['Bill ID'])+'\',loadBills)">Delete</button></td></tr>';
-        });
-        h+='</table>';
-      }
-      h+='</div>';
-      setView(h,tok);
-    });
-  });
-}
-
-/* ---------------- ADD FORMS (maintenance / movement / bill / issue) ---------------- */
-function selEl(id,opts,val){return '<select class="f" id="'+id+'">'+opts.map(function(o){return '<option'+(String(o)===String(val||'')?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select>';}
-
-function openMaint(assetId){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add maintenance &middot; '+esc(assetId)+'</h3>'+
-    '<label class="f">Event type</label>'+selEl('mt',LOOKUPS.maintTypes)+
-    '<label class="f">Event date</label><input class="f" id="md" type="date">'+
-    '<label class="f">Doer</label>'+selEl('mdo',[''].concat(LOOKUPS.doers))+
-    '<label class="f">Description</label><input class="f" id="mds">'+
-    '<label class="f">Action taken</label><textarea class="f" id="mat"></textarea>'+
-    '<label class="f">Parts used</label><input class="f" id="mpu">'+
-    '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="mv"></div>'+
-    '<div class="col"><label class="f">Cost</label><input class="f" id="mc" type="number" step="any"></div></div>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveMaint(\''+esc(assetId)+'\')">Save</button></div>');
-}
-function saveMaint(assetId){
-  var o={assetId:assetId,eventType:$('mt').value,eventDate:$('md').value,doer:$('mdo').value,
-    description:$('mds').value,actionTaken:$('mat').value,partsUsed:$('mpu').value,vendor:$('mv').value,cost:$('mc').value};
-  run('api_addMaintenance',[o],function(id){closeModal();toast('Maintenance '+id+' added');assetDetail(assetId);});
-}
-
-function openMove(assetId){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add movement &middot; '+esc(assetId)+'</h3>'+
-    '<label class="f">To location</label><input class="f" id="vto">'+
-    '<label class="f">Movement date</label><input class="f" id="vd" type="date">'+
-    '<label class="f">Moved by</label>'+selEl('vby',[''].concat(LOOKUPS.doers))+
-    '<label class="f">Reason</label><input class="f" id="vr">'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveMove(\''+esc(assetId)+'\')">Save</button></div>');
-}
-function saveMove(assetId){
-  var o={assetId:assetId,toLocation:$('vto').value,movementDate:$('vd').value,movedBy:$('vby').value,reason:$('vr').value};
-  run('api_addMovement',[o],function(id){closeModal();toast('Movement '+id+' added');assetDetail(assetId);});
-}
-
-function openIssue(assetId){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Raise issue &middot; '+esc(assetId)+'</h3>'+
-    '<label class="f">Issue type</label>'+selEl('it',LOOKUPS.issueTypes)+
-    '<label class="f">Problem</label><input class="f" id="ip">'+
-    '<div class="row"><div class="col"><label class="f">Severity</label>'+selEl('is',LOOKUPS.issueSeverity)+'</div>'+
-    '<div class="col"><label class="f">Priority</label>'+selEl('ipr',LOOKUPS.issuePriority)+'</div></div>'+
-    '<label class="f">Assign doer</label>'+selEl('ido',[''].concat(LOOKUPS.doers))+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveNewIssue(\''+esc(assetId)+'\')">Raise</button></div>');
-}
-function saveNewIssue(assetId){
-  var o={assetId:assetId,issueType:$('it').value,problem:$('ip').value,severity:$('is').value,priority:$('ipr').value,assignedDoer:$('ido').value};
-  run('api_createIssue',[o],function(id){closeModal();toast('Issue '+id+' raised');assetDetail(assetId);});
-}
-
-function openBill(assetId, issueId){
-  var proofReq = !!issueId;
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add bill'+(assetId?(' &middot; '+esc(assetId)):'')+'</h3>'+
-    (issueId?('<p style="color:var(--red);margin-bottom:8px">Against issue '+esc(issueId)+' - proof file is REQUIRED.</p>'):'')+
-    '<input type="hidden" id="bIssue" value="'+esc(issueId||'')+'">'+
-    '<label class="f">Asset ID</label><input class="f" id="ba" value="'+esc(assetId)+'">'+
-    '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="bv"></div>'+
-    '<div class="col"><label class="f">Invoice no.</label><input class="f" id="bin"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Invoice date</label><input class="f" id="bid" type="date"></div>'+
-    '<div class="col"><label class="f">Bill type</label>'+selEl('bt',LOOKUPS.billTypes)+'</div></div>'+
-    '<div class="row"><div class="col"><label class="f">Subtotal</label><input class="f" id="bs" type="number" step="any"></div>'+
-    '<div class="col"><label class="f">GST</label><input class="f" id="bg" type="number" step="any"></div></div>'+
-    '<label class="f">Payment status</label>'+selEl('bps',LOOKUPS.paymentStatus)+
-    '<label class="f">Attach bill / proof (PDF/image)'+(proofReq?' <span style="color:var(--red)">*required</span>':'')+'</label><input class="f" id="bf" type="file" accept="application/pdf,image/*">'+
-    '<div style="margin-top:14px"><button class="btn" id="bbtn" onclick="saveBill()">Save bill</button></div>');
-}
-function saveBill(){
-  var issueId=$('bIssue')?$('bIssue').value:'';
-  var o={assetId:$('ba').value,issueId:issueId,vendor:$('bv').value,invoiceNumber:$('bin').value,invoiceDate:$('bid').value,
-    billType:$('bt').value,subtotal:$('bs').value,gst:$('bg').value,paymentStatus:$('bps').value};
-  var fileInput=$('bf');
-  var hasFile=fileInput&&fileInput.files&&fileInput.files[0];
-  if(issueId&&!hasFile){toast('Proof file required for issue bills');return;}
-  var send=function(){
-    $('bbtn').disabled=true;$('bbtn').textContent='Saving...';
-    run('api_createBill',[o],function(res){closeModal();toast('Bill '+res.billId+' saved');
-      if(CURRENT==='bills')loadBills(); else if(CURRENT==='dashboard')loadDashboard(); else if(o.assetId)assetDetail(o.assetId);});
-  };
-  if(hasFile){
-    var f=fileInput.files[0],reader=new FileReader();
-    reader.onload=function(){o.file={base64:reader.result.split(',')[1],mimeType:f.type,filename:f.name};send();};
-    reader.readAsDataURL(f);
-  } else { send(); }
-}
-
-/* ---------------- SEARCH ---------------- */
-function doSearch(){
-  var q=$('q').value.trim();if(!q)return;
-  CURRENT='search';$('view').innerHTML='<div class="loader">Searching</div>';
-  Array.prototype.forEach.call(document.querySelectorAll('#tabs button'),function(b){b.classList.remove('active');});
-  run('api_search',[q],function(r){
-    var h='';
-    h+=searchBlock('Assets',r.assets,function(a){return '<a class="link" onclick="assetDetail(\''+esc(a['Asset ID'])+'\')">'+esc(a['Asset ID'])+'</a> &middot; '+esc(a['Asset Name']||a['Asset Name / Type']||'')+' ('+esc(a['Asset Type']||'')+')';});
-    h+=searchBlock('Issues',r.issues,function(a){return esc(a['Issue ID'])+' &middot; '+esc(a['Asset ID'])+' &middot; '+esc(a['Problem']);});
-    h+=searchBlock('Bills',r.bills,function(a){return esc(a['Bill ID'])+' &middot; '+esc(a['Vendor'])+' &middot; '+money(a['Total Amount']);});
-    h+=searchBlock('Tasks',r.tasks,function(a){return esc(a['Task ID'])+' &middot; '+esc(a['Task']);});
-    $('view').innerHTML=h||'<div class="empty">No results.</div>';
-  });
-}
-function searchBlock(title,rows,fmt){
-  if(!rows||!rows.length)return '';
-  return '<div class="section"><h2>'+title+' ('+rows.length+')</h2>'+rows.map(function(r){return '<div style="padding:6px 0;border-bottom:1px solid var(--line)">'+fmt(r)+'</div>';}).join('')+'</div>';
-}
-
-/* ---------------- MANAGE (sheet management from webapp) ---------------- */
-var MANAGE_SUB='machines';
-function loadManage(tok){
-  var subs=[['machines','Machines'],['checklist','Checklist'],['tasks','Tasks'],['doers','Doers'],
-    ['holidays','Holidays'],['leave','Leave'],['money','Money'],['config','Config'],['import','Import'],['scheduler','Sync / Scheduler'],['reset','Reset']];
-  var h='<div class="subtabs">'+subs.map(function(s){
-    return '<button id="sm_'+s[0]+'" class="'+(MANAGE_SUB===s[0]?'active':'')+'" onclick="manageSub(\''+s[0]+'\')">'+s[1]+'</button>';
-  }).join('')+'</div><div id="mgBody"><div class="loader">Loading</div></div>';
-  setView(h,tok);
-  var f={machines:manageMachines,checklist:manageChecklist,tasks:manageTasks,doers:manageDoers,
-    holidays:manageHolidays,leave:manageLeave,money:manageMoney,config:manageConfig,import:manageImport,scheduler:manageScheduler,reset:manageReset};
-  (f[MANAGE_SUB]||manageMachines)();
-}
-function manageSub(s){MANAGE_SUB=s;loadManage();}
-
-/* --- Manage: Machines (edit / deactivate) --- */
-function manageMachines(){
-  run('api_assetList',[],function(rows){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Machines ('+rows.length+')</h2><button class="btn sm" onclick="openAddMachine()">+ Add machine</button></div>';
-    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No machines.</div></div>';return;}
-    h+='<table><tr><th>ID</th><th>Name</th><th>Type</th><th>Location</th><th>Status</th><th></th></tr>';
-    rows.forEach(function(r){
-      h+='<tr><td>'+esc(r.assetId)+'</td><td>'+esc(r.name)+'</td><td>'+esc(r.type)+'</td><td>'+esc(r.location)+'</td>'+
-        '<td>'+statusPill(r.status)+'</td>'+
-        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick="editMachine(\''+esc(r.assetId)+'\')">Edit</button> '+
-        (String(r.status).toLowerCase()!=='inactive'?'<button class="btn sm ghost" onclick="deactivateMachine(\''+esc(r.assetId)+'\')">Deactivate</button>':'<button class="btn sm ghost" onclick="reactivateMachine(\''+esc(r.assetId)+'\')">Reactivate</button>')+'</td></tr>';
-    });
-    $('mgBody').innerHTML=h+'</table></div>';
-  });
-}
-function editMachine(id){
-  run('api_assetDetail',[id],function(d){
-    if(!d){toast('Not found');return;}
-    var o=d.overview;
-    var types=(LOOKUPS.assetTypes||[]).map(function(t){return '<option'+(t===o['Asset Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
-    var crit=(LOOKUPS.criticality||[]).map(function(t){return '<option'+(t===o['Criticality']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
-    openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Edit '+esc(id)+'</h3>'+
-      '<div class="row"><div class="col"><label class="f">Name</label><input class="f" id="emName" value="'+esc(o['Asset Name']||'')+'"></div>'+
-      '<div class="col"><label class="f">Type</label><select class="f" id="emType">'+types+'</select></div></div>'+
-      '<div class="row"><div class="col"><label class="f">Location</label><input class="f" id="emLoc" value="'+esc(o['Current Location']||o['Location']||'')+'"></div>'+
-      '<div class="col"><label class="f">Criticality</label><select class="f" id="emCrit">'+crit+'</select></div></div>'+
-      '<div class="row"><div class="col"><label class="f">Make</label><input class="f" id="emMake" value="'+esc(o['Make']||'')+'"></div>'+
-      '<div class="col"><label class="f">Model</label><input class="f" id="emModel" value="'+esc(o['Model']||'')+'"></div></div>'+
-      '<div class="row"><div class="col"><label class="f">Vendor</label><input class="f" id="emVendor" value="'+esc(o['Vendor']||'')+'"></div>'+
-      '<div class="col"><label class="f">Serial</label><input class="f" id="emSerial" value="'+esc(o['Serial Number']||'')+'"></div></div>'+
-      '<label class="f">Remarks</label><input class="f" id="emRem" value="'+esc(o['Remarks']||'')+'">'+
-      '<div style="margin-top:14px"><button class="btn" onclick="saveEditMachine(\''+esc(id)+'\')">Save</button></div>');
-  });
-}
-function saveEditMachine(id){
-  var patch={'Asset Name':$('emName').value,'Asset Type':$('emType').value,'Location':$('emLoc').value,
-    'Current Location':$('emLoc').value,'Criticality':$('emCrit').value,'Make':$('emMake').value,
-    'Model':$('emModel').value,'Vendor':$('emVendor').value,'Serial Number':$('emSerial').value,'Remarks':$('emRem').value};
-  run('api_updateAsset',[id,patch],function(){closeModal();toast('Machine updated');manageMachines();});
-}
-function deactivateMachine(id){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Deactivate '+esc(id)+'?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">This marks the machine Inactive - the scheduler will skip it. No data is deleted.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" onclick="confirmDeactivate(\''+esc(id)+'\')">Yes, deactivate</button>'+
-    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
-}
-function confirmDeactivate(id){
-  run('api_deactivateAsset',[id],function(){closeModal();toast(id+' deactivated');manageMachines();});
-}
-
-function reactivateMachine(id){
-  run('api_reactivateAsset',[id],function(){toast(id+' reactivated');manageMachines();});
-}
-
-/* generic delete with confirm */
-function askDelete(kind,id,after){
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Delete '+esc(id)+'?</h3>'+
-    '<p style="color:var(--muted);margin:8px 0 14px">This row will be permanently deleted. Cannot be undone.</p>'+
-    '<div style="display:flex;gap:8px"><button class="btn" onclick="doDelete(\''+kind+'\',\''+esc(id)+'\')">Yes, delete</button>'+
-    '<button class="btn ghost" onclick="closeModal()">Cancel</button></div>');
-  window.__afterDelete=after;
-}
-function doDelete(kind,id){
-  run('api_deleteRow',[kind,id],function(){closeModal();toast('Deleted');if(window.__afterDelete)window.__afterDelete();});
-}
-
-/* --- Manage: TASKS (scheduler defs) --- */
-function manageTasks(){
-  run('api_listTasks',[],function(rows){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Recurring tasks ('+rows.length+')</h2><button class="btn sm" onclick="editTask(null)">+ Add task</button></div>';
-    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No tasks. Add one - it feeds the scheduler.</div></div>';return;}
-    h+='<table><tr><th>ID</th><th>Task</th><th>Doer</th><th>Freq</th><th>Anchor</th><th>Scope</th><th>Active</th><th></th></tr>';
-    rows.forEach(function(r){
-      h+='<tr><td>'+esc(r['Task ID'])+'</td><td>'+esc(r['Task'])+'</td><td>'+esc(r['Doer Name'])+'</td>'+
-        '<td>'+esc(r['Frequency'])+'</td><td>'+esc(r['Anchor (Day/Date)'])+'</td><td>'+esc(r['Asset Scope'])+'</td>'+
-        '<td>'+statusPill(r['Active'])+'</td>'+
-        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editTask('+JSON.stringify(r)+')\'>Edit</button> '+
-        '<button class="btn sm ghost" onclick="toggleTask(\''+esc(r['Task ID'])+'\','+(String(r['Active']).toLowerCase()==='active'?'false':'true')+')">'+
-        (String(r['Active']).toLowerCase()==='active'?'Off':'On')+'</button></td></tr>';
-    });
-    $('mgBody').innerHTML=h+'</table><p style="color:var(--muted);margin-top:8px">After adding/editing tasks, open <b>Run Scheduler</b> to generate the dated checklist.</p></div>';
-  });
-}
-function editTask(r){
-  r=r||{};
-  var doers=[''].concat(LOOKUPS.doers||[]).map(function(d){return '<option'+(d===r['Doer Name']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
-  var freq=(LOOKUPS.frequencies||[]).map(function(d){return '<option'+(d===r['Frequency']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
-  var scope=(LOOKUPS.assetScopes||[]).map(function(d){return '<option'+(d===r['Asset Scope']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
-  var dept=(LOOKUPS.departments||[]).map(function(d){return '<option'+(d===r['Department']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(r['Task ID']?'Edit':'Add')+' Task</h3>'+
-    '<input type="hidden" id="tkId" value="'+esc(r['Task ID']||'')+'">'+
-    '<label class="f">Task</label><input class="f" id="tkTask" value="'+esc(r['Task']||'')+'">'+
-    '<div class="row"><div class="col"><label class="f">Doer</label><select class="f" id="tkDoer">'+doers+'</select></div>'+
-    '<div class="col"><label class="f">Department</label><select class="f" id="tkDept">'+dept+'</select></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Frequency</label><select class="f" id="tkFreq">'+freq+'</select></div>'+
-    '<div class="col"><label class="f">Anchor (day/date)</label><input class="f" id="tkAnchor" value="'+esc(r['Anchor (Day/Date)']||'')+'" placeholder="Monday / 1 / 1-Apr"></div></div>'+
-    '<label class="f">Asset Scope</label><select class="f" id="tkScope">'+scope+'</select>'+
-    '<p style="color:var(--muted);font-size:12px;margin-top:6px">Scope "All Active Assets" = task runs on every machine. "General" = one-off.</p>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveTask()">Save</button></div>');
-}
-function saveTask(){
-  var o={taskId:$('tkId').value,task:$('tkTask').value,doer:$('tkDoer').value,department:$('tkDept').value,
-    frequency:$('tkFreq').value,anchor:$('tkAnchor').value,scope:$('tkScope').value,active:'Active'};
-  if(!o.task){toast('Task name required');return;}
-  run('api_saveTask',[o],function(){closeModal();toast('Task saved');manageTasks();});
-}
-function toggleTask(id,on){run('api_toggleTask',[id,on],function(){toast('Updated');manageTasks();});}
-
-/* --- Manage: DOERS --- */
-function manageDoers(){
-  run('api_listDoers',[],function(rows){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Doers / staff ('+rows.length+')</h2><button class="btn sm" onclick="editDoer(null)">+ Add doer</button></div>';
-    if(!rows.length){$('mgBody').innerHTML=h+'<div class="empty">No doers.</div></div>';return;}
-    h+='<table><tr><th>Name</th><th>Dept</th><th>Email</th><th>Phone</th><th>Buddy</th><th>Active</th><th></th></tr>';
-    rows.forEach(function(r){
-      h+='<tr><td>'+esc(r['Doer Name'])+'</td><td>'+esc(r['Department'])+'</td><td>'+esc(r['Email'])+'</td>'+
-        '<td>'+esc(r['Phone Number'])+'</td><td>'+esc(r['Buddy'])+'</td><td>'+statusPill(r['Active'])+'</td>'+
-        '<td><button class="btn sm ghost" onclick=\'editDoer('+JSON.stringify(r)+')\'>Edit</button></td></tr>';
-    });
-    $('mgBody').innerHTML=h+'</table></div>';
-  });
-}
-function editDoer(r){
-  r=r||{};
-  var dept=(LOOKUPS.departments||[]).map(function(d){return '<option'+(d===r['Department']?' selected':'')+'>'+esc(d)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(r['Doer Name']?'Edit':'Add')+' Doer</h3>'+
-    '<input type="hidden" id="drOld" value="'+esc(r['Doer Name']||'')+'">'+
-    '<div class="row"><div class="col"><label class="f">Name</label><input class="f" id="drName" value="'+esc(r['Doer Name']||'')+'"></div>'+
-    '<div class="col"><label class="f">Department</label><select class="f" id="drDept">'+dept+'</select></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Email</label><input class="f" id="drEmail" value="'+esc(r['Email']||'')+'"></div>'+
-    '<div class="col"><label class="f">Phone</label><input class="f" id="drPhone" value="'+esc(r['Phone Number']||'')+'"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Reminder hour (0-23)</label><input class="f" id="drHour" type="number" min="0" max="23" value="'+esc(r['Email Reminder Hour']||'')+'"></div>'+
-    '<div class="col"><label class="f">Buddy</label><input class="f" id="drBuddy" value="'+esc(r['Buddy']||'')+'"></div></div>'+
-    '<label class="f">Active</label><select class="f" id="drActive"><option'+(String(r['Active']).toLowerCase()!=='inactive'?' selected':'')+'>Active</option><option'+(String(r['Active']).toLowerCase()==='inactive'?' selected':'')+'>Inactive</option></select>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveDoer()">Save</button></div>');
-}
-function saveDoer(){
-  var o={oldName:$('drOld').value,name:$('drName').value,department:$('drDept').value,email:$('drEmail').value,
-    phone:$('drPhone').value,reminderHour:$('drHour').value,buddy:$('drBuddy').value,active:$('drActive').value};
-  if(!o.name){toast('Name required');return;}
-  run('api_saveDoer',[o],function(){closeModal();toast('Doer saved');manageDoers();});
-}
-
-/* --- Manage: HOLIDAYS --- */
-function manageHolidays(){
-  run('api_listHolidays',[],function(rows){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Holidays ('+rows.length+')</h2><button class="btn sm" onclick="addHolidayModal()">+ Add holiday</button></div>';
-    if(!rows.length){h+='<div class="empty">No holidays.</div>';}
-    else{h+='<table><tr><th>Date</th><th>Day</th><th>Type</th><th>Name</th></tr>';
-      rows.forEach(function(r){h+='<tr><td>'+esc(r['Holiday Date'])+'</td><td>'+esc(r['Day Name'])+'</td><td>'+esc(r['Holiday Type'])+'</td><td>'+esc(r['Holiday Name'])+'</td></tr>';});
-      h+='</table>';}
-    $('mgBody').innerHTML=h+'</div>';
-  });
-}
-function addHolidayModal(){
-  var types=(LOOKUPS.holidayTypes||['GH','RH']).map(function(t){return '<option>'+esc(t)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add holiday</h3>'+
-    '<label class="f">Date</label><input class="f" id="hlDate" type="date">'+
-    '<div class="row"><div class="col"><label class="f">Type</label><select class="f" id="hlType">'+types+'</select></div>'+
-    '<div class="col"><label class="f">Name</label><input class="f" id="hlName"></div></div>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveHoliday()">Save</button></div>');
-}
-function saveHoliday(){
-  var o={date:$('hlDate').value,type:$('hlType').value,name:$('hlName').value};
-  if(!o.date){toast('Date required');return;}
-  run('api_addHoliday',[o],function(){closeModal();toast('Holiday added');manageHolidays();});
-}
-
-/* --- Manage: LEAVE --- */
-function manageLeave(){
-  run('api_listLeave',[],function(rows){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Leave ('+rows.length+')</h2><button class="btn sm" onclick="addLeaveModal()">+ Add leave</button></div>';
-    if(!rows.length){h+='<div class="empty">No leave records.</div>';}
-    else{h+='<table><tr><th>Doer</th><th>From</th><th>To</th><th>Reason</th><th>Buddy</th></tr>';
-      rows.forEach(function(r){h+='<tr><td>'+esc(r['Doer Name'])+'</td><td>'+esc(r['From Date'])+'</td><td>'+esc(r['To Date'])+'</td><td>'+esc(r['Reason'])+'</td><td>'+esc(r['Buddy'])+'</td></tr>';});
-      h+='</table>';}
-    $('mgBody').innerHTML=h+'</div>';
-  });
-}
-function addLeaveModal(){
-  var doers=[''].concat(LOOKUPS.doers||[]).map(function(d){return '<option>'+esc(d)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>Add leave</h3>'+
-    '<label class="f">Doer</label><select class="f" id="lvDoer">'+doers+'</select>'+
-    '<div class="row"><div class="col"><label class="f">From</label><input class="f" id="lvFrom" type="date"></div>'+
-    '<div class="col"><label class="f">To</label><input class="f" id="lvTo" type="date"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Reason</label><input class="f" id="lvReason"></div>'+
-    '<div class="col"><label class="f">Buddy (cover)</label><input class="f" id="lvBuddy"></div></div>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveLeave()">Save</button></div>');
-}
-function saveLeave(){
-  var o={doer:$('lvDoer').value,from:$('lvFrom').value,to:$('lvTo').value,reason:$('lvReason').value,buddy:$('lvBuddy').value};
-  if(!o.doer){toast('Doer required');return;}
-  run('api_addLeave',[o],function(){closeModal();toast('Leave added');manageLeave();});
-}
-
-/* --- Manage: CONFIG --- */
-function manageConfig(){
-  run('api_listConfig',[],function(rows){
-    var h='<div class="section"><h2>Config settings ('+rows.length+')</h2>';
-    if(!rows.length){h+='<div class="empty">No config. Run Setup first.</div>';}
-    else{h+='<table><tr><th>Key</th><th>Value</th><th>Description</th><th></th></tr>';
-      rows.forEach(function(r){
-        h+='<tr><td>'+esc(r.key)+'</td><td><input class="f" id="cfg_'+esc(r.key)+'" value="'+esc(r.value)+'" style="min-width:120px"></td>'+
-          '<td style="color:var(--muted);font-size:12px">'+esc(r.description)+'</td>'+
-          '<td><button class="btn sm" onclick="saveConfig(\''+esc(r.key)+'\')">Save</button></td></tr>';
-      });
-      h+='</table>';}
-    $('mgBody').innerHTML=h+'</div>';
-  });
-}
-function saveConfig(key){
-  var v=$('cfg_'+key).value;
-  run('api_setConfig',[key,v],function(){toast(key+' saved');});
-}
-
-/* --- Manage: MONEY FLOW --- */
-function manageMoney(){
-  run('api_moneyRows',[],function(rows){
-    var total=rows.reduce(function(s,r){return s+(Number(r['Total'])||0);},0);
-    var unpaid=rows.reduce(function(s,r){return s+(String(r['Payment Status']).toLowerCase()!=='paid'?(Number(r['Total'])||0):0);},0);
-    var h='<div class="section"><h2>Money flow ('+rows.length+' txns)</h2>'+
-      '<div class="cards"><div class="card info"><div class="k">Total</div><div class="v">'+money(total)+'</div></div>'+
-      '<div class="card bad"><div class="k">Unpaid</div><div class="v">'+money(unpaid)+'</div></div></div>';
-    if(!rows.length){h+='<div class="empty">No transactions.</div>';}
-    else{h+='<table><tr><th>ID</th><th>Date</th><th>Asset</th><th>Vendor</th><th>Type</th><th>Total</th><th>Status</th><th></th></tr>';
-      rows.forEach(function(r){
-        h+='<tr><td>'+esc(r['Transaction ID'])+'</td><td>'+esc(r['Date'])+'</td><td>'+esc(r['Asset ID'])+'</td>'+
-          '<td>'+esc(r['Vendor'])+'</td><td>'+esc(r['Type'])+'</td><td>'+money(r['Total'])+'</td><td>'+statusPill(r['Payment Status'])+'</td>'+
-          '<td><button class="btn sm ghost" onclick="askDelete(\'money\',\''+esc(r['Transaction ID'])+'\',manageMoney)">Del</button></td></tr>';
-      });
-      h+='</table>';}
-    $('mgBody').innerHTML=h+'</div>';
-  });
-}
-
-/* --- Manage: RUN SCHEDULER --- */
-function manageScheduler(){
-  $('mgBody').innerHTML='<div class="section"><h2>Sync / maintenance</h2>'+
-    '<p style="color:var(--muted);margin-bottom:12px"><b>Sync all</b> reconciles sheets (asset registry, warranty, refresh For PC). Tasks are NOT auto-generated - you assign them manually from Today\'s work.</p>'+
-    '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="syncBtn" onclick="runSyncAll()">Sync all now</button>'+
-    '<button class="btn ghost" id="fmtBtn" onclick="runFormat()">Format all sheets</button></div>'+
-    '<div id="schOut" style="margin-top:14px"></div></div>';
-}
-function runSyncAll(){
-  $('syncBtn').disabled=true;$('syncBtn').textContent='Syncing...';
-  run('api_syncAll',[],function(msg){
-    $('syncBtn').disabled=false;$('syncBtn').textContent='Sync all now';
-    $('schOut').innerHTML='<div class="pill green">Synced</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
-    toast('All sheets synced');
-  });
-}
-function runFormat(){
-  $('fmtBtn').disabled=true;$('fmtBtn').textContent='Formatting...';
-  run('api_formatSheets',[],function(msg){
-    $('fmtBtn').disabled=false;$('fmtBtn').textContent='Format all sheets';
-    $('schOut').innerHTML='<div class="pill green">Formatted</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
-    toast('All sheets formatted');
-  });
-}
-function runScheduler(){
-  $('schBtn').disabled=true;$('schBtn').textContent='Running...';
-  run('api_runScheduler',[],function(msg){
-    $('schBtn').disabled=false;$('schBtn').textContent='Generate + refresh now';
-    $('schOut').innerHTML='<div class="pill green">Done</div> <span style="color:var(--muted)">'+esc(msg)+'</span>';
-    toast('Scheduler run complete');
-  });
-}
-
-
-/* --- Manage: Checklist questions (CRUD) --- */
-function manageChecklist(){
-  run('api_checklistItems',[],function(items){
-    var h='<div class="section"><div style="display:flex;justify-content:space-between;align-items:center"><h2 style="border:0">Checklist questions ('+items.length+')</h2><button class="btn sm" onclick="editChecklistItem(null)">+ Add question</button></div>';
-    if(!items.length){$('mgBody').innerHTML=h+'<div class="empty">No questions. Add one, or seed templates from the sheet menu.</div></div>';return;}
-    h+='<table><tr><th>Type</th><th>Category</th><th>Question</th><th>Response</th><th>Min/Max</th><th>Active</th><th></th></tr>';
-    items.forEach(function(it){
-      var mm=(it['Minimum Value']||'')+((it['Minimum Value']||it['Maximum Value'])?' / ':'')+(it['Maximum Value']||'');
-      h+='<tr><td>'+esc(it['Asset Type'])+'</td><td>'+esc(it['Category'])+'</td><td>'+esc(it['Question'])+'</td>'+
-        '<td>'+esc(it['Response Type'])+'</td><td>'+esc(mm||'-')+'</td><td>'+statusPill(it['Active'])+'</td>'+
-        '<td style="white-space:nowrap"><button class="btn sm ghost" onclick=\'editChecklistItem('+JSON.stringify(it)+')\'>Edit</button> '+
-        '<button class="btn sm ghost" onclick="toggleItem(\''+esc(it['Item ID'])+'\','+(String(it['Active']).toLowerCase()==='active'?'false':'true')+')">'+
-        (String(it['Active']).toLowerCase()==='active'?'Off':'On')+'</button></td></tr>';
-    });
-    $('mgBody').innerHTML=h+'</table></div>';
-  });
-}
-function editChecklistItem(it){
-  it=it||{};
-  var types=(LOOKUPS.assetTypes||[]).map(function(t){return '<option'+(t===it['Asset Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
-  var rtypes=['OK / NOT OK','Yes / No','Done / Not Done','Numeric Reading','Text','Date','Time'].map(function(t){return '<option'+(t===it['Response Type']?' selected':'')+'>'+esc(t)+'</option>';}).join('');
-  openModal('<span class="close" onclick="closeModal()">&times;</span><h3>'+(it['Item ID']?'Edit':'Add')+' Question</h3>'+
-    '<input type="hidden" id="ciId" value="'+esc(it['Item ID']||'')+'">'+
-    '<div class="row"><div class="col"><label class="f">Asset type</label><select class="f" id="ciType">'+types+'</select></div>'+
-    '<div class="col"><label class="f">Category</label><input class="f" id="ciCat" value="'+esc(it['Category']||'')+'"></div></div>'+
-    '<label class="f">Question</label><input class="f" id="ciQ" value="'+esc(it['Question']||'')+'">'+
-    '<div class="row"><div class="col"><label class="f">Response type</label><select class="f" id="ciRT">'+rtypes+'</select></div>'+
-    '<div class="col"><label class="f">Unit</label><input class="f" id="ciUnit" value="'+esc(it['Unit']||'')+'"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Min (numeric)</label><input class="f" id="ciMin" type="number" step="any" value="'+esc(it['Minimum Value']||'')+'"></div>'+
-    '<div class="col"><label class="f">Max (numeric)</label><input class="f" id="ciMax" type="number" step="any" value="'+esc(it['Maximum Value']||'')+'"></div></div>'+
-    '<div class="row"><div class="col"><label class="f">Sequence</label><input class="f" id="ciSeq" type="number" value="'+esc(it['Sequence']||'')+'"></div>'+
-    '<div class="col"><label class="f">Frequency (blank=all)</label><input class="f" id="ciFreq" value="'+esc(it['Frequency']||'')+'"></div></div>'+
-    '<div style="margin-top:14px"><button class="btn" onclick="saveChecklistItem()">Save</button></div>');
-}
-function saveChecklistItem(){
-  var o={itemId:$('ciId').value,assetType:$('ciType').value,category:$('ciCat').value,question:$('ciQ').value,
-    responseType:$('ciRT').value,unit:$('ciUnit').value,min:$('ciMin').value,max:$('ciMax').value,
-    sequence:$('ciSeq').value,frequency:$('ciFreq').value,active:'Active'};
-  if(!o.question){toast('Question required');return;}
-  run('api_saveChecklistItem',[o],function(){closeModal();toast('Question saved');manageChecklist();});
-}
-function toggleItem(id,on){run('api_toggleChecklistItem',[id,on],function(){toast('Updated');manageChecklist();});}
-
-/* --- Manage: Bulk Upload (CSV paste or file) --- */
-var BULK_ROWS=[];
-var IMPORT_ROWS=[], IMPORT_TARGET='machines';
-var IMPORT_DEF={
-  machines:{label:'Machines',cols:'Name,Type,Location,Make,Model,Serial,Vendor,WarrantyEnd,GuaranteeEnd,Criticality,PurchaseCost',
-    sample:'Name,Type,Location,Make,Model,Serial,Vendor,WarrantyEnd,GuaranteeEnd,Criticality,PurchaseCost\nCorridor Light,Light,Block A,Philips,LED-100,LGT-201,Bright Elec,2027-06-30,2028-06-30,Low,2500\nBooster Pump,Pump,Pump House 2,Kirloskar,KP-10,PMP-777,Jai Pumps,2027-01-15,,Medium,18000',
-    prev:['name','type','location','warrantyend']},
-  checklist:{label:'Checklist questions',cols:'AssetType,Category,Question,ResponseType,Unit,Min,Max,Sequence,Frequency',
-    sample:'AssetType,Category,Question,ResponseType,Unit,Min,Max,Sequence,Frequency\nMotor,Thermal,Casing temperature,Numeric Reading,C,,80,1,\nLight,Physical,Any bulb fused?,Yes / No,,,,1,\nPump,Seal,Seal leakage?,OK / NOT OK,,,,2,',
-    prev:['assettype','category','question','responsetype']},
-  doers:{label:'Doers / staff',cols:'Name,Department,Email,Phone,Buddy',
-    sample:'Name,Department,Email,Phone,Buddy\nRavi Kumar,Maintenance,ravi@example.com,9800000001,Amit Singh\nAmit Singh,Maintenance,amit@example.com,9800000002,Ravi Kumar',
-    prev:['name','department','email','phone']},
-  tasks:{label:'Recurring tasks',cols:'Task,Doer,Department,Frequency,Anchor,Scope',
-    sample:'Task,Doer,Department,Frequency,Anchor,Scope\nDaily motor check,Ravi Kumar,Maintenance,Daily,,All Active Assets\nWeekly pump service,Amit Singh,Maintenance,Weekly,Monday,All Active Assets',
-    prev:['task','doer','frequency','scope']}
+  // Inline SVG brand mark (works in monochrome; copper accent)
+  logoSVG:
+    '<svg class="mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">' +
+    '<path d="M6 30 L24 6 L42 30" stroke="#B47745" stroke-width="3"/>' +
+    '<path d="M11 34 L24 17 L37 34" stroke="#F2EFE8" stroke-width="2.4"/>' +
+    '<path d="M16 38 L24 28 L32 38" stroke="#F2EFE8" stroke-width="2.4" opacity="0.7"/></svg>',
 };
-function manageImport(){
-  var opts=Object.keys(IMPORT_DEF).map(function(k){return '<option value="'+k+'"'+(k===IMPORT_TARGET?' selected':'')+'>'+IMPORT_DEF[k].label+'</option>';}).join('');
-  var def=IMPORT_DEF[IMPORT_TARGET];
-  var h='<div class="section"><h2>Import data</h2>'+
-    '<p style="color:var(--muted);margin-bottom:8px">Choose what you are importing, paste CSV (or a .csv file). Each row lands in its own sheet. IDs auto-generate.</p>'+
-    '<label class="f">Import into</label><select class="f" id="impTarget" onchange="importTargetChange()" style="max-width:260px">'+opts+'</select>'+
-    '<p class="small" style="margin-top:8px">Columns (header row required):<br><code>'+esc(def.cols)+'</code></p>'+
-    '<div style="margin:8px 0"><button class="btn sm ghost" onclick="fillSampleCSV()">Insert sample</button> '+
-    '<input type="file" id="csvFile" accept=".csv,text/csv" style="display:inline-block;margin-left:8px" onchange="readCSVFile()"></div>'+
-    '<textarea class="f" id="csvText" style="min-height:150px;font-family:monospace" placeholder="paste CSV here"></textarea>'+
-    '<div style="margin-top:10px"><button class="btn" onclick="parseImport()">Preview</button></div>'+
-    '<div id="impPreview"></div></div>';
-  $('mgBody').innerHTML=h;
-}
-function importTargetChange(){ IMPORT_TARGET=$('impTarget').value; manageImport(); }
-function fillSampleCSV(){ $('csvText').value=IMPORT_DEF[IMPORT_TARGET].sample; }
-function readCSVFile(){
-  var f=$('csvFile').files[0];if(!f)return;
-  var r=new FileReader();r.onload=function(){$('csvText').value=r.result;parseImport();};r.readAsText(f);
-}
-function parseCSV_(text){
-  var lines=String(text||'').trim().split(/\r?\n/).filter(function(l){return l.trim();});
-  if(lines.length<2)return {header:[],rows:[]};
-  function splitLine(l){
-    var out=[],cur='',q=false;
-    for(var i=0;i<l.length;i++){var c=l[i];
-      if(c==='"'){q=!q;}
-      else if(c===','&&!q){out.push(cur);cur='';}
-      else cur+=c;}
-    out.push(cur);return out.map(function(s){return s.trim();});
-  }
-  var header=splitLine(lines[0]).map(function(h){return h.toLowerCase().replace(/[^a-z0-9]/g,'');});
-  var rows=[];
-  for(var i=1;i<lines.length;i++){
-    var cells=splitLine(lines[i]);var o={};
-    header.forEach(function(h,idx){o[h]=cells[idx]||'';});
-    rows.push(o);
-  }
-  return {header:header,rows:rows};
-}
-function parseImport(){
-  var p=parseCSV_($('csvText').value);
-  if(!p.rows.length){$('impPreview').innerHTML='<div class="empty">Nothing to parse. Check the header row.</div>';return;}
-  IMPORT_ROWS=p.rows;
-  var prev=IMPORT_DEF[IMPORT_TARGET].prev;
-  var h='<div class="section"><h2>Preview ('+IMPORT_ROWS.length+' rows into '+esc(IMPORT_DEF[IMPORT_TARGET].label)+')</h2>'+
-    '<table><tr>'+prev.map(function(c){return '<th>'+esc(c)+'</th>';}).join('')+'</tr>';
-  IMPORT_ROWS.slice(0,50).forEach(function(r){ h+='<tr>'+prev.map(function(c){return '<td>'+esc(r[c]||'-')+'</td>';}).join('')+'</tr>'; });
-  h+='</table><div style="margin-top:12px"><button class="btn" id="impBtn" onclick="commitImport()">Import '+IMPORT_ROWS.length+' rows</button></div></div>';
-  $('impPreview').innerHTML=h;
-}
-function commitImport(){
-  if(!IMPORT_ROWS.length)return;
-  $('impBtn').disabled=true;$('impBtn').textContent='Importing...';
-  run('api_bulkImport',[IMPORT_TARGET,IMPORT_ROWS],function(res){
-    var m='Imported '+res.added+' into '+IMPORT_TARGET;
-    if(res.errors&&res.errors.length)m+=' ('+res.errors.length+' skipped)';
-    toast(m);
-    IMPORT_ROWS=[]; loadManage();
-  });
-}
 
-/* --- Manage: RESET / WIPE --- */
-function manageReset(){
-  $('mgBody').innerHTML='<div class="section"><h2>Reset / wipe data</h2>'+
-    '<div class="warn" style="border-left:4px solid var(--red);background:var(--redbg);padding:10px 12px;border-radius:0 6px 6px 0;margin-bottom:12px">'+
-    '<b>Danger.</b> This permanently deletes data rows (headers stay). Cannot be undone. Type <b>DELETE</b> to confirm.</div>'+
-    '<label class="f">What to wipe</label><select class="f" id="wipeScope" style="max-width:320px">'+
-    '<option value="transactions">Transactions (issues, bills, money, maintenance, movement, checklist answers)</option>'+
-    '<option value="lifecycle">Lifecycle (+ asset registry, checklist questions)</option>'+
-    '<option value="scheduler">Scheduler (Master + For PC only)</option>'+
-    '<option value="everything">EVERYTHING (all data sheets)</option>'+
-    '</select>'+
-    '<label class="f">Type DELETE to confirm</label><input class="f" id="wipeConfirm" placeholder="DELETE" style="max-width:200px">'+
-    '<div style="margin-top:14px"><button class="btn" id="wipeBtn" style="background:var(--red);border-color:var(--red)" onclick="commitWipe()">Wipe now</button></div></div>';
-}
-function commitWipe(){
-  var scope=$('wipeScope').value, conf=$('wipeConfirm').value;
-  if(conf!=='DELETE'){toast('Type DELETE to confirm');return;}
-  $('wipeBtn').disabled=true;$('wipeBtn').textContent='Wiping...';
-  run('api_wipeSheets',[scope,conf],function(res){
-    toast('Wiped '+res.cleared+' rows from '+res.sheets+' sheets');
-    MANAGE_SUB='machines';loadManage();
-  });
-}
+</script>
+<script>
+/* ============================================================
+   DEFAULT CONTENT (fallback when API_URL is empty, and the
+   seed the admin panel / Google Sheet starts from).
+   The admin CMS manages: Minerals, Gallery, Blog posts, Settings.
+   ============================================================ */
+window.DEFAULTS = {
+  images: {
+    heroHome: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=2000&q=80",
+    heroAbout: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=2000&q=80",
+    heroMinerals: "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=2000&q=80",
+    heroSourcing: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=2000&q=80",
+    heroOperations: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=2000&q=80",
+    heroWhy: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=2000&q=80",
+    heroGallery: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?auto=format&fit=crop&w=2000&q=80",
+    heroBlog: "https://images.unsplash.com/photo-1454942901704-3c44c11b2ad1?auto=format&fit=crop&w=2000&q=80",
+    heroContact: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=2000&q=80",
+    intro: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=1400&q=80",
+    sourcingBand: "https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?auto=format&fit=crop&w=2000&q=80",
+    ctaBand: "https://images.unsplash.com/photo-1454942901704-3c44c11b2ad1?auto=format&fit=crop&w=2000&q=80",
+  },
 
-/* ================= LIVE SYNC (sheet -> webapp) =================
- * A standalone page can't be pushed to from Google Sheets, so we POLL: every SYNC_MS we silently
- * re-run the current view. Webapp -> sheet is already instant (every action writes to the sheet).
- * onEdit on the sheet already auto-rebuilds For PC, so both sides stay in step. */
-var SYNC_MS=20000, _syncTimer=null;
-function refreshCurrent(){
-  if($('modalBg')&&$('modalBg').classList.contains('show')) return; // don't disturb an open form
-  _silent=true;
-  var tok=_viewToken;   // if the user switches tab before this returns, the render is dropped
-  try{
-    if(CURRENT==='dashboard')loadDashboard(tok);
-    else if(CURRENT==='today')loadToday(tok);
-    else if(CURRENT==='done')loadDone(tok);
-    else if(CURRENT==='assets')loadAssets(tok);
-    else if(CURRENT==='issues')loadIssues(tok);
-    else if(CURRENT==='bills')loadBills(tok);
-    else if(CURRENT==='reports')loadReports(tok);
-    else if(CURRENT==='manage')loadManage(tok);
-  }catch(e){}
-  setTimeout(function(){_silent=false;},50);
-}
-function startSync(){ stopSync(); _syncTimer=setInterval(refreshCurrent,SYNC_MS); }
-function stopSync(){ if(_syncTimer){clearInterval(_syncTimer);_syncTimer=null;} }
-function toggleSync(){
-  var on=$('autoSync')&&$('autoSync').checked;
-  $('syncDot').classList.toggle('on',on);
-  if(on)startSync(); else stopSync();
-}
-function manualRefresh(){ var b=$('refreshBtn'); if(b){b.style.transform='rotate(360deg)';b.style.transition='transform .5s';setTimeout(function(){b.style.transform='';},500);} refreshCurrent(); toast('Synced from sheet'); }
+  settings: {
+    heroTitle: "Powering industry through earth's resources.",
+    heroText: "Connecting mineral resources with industrial demand through dependable sourcing, quality-focused supply and business relationships.",
+    aboutText: "SP Mines & Minerals is a mineral-focused business engaged in mineral resources, sourcing, trading and supply — working to connect dependable material with industrial demand.",
+  },
 
-/* ---------------- REPORTS ---------------- */
-function loadReports(tok){
-  cachedRun('reports','api_report',[''],function(d){
-    var t=(d&&d.totals)||{}, doers=(d&&d.doers)||[];
-    var h='<div class="section"><h2>Overall</h2><div class="cards">'+
-      '<div class="card"><div class="k">Total tasks</div><div class="v">'+(t.total||0)+'</div></div>'+
-      '<div class="card ok"><div class="k">Done</div><div class="v">'+(t.done||0)+'</div></div>'+
-      '<div class="card warn"><div class="k">Pending</div><div class="v">'+(t.pending||0)+'</div></div>'+
-      '<div class="card bad"><div class="k">Missed (overdue)</div><div class="v">'+(t.overdue||0)+'</div></div>'+
-      '<div class="card"><div class="k">Deleted</div><div class="v">'+(t.deleted||0)+'</div></div>'+
-      '</div></div>';
-    h+='<div class="section"><h2>Doer performance ('+doers.length+')</h2>';
-    if(!doers.length){h+='<div class="empty">No data yet.</div>';}
-    else{
-      h+='<table><tr><th>Doer</th><th>Done</th><th>Pending</th><th>Missed</th><th>Deleted</th><th>Total</th><th>Completion</th></tr>';
-      doers.forEach(function(r){
-        var pill=r.completion>=80?'green':(r.completion>=50?'amber':'red');
-        h+='<tr><td>'+esc(r.doer)+'</td><td>'+r.done+'</td><td>'+r.pending+'</td>'+
-          '<td>'+(r.overdue?('<span class="pill red">'+r.overdue+'</span>'):'0')+'</td>'+
-          '<td>'+r.deleted+'</td><td>'+r.total+'</td>'+
-          '<td><span class="pill '+pill+'">'+r.completion+'%</span></td></tr>';
-      });
-      h+='</table>';
+  minerals: [
+    { id: "iron-ore", name: "Iron Ore", application: "Steel & Metallurgy", summary: "Primary raw material for iron and steel making.", description: "Iron ore is a core industrial raw material used as feedstock in iron and steel production. Supply is coordinated to buyer requirements.", applications: ["Steel Production", "Metallurgical Industry", "Foundries"], image: "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=1000&q=80" },
+    { id: "manganese-ore", name: "Manganese Ore", application: "Ferroalloys & Steel", summary: "Key alloying input for steel and ferroalloys.", description: "Manganese ore is widely used in steel manufacturing and ferroalloy production as an alloying and deoxidising agent.", applications: ["Ferroalloy Production", "Steel Alloying", "Metallurgical Industry"], image: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80" },
+    { id: "quartz", name: "Quartz", application: "Glass & Ceramics", summary: "High-silica mineral for glass, ceramics and more.", description: "Quartz is a hard, abundant silica mineral used across glass, ceramics and a range of industrial processes.", applications: ["Glass Manufacturing", "Ceramics", "Industrial Processing"], image: "https://images.unsplash.com/photo-1596996786264-4c3a6d8f1f1a?auto=format&fit=crop&w=1000&q=80" },
+    { id: "feldspar", name: "Feldspar", application: "Ceramics & Glass", summary: "Fluxing mineral for ceramics and glass.", description: "Feldspar is commonly used as a flux in ceramics and glass manufacturing, helping lower melting temperatures.", applications: ["Ceramics", "Glass Manufacturing", "Tiles & Sanitaryware"], image: "https://images.unsplash.com/photo-1518364538800-6bae3c2ea0f2?auto=format&fit=crop&w=1000&q=80" },
+    { id: "dolomite", name: "Dolomite", application: "Steel & Construction", summary: "Carbonate mineral for steel, construction and more.", description: "Dolomite is a carbonate mineral used in steelmaking as a flux and refractory material, as well as in construction.", applications: ["Steel Flux", "Construction", "Refractories"], image: "https://images.unsplash.com/photo-1609743522653-52354461eb27?auto=format&fit=crop&w=1000&q=80" },
+    { id: "limestone", name: "Limestone", application: "Cement & Construction", summary: "Versatile raw material for cement and industry.", description: "Limestone is a widely used industrial mineral, serving as a primary input for cement, lime and construction.", applications: ["Cement", "Construction", "Industrial Processing"], image: "https://images.unsplash.com/photo-1558478551-1a378f63328e?auto=format&fit=crop&w=1000&q=80" },
+    { id: "silica", name: "Silica", application: "Glass & Foundry", summary: "Industrial sand for glass, foundry and construction.", description: "Silica (industrial sand) is used across glass production, foundry casting, construction and filtration.", applications: ["Glass Manufacturing", "Foundry", "Construction"], image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80" },
+    { id: "coal", name: "Coal", application: "Energy & Industry", summary: "Industrial fuel and process input.", description: "Coal is supplied as an industrial fuel and process input across a range of sectors.", applications: ["Industrial Fuel", "Processing Industry", "Power & Heat"], image: "https://images.unsplash.com/photo-1623961990059-28356e226a77?auto=format&fit=crop&w=1000&q=80" },
+  ],
+
+  industries: [
+    { title: "Construction", description: "Raw materials supporting building and construction activity.", image: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1000&q=80" },
+    { title: "Infrastructure", description: "Bulk material inputs for infrastructure development.", image: "https://images.unsplash.com/photo-1545259741-2ea3ebf61fa3?auto=format&fit=crop&w=1000&q=80" },
+    { title: "Industrial Manufacturing", description: "Mineral feedstock for manufacturing processes.", image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" },
+    { title: "Metallurgical Industry", description: "Ores and fluxes for metal and alloy production.", image: "https://images.unsplash.com/photo-1533630018502-c2a2b6e5b0a1?auto=format&fit=crop&w=1000&q=80" },
+    { title: "Processing Industry", description: "Minerals as inputs for downstream processing.", image: "https://images.unsplash.com/photo-1531972111231-7482a960e109?auto=format&fit=crop&w=1000&q=80" },
+    { title: "Material Supply", description: "Dependable bulk supply coordination for industrial buyers.", image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1000&q=80" },
+  ],
+
+  gallery: [
+    { src: "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=1000&q=80", alt: "Iron ore close-up", category: "Minerals" },
+    { src: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80", alt: "Mineral ore texture", category: "Minerals" },
+    { src: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1000&q=80", alt: "Excavator at open-pit site", category: "Mining" },
+    { src: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=1000&q=80", alt: "Open-pit mine terraces", category: "Mining" },
+    { src: "https://images.unsplash.com/photo-1558478551-1a378f63328e?auto=format&fit=crop&w=1000&q=80", alt: "Bulk material stockpile", category: "Materials" },
+    { src: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1000&q=80", alt: "Loading operation", category: "Materials" },
+    { src: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80", alt: "Industrial processing", category: "Industrial" },
+    { src: "https://images.unsplash.com/photo-1531972111231-7482a960e109?auto=format&fit=crop&w=1000&q=80", alt: "Industrial warehouse", category: "Industrial" },
+    { src: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1000&q=80", alt: "Rocky mountain landscape", category: "Landscapes" },
+    { src: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?auto=format&fit=crop&w=1000&q=80", alt: "Quarry rock face", category: "Mining" },
+    { src: "https://images.unsplash.com/photo-1454942901704-3c44c11b2ad1?auto=format&fit=crop&w=1000&q=80", alt: "Arid mineral terrain", category: "Landscapes" },
+    { src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80", alt: "Silica sand grains", category: "Materials" },
+  ],
+
+  posts: [
+    { slug: "choosing-right-iron-ore-grade", title: "Choosing the Right Iron Ore Grade for Your Process", date: "2026-11-10", category: "Minerals", author: "SP Mines & Minerals", cover: "https://images.unsplash.com/photo-1605792657660-596af9009e82?auto=format&fit=crop&w=1400&q=80", excerpt: "Grade, size and consistency all shape how iron ore performs downstream. A short guide to what buyers should confirm before an order.", body: "Iron ore is not a single product — grade, lump-to-fines ratio and impurity levels all affect how it behaves in a furnace.\n\nBefore committing to a supply, confirm the material requirement with your process team: target Fe content, acceptable silica and alumina, and the size fraction your plant is set up for.\n\nAt SP Mines & Minerals, specifications are discussed per enquiry so the material matches the requirement rather than the other way around." },
+    { slug: "how-mineral-sourcing-works", title: "How Mineral Sourcing Actually Works", date: "2026-11-04", category: "Sourcing", author: "SP Mines & Minerals", cover: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1400&q=80", excerpt: "From a buyer's requirement to a coordinated supply — a plain look at the steps a sourcing enquiry moves through.", body: "A sourcing enquiry usually starts with a requirement, not a product.\n\nThe buyer describes what they need; we identify relevant sourcing opportunities, discuss specifications, coordinate the commercial side, and support delivery to agreed terms.\n\nClear communication at each step is what keeps a supply dependable." },
+    { slug: "industrial-minerals-in-construction", title: "Industrial Minerals That Quietly Build Everything", date: "2026-10-28", category: "Industry", author: "SP Mines & Minerals", cover: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1400&q=80", excerpt: "Limestone, silica, dolomite — the unglamorous minerals behind cement, glass and steel.", body: "Most of the built environment rests on a handful of industrial minerals.\n\nLimestone feeds cement. Silica makes glass and strengthens foundries. Dolomite fluxes steel. None of them make headlines, but construction and manufacturing stop without them.\n\nReliable supply of these materials is the quiet backbone of industry." },
+  ],
+};
+
+</script>
+<script>
+/* ============================================================
+   CONTENT LAYER
+   - If SITE.API_URL is set, pulls live content from the Google
+     Apps Script web app and merges it over the defaults.
+   - If not, the site runs entirely on data.js defaults.
+   Pages call: Content.load().then(data => render(data))
+   ============================================================ */
+window.Content = {
+  _cache: null,
+
+  async load() {
+    if (this._cache) return this._cache;
+    var data = JSON.parse(JSON.stringify(window.DEFAULTS));
+    var url = (window.SITE && window.SITE.API_URL) || "";
+    if (url) {
+      try {
+        var res = await fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "action=content", {
+          method: "GET",
+        });
+        var json = await res.json();
+        if (json && json.ok && json.data) {
+          ["minerals", "gallery", "posts", "industries"].forEach(function (k) {
+            if (Array.isArray(json.data[k]) && json.data[k].length) data[k] = json.data[k];
+          });
+          if (json.data.settings) Object.assign(data.settings, json.data.settings);
+        }
+      } catch (e) {
+        console.warn("[CMS] Live content unavailable, using built-in defaults.", e);
+      }
+    } else {
+      // Demo mode: merge any admin edits saved to localStorage (same browser).
+      try {
+        ["minerals", "gallery", "posts", "industries"].forEach(function (k) {
+          var o = localStorage.getItem("cms_" + k);
+          if (o) { var v = JSON.parse(o); if (Array.isArray(v)) data[k] = v; }
+        });
+        var s = localStorage.getItem("cms_settings");
+        if (s) Object.assign(data.settings, JSON.parse(s));
+      } catch (e) {}
     }
-    h+='</div>';
-    setView(h,tok);
-  });
-}
+    this._cache = data;
+    return data;
+  },
 
-/* ---------------- BOOT ---------------- */
-var BOOT_DASH=null;
-function boot(){
-  $('view').innerHTML=skeleton();
-  run('api_boot',[],function(d){
-    LOOKUPS=(d&&d.lookups)||{};
-    BOOT_DASH=(d&&d.dashboard)||null;
-    go('dashboard');
-  },{retry:boot});
-}
-boot();
+  post(slug) {
+    return this.load().then(function (d) {
+      return d.posts.find(function (p) { return p.slug === slug; });
+    });
+  },
+  mineral(id) {
+    return this.load().then(function (d) {
+      return d.minerals.find(function (m) { return m.id === id; });
+    });
+  },
+};
+
+/* Admin API (used by admin.js). Uses text/plain POST to avoid CORS preflight. */
+window.CMS = {
+  url() { return (window.SITE && window.SITE.API_URL) || ""; },
+  async call(action, payload, token) {
+    var url = this.url();
+    if (!url) throw new Error("API_URL not set in config.js");
+    var res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: action, token: token || "", payload: payload || {} }),
+    });
+    return res.json();
+  },
+};
+
+</script>
+<script>
+/* ============================================================
+   SHARED CHROME — builds header + footer on every page,
+   wires nav, mobile menu, scroll reveal, image fallback.
+   Requires config.js (window.SITE) loaded first.
+   ============================================================ */
+(function () {
+  "use strict";
+  var S = window.SITE;
+  window.$ = function (s, r) { return (r || document).querySelector(s); };
+  window.$$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  window.esc = function (x) { return String(x == null ? "" : x).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); };
+
+  function current() {
+    var p = location.pathname.split("/").pop();
+    return p === "" ? "index.html" : p;
+  }
+
+  function navItems(isMobile) {
+    var cur = current();
+    return S.nav.map(function (n) {
+      var active = n.href === cur ? " active" : "";
+      return '<a href="' + n.href + '" class="' + (active ? "active" : "") + '">' + esc(n.label) + "</a>";
+    }).join(isMobile ? "" : "");
+  }
+
+  function buildHeader() {
+    var host = $("#site-header");
+    if (!host) return;
+    var cur = current();
+    var links = S.nav.map(function (n) {
+      return '<li><a ' + (n.href === cur ? 'class="active" ' : "") + 'href="' + n.href + '">' + esc(n.label) + "</a></li>";
+    }).join("");
+    host.innerHTML =
+      '<header class="header">' +
+      '<div class="container nav">' +
+      '<a href="index.html" class="brand" aria-label="' + esc(S.brand) + ' home">' +
+      S.logoSVG +
+      '<span class="word"><b>' + esc(S.brandA) + '<span>' + esc(S.brandB) + "</span></b><small>" + esc(S.subline) + "</small></span>" +
+      "</a>" +
+      '<ul class="nav-links">' + links + "</ul>" +
+      '<a href="contact.html" class="btn btn-primary header-cta">Enquire Now</a>' +
+      '<button class="burger" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>' +
+      "</div></header>" +
+      '<nav class="mobile-menu">' +
+      S.nav.map(function (n) { return '<a ' + (n.href === cur ? 'class="active" ' : "") + 'href="' + n.href + '">' + esc(n.label) + "</a>"; }).join("") +
+      '<a href="contact.html" class="btn btn-primary">Enquire Now</a>' +
+      "</nav>";
+  }
+
+  function buildFooter() {
+    var host = $("#site-footer");
+    if (!host) return;
+    var c = S.contact;
+    var navLinks = S.nav.filter(function (n) { return n.href !== "index.html"; }).map(function (n) {
+      return '<li><a href="' + n.href + '">' + esc(n.label) + "</a></li>";
+    }).join("");
+    host.innerHTML =
+      '<footer class="footer"><div class="container top">' +
+      '<div><a href="index.html" class="brand">' + S.logoSVG +
+      '<span class="word"><b>' + esc(S.brandA) + '<span>' + esc(S.brandB) + "</span></b><small>" + esc(S.subline) + "</small></span></a>" +
+      '<p class="desc">' + esc(S.brand) + " — mineral sourcing, trading and bulk industrial supply, connecting mineral resources with industrial demand.</p></div>" +
+      '<div><h4>Company</h4><ul>' + navLinks + "</ul></div>" +
+      '<div><h4>Contact</h4><ul>' +
+      '<li><a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a></li>" +
+      '<li><a href="tel:' + esc(c.phone.replace(/\s/g, "")) + '">' + esc(c.phone) + "</a></li>" +
+      "<li>" + esc(c.address) + "</li></ul></div>" +
+      '<div><h4>Admin</h4><ul><li><a href="admin.html">Content Admin</a></li></ul>' +
+      '<p class="note" style="margin-top:12px;color:rgba(242,239,232,.35)">Contact details are placeholders — update in config.js.</p></div>' +
+      "</div>" +
+      '<div class="container bottom"><small>© <span id="yr"></span> ' + esc(S.brand) + ". All rights reserved.</small>" +
+      '<button class="to-top">Back to top <span class="circ"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span></button></div></footer>';
+  }
+
+  function initChrome() {
+    var header = $(".header");
+    function onScroll() { if (header) header.classList.toggle("solid", window.scrollY > 40); }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+
+    var burger = $(".burger"), menu = $(".mobile-menu");
+    function toggle(o) { if (menu) { menu.classList.toggle("open", o); document.body.style.overflow = o ? "hidden" : ""; } }
+    if (burger) burger.addEventListener("click", function () { toggle(!menu.classList.contains("open")); });
+    if (menu) $$("a", menu).forEach(function (a) { a.addEventListener("click", function () { toggle(false); }); });
+
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } });
+      }, { threshold: 0.12, rootMargin: "-40px" });
+      window.observeReveals = function () {
+        $$(".reveal:not(.visible)").forEach(function (el) { if (!el.dataset.obs) { el.dataset.obs = "1"; io.observe(el); } });
+      };
+    } else {
+      window.observeReveals = function () { $$(".reveal").forEach(function (el) { el.classList.add("visible"); }); };
+    }
+    window.observeReveals();
+
+    var tt = $(".to-top");
+    if (tt) tt.addEventListener("click", function () { window.scrollTo({ top: 0, behavior: "smooth" }); });
+
+    var yr = $("#yr"); if (yr) yr.textContent = new Date().getFullYear();
+    window.imgFallback();
+  }
+
+  window.imgFallback = function () {
+    $$("img").forEach(function (img) {
+      if (img.dataset.fbBound) return; img.dataset.fbBound = "1";
+      img.addEventListener("error", function () {
+        if (img.dataset.fb) return; img.dataset.fb = "1";
+        img.removeAttribute("src"); img.classList.add("img-fallback");
+        if (!img.style.minHeight) img.style.minHeight = "180px";
+      });
+    });
+  };
+
+  // Build chrome immediately (scripts are at end of body)
+  buildHeader();
+  buildFooter();
+  initChrome();
+})();
+
+</script>
+<script>
+/* ============================================================
+   PAGE LOGIC — renders data-driven content from Content.load()
+   Router keys off <body data-page="...">.
+   ============================================================ */
+(function () {
+  "use strict";
+  var page = document.body.getAttribute("data-page");
+  var qs = new URLSearchParams(location.search);
+
+  function afterRender() { window.imgFallback(); if (window.observeReveals) window.observeReveals(); }
+
+  /* ---------- shared lightbox ---------- */
+  var LB = null, lbList = [], lbIdx = 0;
+  function ensureLB() {
+    if (LB) return;
+    LB = document.createElement("div");
+    LB.className = "lightbox";
+    LB.innerHTML =
+      '<button class="lb-btn lb-close" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>' +
+      '<button class="lb-btn lb-prev" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>' +
+      '<img src="" alt="" />' +
+      '<button class="lb-btn lb-next" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>';
+    document.body.appendChild(LB);
+    var img = LB.querySelector("img");
+    function show() { img.src = lbList[lbIdx].src; img.alt = lbList[lbIdx].alt || ""; }
+    function close() { LB.classList.remove("open"); document.body.style.overflow = ""; }
+    function step(d) { lbIdx = (lbIdx + d + lbList.length) % lbList.length; show(); }
+    LB.addEventListener("click", function (e) { if (e.target === LB) close(); });
+    LB.querySelector(".lb-close").addEventListener("click", close);
+    LB.querySelector(".lb-prev").addEventListener("click", function (e) { e.stopPropagation(); step(-1); });
+    LB.querySelector(".lb-next").addEventListener("click", function (e) { e.stopPropagation(); step(1); });
+    document.addEventListener("keydown", function (e) {
+      if (!LB.classList.contains("open")) return;
+      if (e.key === "Escape") close(); if (e.key === "ArrowRight") step(1); if (e.key === "ArrowLeft") step(-1);
+    });
+    LB._open = function (list, i) { lbList = list; lbIdx = i; show(); LB.classList.add("open"); document.body.style.overflow = "hidden"; };
+  }
+  function openLightbox(list, i) { ensureLB(); LB._open(list, i); }
+
+  /* ---------- card builders ---------- */
+  function mineralCard(m) {
+    return '<article class="card reveal"><div class="thumb"><img src="' + esc(m.image) + '" alt="' + esc(m.name) + '"/>' +
+      '<span class="tag">' + esc(m.application) + "</span></div>" +
+      '<div class="body"><h3>' + esc(m.name) + "</h3><p>" + esc(m.summary) + "</p>" +
+      '<div class="foot"><a href="mineral.html?id=' + encodeURIComponent(m.id) + '">View Details <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>' +
+      '<a class="enq" href="contact.html?mineral=' + encodeURIComponent(m.name) + '">Enquire</a></div></div></article>';
+  }
+  function galleryTile(g, i) {
+    return '<button class="g" data-cat="' + esc(g.category) + '" data-i="' + i + '"><img src="' + esc(g.src) + '" alt="' + esc(g.alt) + '"/></button>';
+  }
+  function postCard(p) {
+    return '<a class="post-card reveal" href="post.html?slug=' + encodeURIComponent(p.slug) + '">' +
+      '<div class="thumb"><img src="' + esc(p.cover) + '" alt="' + esc(p.title) + '"/></div>' +
+      '<div class="body"><span class="meta">' + esc(fmtDate(p.date)) + " · " + esc(p.category) + "</span>" +
+      "<h3>" + esc(p.title) + "</h3><p>" + esc(p.excerpt) + "</p>" +
+      '<span class="more">Read more <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div></a>';
+  }
+  function fmtDate(d) { try { return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); } catch (e) { return d; } }
+
+  /* ---------- renderers ---------- */
+  var R = {
+    home: function (d) {
+      if ($("#hero-title") && d.settings.heroTitle) $("#hero-title").textContent = d.settings.heroTitle;
+      if ($("#hero-text") && d.settings.heroText) $("#hero-text").textContent = d.settings.heroText;
+      if ($("#about-text") && d.settings.aboutText) $("#about-text").textContent = d.settings.aboutText;
+      var mg = $("#mineral-grid"); if (mg) mg.innerHTML = d.minerals.slice(0, 8).map(mineralCard).join("");
+      var gg = $("#gallery-grid");
+      if (gg) {
+        var items = d.gallery.slice(0, 9);
+        gg.innerHTML = items.map(galleryTile).join("");
+        $$(".g", gg).forEach(function (b) { b.addEventListener("click", function () { openLightbox(items, +b.dataset.i); }); });
+      }
+    },
+    minerals: function (d) {
+      var host = $("#catalog"); if (!host) return;
+      var cats = ["All"].concat(d.minerals.map(function (m) { return m.application; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
+      var state = { q: "", cat: "All" };
+      function draw() {
+        var list = d.minerals.filter(function (m) {
+          var okC = state.cat === "All" || m.application === state.cat;
+          var q = state.q.toLowerCase();
+          var okQ = !q || m.name.toLowerCase().indexOf(q) > -1 || m.summary.toLowerCase().indexOf(q) > -1;
+          return okC && okQ;
+        });
+        grid.innerHTML = list.length ? list.map(mineralCard).join("") : '<p class="note" style="grid-column:1/-1;text-align:center">No minerals match your search.</p>';
+        afterRender();
+      }
+      host.innerHTML =
+        '<div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;margin-bottom:28px">' +
+        '<input id="msearch" type="search" placeholder="Search minerals…" style="border:1px solid rgba(23,26,24,.15);border-radius:3px;padding:12px 15px;font-size:.9rem;min-width:240px;outline:none"/>' +
+        '<div class="filters" id="mcats" style="margin:0"></div></div>' +
+        '<div class="grid c3" id="mgrid"></div>';
+      var grid = $("#mgrid");
+      $("#mcats").innerHTML = cats.map(function (c) { return '<button class="' + (c === "All" ? "active" : "") + '" data-c="' + esc(c) + '">' + esc(c) + "</button>"; }).join("");
+      $$("#mcats button").forEach(function (b) { b.addEventListener("click", function () { $$("#mcats button").forEach(function (x) { x.classList.remove("active"); }); b.classList.add("active"); state.cat = b.dataset.c; draw(); }); });
+      $("#msearch").addEventListener("input", function (e) { state.q = e.target.value; draw(); });
+      draw();
+    },
+    mineral: function (d) {
+      var m = d.minerals.find(function (x) { return x.id === qs.get("id"); });
+      var host = $("#detail"); if (!host) return;
+      if (!m) { host.innerHTML = '<div class="container section"><h1>Mineral not found</h1><p class="note">This item may have been renamed. <a href="minerals.html" style="color:var(--copper)">Back to minerals</a>.</p></div>'; return; }
+      document.title = m.name + " · " + SITE.brand;
+      var related = d.minerals.filter(function (x) { return x.id !== m.id; }).slice(0, 3);
+      host.innerHTML =
+        '<section class="bg-dark" style="padding-top:112px"><div class="container split" style="padding:56px 0">' +
+        '<div><div class="crumbs"><a href="index.html">Home</a><span class="sep">/</span><a href="minerals.html">Minerals</a><span class="sep">/</span><span style="color:var(--copper)">' + esc(m.name) + "</span></div>" +
+        '<span class="eyebrow" style="margin-top:20px">' + esc(m.application) + "</span>" +
+        '<h1 style="margin-top:14px;font-size:clamp(2.2rem,5vw,3.4rem);color:var(--mineral);font-weight:800">' + esc(m.name) + "</h1>" +
+        '<p style="margin-top:18px;max-width:46ch;color:rgba(242,239,232,.72);line-height:1.7">' + esc(m.description) + "</p>" +
+        '<a href="contact.html?mineral=' + encodeURIComponent(m.name) + '" class="btn btn-primary" style="margin-top:26px">Enquire About ' + esc(m.name) + "</a></div>" +
+        '<div class="media r43"><img src="' + esc(m.image) + '" alt="' + esc(m.name) + '"/></div>' +
+        "</div></section>" +
+        '<section class="section bg-min"><div class="container"><h2 style="font-size:1.6rem;font-weight:800">Industry Applications</h2>' +
+        '<div class="grid c3" style="margin-top:22px">' + (m.applications || []).map(function (a) { return '<div style="background:#fff;border:1px solid rgba(23,26,24,.1);border-radius:4px;padding:16px 18px;font-weight:500;font-size:.9rem">' + esc(a) + "</div>"; }).join("") + "</div>" +
+        '<p class="note" style="margin-top:28px;max-width:60ch">Grades, chemical composition, sizes and origin are confirmed per enquiry and are not listed until supplied.</p>' +
+        '<h2 style="margin-top:48px;font-size:1.4rem;font-weight:800">Related minerals</h2>' +
+        '<div class="grid c3" style="margin-top:22px">' + related.map(mineralCard).join("") + "</div></div></section>";
+    },
+    gallery: function (d) {
+      var host = $("#gallery-full"); if (!host) return;
+      var cats = ["All"].concat(d.gallery.map(function (g) { return g.category; }).filter(function (v, i, a) { return a.indexOf(v) === i; }));
+      host.innerHTML = '<div class="filters" id="gcats"></div><div class="masonry" id="gmason"></div>';
+      $("#gcats").innerHTML = cats.map(function (c) { return '<button class="' + (c === "All" ? "active" : "") + '" data-c="' + esc(c) + '">' + esc(c) + "</button>"; }).join("");
+      function draw(cat) {
+        var list = cat === "All" ? d.gallery : d.gallery.filter(function (g) { return g.category === cat; });
+        $("#gmason").innerHTML = list.map(galleryTile).join("");
+        $$("#gmason .g").forEach(function (b) { b.addEventListener("click", function () { openLightbox(list, +b.dataset.i); }); });
+        afterRender();
+      }
+      $$("#gcats button").forEach(function (b) { b.addEventListener("click", function () { $$("#gcats button").forEach(function (x) { x.classList.remove("active"); }); b.classList.add("active"); draw(b.dataset.c); }); });
+      draw("All");
+    },
+    blog: function (d) {
+      var host = $("#blog-list"); if (!host) return;
+      host.innerHTML = d.posts.length ? d.posts.map(postCard).join("") : '<p class="note">No posts yet.</p>';
+    },
+    post: function (d) {
+      var p = d.posts.find(function (x) { return x.slug === qs.get("slug"); });
+      var host = $("#post"); if (!host) return;
+      if (!p) { host.innerHTML = '<div class="container section"><h1>Post not found</h1><p class="note"><a href="blog.html" style="color:var(--copper)">Back to blog</a></p></div>'; return; }
+      document.title = p.title + " · " + SITE.brand;
+      var bodyHtml = String(p.body || "").split(/\n{2,}/).map(function (para) { return "<p>" + esc(para) + "</p>"; }).join("");
+      host.innerHTML =
+        '<section class="phero" style="min-height:52vh"><div class="bg"><img src="' + esc(p.cover) + '" alt="' + esc(p.title) + '"/></div><div class="ov"></div>' +
+        '<div class="container inner"><div class="crumbs"><a href="index.html">Home</a><span class="sep">/</span><a href="blog.html">Blog</a></div>' +
+        '<span class="eyebrow" style="margin-top:14px">' + esc(p.category) + " · " + esc(fmtDate(p.date)) + "</span>" +
+        '<h1 style="margin-top:12px">' + esc(p.title) + "</h1></div></section>" +
+        '<section class="section bg-min"><div class="container"><div class="article">' + bodyHtml +
+        '<p style="margin-top:32px"><a href="blog.html" class="btn btn-dark">← All posts</a></p></div></div></section>';
+    },
+  };
+
+  /* ---------- contact form ---------- */
+  function initContact() {
+    var form = $("#enquiry-form"); if (!form) return;
+    var pre = qs.get("mineral"); if (pre) { var sel = form.querySelector('[name="mineral"]'); if (sel) sel.value = pre; }
+    var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/, phoneRe = /^[+\d][\d\s\-()]{6,}$/;
+    function setErr(n, m) { var f = form.querySelector('[name="' + n + '"]'), e = form.querySelector('[data-err="' + n + '"]'); if (f) f.classList.toggle("invalid", !!m); if (e) e.textContent = m || ""; }
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var v = function (n) { var el = form.querySelector('[name="' + n + '"]'); return el ? el.value.trim() : ""; };
+      var ok = true;
+      if (!v("name")) { setErr("name", "Please enter your name."); ok = false; } else setErr("name");
+      if (!v("phone")) { setErr("phone", "Please enter a phone number."); ok = false; } else if (!phoneRe.test(v("phone"))) { setErr("phone", "Enter a valid phone number."); ok = false; } else setErr("phone");
+      if (!v("email")) { setErr("email", "Please enter an email."); ok = false; } else if (!emailRe.test(v("email"))) { setErr("email", "Enter a valid email."); ok = false; } else setErr("email");
+      if (!v("message")) { setErr("message", "Please add a message."); ok = false; } else setErr("message");
+      if (!ok) return;
+      var btn = form.querySelector('button[type="submit"]'); btn.disabled = true; var lbl = btn.innerHTML; btn.textContent = "Sending…";
+      var payload = {}; $$("[name]", form).forEach(function (el) { payload[el.name] = el.value.trim(); });
+      function done(okSend) { form.classList.add("hidden"); $("#form-ok").classList.remove("hidden"); btn.disabled = false; btn.innerHTML = lbl; form.reset(); }
+      if (window.SITE.API_URL) {
+        window.CMS.call("enquiry", payload).then(function () { done(true); }).catch(function () { done(false); });
+      } else {
+        setTimeout(function () { done(false); }, 900);
+      }
+    });
+    var again = $("#send-again"); if (again) again.addEventListener("click", function () { $("#form-ok").classList.add("hidden"); form.classList.remove("hidden"); });
+  }
+
+  /* ---------- boot ---------- */
+  Content.load().then(function (d) {
+    if (R[page]) R[page](d);
+    afterRender();
+    initContact();
+  });
+})();
+
 </script>
 </body>
 </html>
